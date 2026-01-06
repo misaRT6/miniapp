@@ -1,33 +1,476 @@
 <!doctype html>
-<html>
+<html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <title>Auction Mini App</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portals-style Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root{
+      --bg:#0b0b0f;
+      --card:#14141a;
+      --card2:#101018;
+      --muted:#9aa0a6;
+      --text:#f2f3f5;
+      --line:rgba(255,255,255,.08);
+      --btn:#2a2a34;
+      --accent:#2f6bff;
+      --good:#3ddc84;
+      --bad:#ff5c5c;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{max-width:980px;margin:0 auto;padding:14px 14px 92px;}
+    .top{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:10px;margin-bottom:12px;
+    }
+    .pill{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:10px 12px;
+      display:flex;align-items:center;gap:10px;
+      min-width:120px;
+    }
+    .pill small{color:var(--muted)}
+    .title{
+      font-size:22px;font-weight:700;
+      margin:6px 0 8px;
+    }
+
+    .tabs{
+      display:flex;gap:14px;
+      font-weight:650;
+      font-size:20px;
+      margin:6px 0 10px;
+    }
+    .tab{color:rgba(255,255,255,.45);cursor:pointer}
+    .tab.active{color:var(--text)}
+    .filters{
+      display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+      margin:10px 0 14px;
+    }
+    .select, .chipbtn{
+      background:var(--card);
+      border:1px solid var(--line);
+      color:var(--text);
+      border-radius:14px;
+      padding:10px 12px;
+      font-size:14px;
+    }
+    .chipbtn{cursor:pointer}
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:12px;
+    }
+    @media (min-width:860px){
+      .grid{grid-template-columns: repeat(3, minmax(0,1fr));}
+    }
+    .card{
+      background:linear-gradient(180deg,var(--card),var(--card2));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      min-height:160px;
+      display:flex;flex-direction:column;justify-content:space-between;
+    }
+    .card h4{margin:0 0 4px;font-size:16px}
+    .meta{color:var(--muted);font-size:13px}
+    .priceRow{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+    .btn{
+      background:var(--btn);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      color:var(--text);
+      font-weight:650;
+      cursor:pointer;
+    }
+    .btn.primary{background:var(--accent);border-color:transparent}
+    .btn.good{background:rgba(61,220,132,.18);border-color:rgba(61,220,132,.35)}
+    .btn.bad{background:rgba(255,92,92,.14);border-color:rgba(255,92,92,.35)}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+
+    .panel{
+      margin-top:14px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:12px;
+    }
+    .panel h3{margin:0 0 10px;font-size:16px}
+    .input{
+      width:100%;
+      background:#0f0f16;
+      border:1px solid var(--line);
+      color:var(--text);
+      border-radius:14px;
+      padding:12px;
+      outline:none;
+    }
+    .muted{color:var(--muted);font-size:13px}
+    .hr{height:1px;background:var(--line);margin:12px 0}
+
+    /* bottom nav */
+    .bottom{
+      position:fixed;left:0;right:0;bottom:0;
+      background:rgba(10,10,14,.92);
+      border-top:1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+    .nav{
+      max-width:980px;margin:0 auto;
+      display:flex;justify-content:space-around;
+      padding:10px 10px;
+    }
+    .nav a{
+      color:rgba(255,255,255,.55);
+      text-decoration:none;
+      font-size:12px;
+      display:flex;flex-direction:column;align-items:center;gap:6px;
+      padding:6px 10px;border-radius:14px;
+    }
+    .nav a.active{color:var(--text);background:rgba(255,255,255,.06)}
+    .dot{width:22px;height:22px;border-radius:8px;background:rgba(255,255,255,.08);display:inline-block}
+    pre{white-space:pre-wrap;word-break:break-word;color:#cbd0d6;margin:8px 0 0}
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <div class="top">
+      <div class="pill">
+        <div class="dot"></div>
+        <div>
+          <div id="userTag" style="font-weight:700">...</div>
+          <small id="userId" class="muted"></small>
+        </div>
+      </div>
 
-<h2 id="user"></h2>
-<button onclick="loadMe()">Мой аккаунт</button>
+      <div class="pill" style="justify-content:space-between;min-width:220px">
+        <div>
+          <small class="muted">Balance</small>
+          <div style="font-weight:800" id="balText">0 TON</div>
+        </div>
+        <button class="btn" onclick="openWithdrawTon()">Withdraw</button>
+      </div>
+    </div>
 
-<pre id="out"></pre>
+    <div class="title">All items</div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="all" onclick="setTab('all')">All items</div>
+      <div class="tab" data-tab="collections" onclick="setTab('collections')">Collections</div>
+      <div class="tab" data-tab="bundles" onclick="setTab('bundles')">Bundles</div>
+    </div>
+
+    <div class="filters">
+      <select class="select" id="modelFilter">
+        <option value="all">Model: All</option>
+      </select>
+      <select class="select" id="bgFilter">
+        <option value="all">Background: All</option>
+      </select>
+      <button class="chipbtn" onclick="refresh()">Refresh</button>
+      <button class="chipbtn" onclick="openCreateAuction()">Create auction</button>
+      <button class="chipbtn" onclick="openWithdrawNft()">Withdraw NFT</button>
+      <button class="chipbtn" onclick="openMyWithdrawals()">My withdrawals</button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="panel" id="panel" style="display:none"></div>
+
+    <div class="panel">
+      <h3>Debug</h3>
+      <div class="muted">Если что-то не работает — сюда падает ответ API.</div>
+      <pre id="debug"></pre>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="nav">
+      <a class="active" href="javascript:void(0)" onclick="setNav('store', this)"><span class="dot"></span><span>Store</span></a>
+      <a href="javascript:void(0)" onclick="setNav('gifts', this)"><span class="dot"></span><span>My gifts</span></a>
+      <a href="javascript:void(0)" onclick="setNav('season', this)"><span class="dot"></span><span>Season</span></a>
+      <a href="javascript:void(0)" onclick="setNav('profile', this)"><span class="dot"></span><span>Profile</span></a>
+    </div>
+  </div>
 
 <script>
-const tg = window.Telegram.WebApp;
-tg.ready();
+  const tg = window.Telegram.WebApp;
+  tg.ready();
 
-document.getElementById("user").innerText =
-  "@" + (tg.initDataUnsafe?.user?.username || tg.initDataUnsafe?.user?.id);
+  const API = "https://api.growagardentrade.online"; // ваш API домен
+  const state = { tab: "all", me: null };
 
-async function loadMe() {
-  const r = await fetch("https://api.YOUR_DOMAIN/me", {
-    headers: { "Authorization": tg.initData }
-  });
-  const data = await r.json();
-  document.getElementById("out").innerText =
-    JSON.stringify(data, null, 2);
-}
+  function setTab(name){
+    state.tab = name;
+    document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab===name));
+    refresh();
+  }
+  function setNav(name, el){
+    document.querySelectorAll(".nav a").forEach(a=>a.classList.remove("active"));
+    el.classList.add("active");
+    // пока просто визуально, можно потом сделать отдельные экраны
+  }
+
+  async function api(path, method="GET", body=null){
+    const opt = { method, headers: { "Authorization": tg.initData } };
+    if(body){
+      opt.headers["Content-Type"]="application/json";
+      opt.body = JSON.stringify(body);
+    }
+    const r = await fetch(API+path, opt);
+    const txt = await r.text();
+    let data;
+    try{ data = JSON.parse(txt); }catch{ data = { raw: txt }; }
+    if(!r.ok) throw new Error(data?.error || txt);
+    return data;
+  }
+
+  function setDebug(x){ document.getElementById("debug").textContent = typeof x==="string"?x:JSON.stringify(x,null,2); }
+
+  function renderCards(){
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+    const items = (state.me?.my_nfts || []).map(n => ({
+      type:"nft",
+      title: n.nft_address.slice(0,10)+"…",
+      subtitle: n.status,
+      price: null,
+      nft: n.nft_address
+    }));
+
+    const auctions = (state.auctions || []).map(a => ({
+      type:"auction",
+      title: a.nft_address.slice(0,10)+"…",
+      subtitle: `bid: ${a.current_bid} TON • ends: ${new Date(a.ends_at).toLocaleString()}`,
+      price: a.current_bid,
+      id: a.id
+    }));
+
+    const mix = [...auctions, ...items];
+    if(mix.length === 0){
+      grid.innerHTML = `<div class="muted">No items yet. Add NFT (admin) or create auctions.</div>`;
+      return;
+    }
+
+    for(const it of mix){
+      const el = document.createElement("div");
+      el.className = "card";
+      el.innerHTML = `
+        <div>
+          <h4>${it.type==="auction" ? "Auction" : "Gift"}</h4>
+          <div style="font-weight:800;font-size:18px">${it.title}</div>
+          <div class="meta">${it.subtitle}</div>
+        </div>
+        <div class="priceRow">
+          <div class="meta">${it.price ? (it.price+" TON") : ""}</div>
+          ${
+            it.type==="auction"
+            ? `<button class="btn primary" onclick="openBid(${it.id})">Bid</button>`
+            : `<button class="btn" onclick="openSellHint('${it.nft}')">Open</button>`
+          }
+        </div>
+      `;
+      grid.appendChild(el);
+    }
+  }
+
+  async function refresh(){
+    try{
+      state.me = await api("/me");
+      state.auctions = (await api("/auctions")).items;
+
+      const u = tg.initDataUnsafe?.user;
+      document.getElementById("userTag").textContent = u?.username ? "@"+u.username : "User";
+      document.getElementById("userId").textContent = u?.id ? "id: "+u.id : "";
+
+      document.getElementById("balText").textContent =
+        `${state.me.balance.available_ton} TON`;
+
+      renderCards();
+      setDebug({ok:true});
+    }catch(e){
+      setDebug(String(e.message||e));
+    }
+  }
+
+  function showPanel(html){
+    const p = document.getElementById("panel");
+    p.style.display = "block";
+    p.innerHTML = html;
+    p.scrollIntoView({behavior:"smooth"});
+  }
+  function closePanel(){
+    const p = document.getElementById("panel");
+    p.style.display = "none";
+    p.innerHTML = "";
+  }
+
+  function openCreateAuction(){
+    showPanel(`
+      <h3>Create auction</h3>
+      <div class="muted">Min start 1 TON, min increment 1 TON, fee 2%.</div>
+      <div class="hr"></div>
+      <input class="input" id="nftAddr" placeholder="NFT address (EQ...)" />
+      <div style="height:8px"></div>
+      <input class="input" id="durH" placeholder="Duration hours (default 24)" />
+      <div style="height:10px"></div>
+      <div class="row">
+        <button class="btn primary" onclick="doCreateAuction()">Create</button>
+        <button class="btn" onclick="closePanel()">Close</button>
+      </div>
+      <pre id="pout"></pre>
+    `);
+  }
+  async function doCreateAuction(){
+    try{
+      const nft = document.getElementById("nftAddr").value.trim();
+      const h = document.getElementById("durH").value.trim();
+      const body = { nft_address: nft };
+      if(h) body.duration_hours = Number(h);
+      const res = await api("/auction/create","POST",body);
+      document.getElementById("pout").textContent = JSON.stringify(res,null,2);
+      await refresh();
+    }catch(e){
+      document.getElementById("pout").textContent = String(e.message||e);
+    }
+  }
+
+  function openBid(id){
+    showPanel(`
+      <h3>Bid on auction #${id}</h3>
+      <div class="muted">Your bid will be reserved. Previous leader gets funds back.</div>
+      <div class="hr"></div>
+      <input class="input" id="bidAmount" placeholder="Amount TON (e.g. 5)" />
+      <div style="height:10px"></div>
+      <div class="row">
+        <button class="btn primary" onclick="doBid(${id})">Place bid</button>
+        <button class="btn" onclick="doFinalize(${id})">Finalize</button>
+        <button class="btn" onclick="closePanel()">Close</button>
+      </div>
+      <pre id="pout"></pre>
+    `);
+  }
+  async function doBid(id){
+    try{
+      const amt = document.getElementById("bidAmount").value.trim();
+      const res = await api("/auction/bid","POST",{auction_id:id, amount_ton: amt});
+      document.getElementById("pout").textContent = JSON.stringify(res,null,2);
+      await refresh();
+    }catch(e){
+      document.getElementById("pout").textContent = String(e.message||e);
+    }
+  }
+  async function doFinalize(id){
+    try{
+      const res = await api("/auction/finalize","POST",{auction_id:id});
+      document.getElementById("pout").textContent = JSON.stringify(res,null,2);
+      await refresh();
+    }catch(e){
+      document.getElementById("pout").textContent = String(e.message||e);
+    }
+  }
+
+  function openWithdrawNft(){
+    showPanel(`
+      <h3>Withdraw NFT (0.2 TON)</h3>
+      <div class="muted">Will charge 0.2 TON and mark NFT as withdrawn. Actual transfer is manual for now.</div>
+      <div class="hr"></div>
+      <input class="input" id="wnft" placeholder="NFT address (EQ...)" />
+      <div style="height:8px"></div>
+      <input class="input" id="waddr" placeholder="Destination wallet (EQ...)" />
+      <div style="height:10px"></div>
+      <div class="row">
+        <button class="btn primary" onclick="doWithdrawNft()">Withdraw</button>
+        <button class="btn" onclick="closePanel()">Close</button>
+      </div>
+      <pre id="pout"></pre>
+    `);
+  }
+  async function doWithdrawNft(){
+    try{
+      const nft = document.getElementById("wnft").value.trim();
+      const addr = document.getElementById("waddr").value.trim();
+      const res = await api("/nft/withdraw","POST",{nft_address:nft, destination_wallet:addr});
+      document.getElementById("pout").textContent = JSON.stringify(res,null,2);
+      await refresh();
+    }catch(e){
+      document.getElementById("pout").textContent = String(e.message||e);
+    }
+  }
+
+  function openWithdrawTon(){
+    showPanel(`
+      <h3>Withdraw TON</h3>
+      <div class="muted">Creates a withdrawal request. Payout is manual now (later automation).</div>
+      <div class="hr"></div>
+      <input class="input" id="tamt" placeholder="Amount TON (e.g. 6)" />
+      <div style="height:8px"></div>
+      <input class="input" id="taddr" placeholder="Destination wallet (EQ...)" />
+      <div style="height:10px"></div>
+      <div class="row">
+        <button class="btn primary" onclick="doWithdrawTon()">Create request</button>
+        <button class="btn" onclick="closePanel()">Close</button>
+      </div>
+      <pre id="pout"></pre>
+    `);
+  }
+  async function doWithdrawTon(){
+    try{
+      const amt = document.getElementById("tamt").value.trim();
+      const addr = document.getElementById("taddr").value.trim();
+      const res = await api("/ton/withdraw","POST",{amount_ton:amt, destination_wallet:addr});
+      document.getElementById("pout").textContent = JSON.stringify(res,null,2);
+      await refresh();
+    }catch(e){
+      document.getElementById("pout").textContent = String(e.message||e);
+    }
+  }
+
+  function openMyWithdrawals(){
+    showPanel(`
+      <h3>My TON withdrawals</h3>
+      <div class="muted">History of withdrawal requests.</div>
+      <div class="hr"></div>
+      <div class="row">
+        <button class="btn" onclick="loadMyWithdrawals()">Refresh</button>
+        <button class="btn" onclick="closePanel()">Close</button>
+      </div>
+      <pre id="pout"></pre>
+    `);
+    loadMyWithdrawals();
+  }
+  async function loadMyWithdrawals(){
+    try{
+      const res = await api("/my/withdrawals","GET");
+      document.getElementById("pout").textContent = JSON.stringify(res,null,2);
+    }catch(e){
+      document.getElementById("pout").textContent = String(e.message||e);
+    }
+  }
+
+  function openSellHint(nft){
+    showPanel(`
+      <h3>Item</h3>
+      <div class="muted">NFT: ${nft}</div>
+      <div class="hr"></div>
+      <div class="row">
+        <button class="btn primary" onclick="openCreateAuction()">Create auction</button>
+        <button class="btn" onclick="closePanel()">Close</button>
+      </div>
+    `);
+  }
+
+  refresh();
 </script>
-
 </body>
 </html>
