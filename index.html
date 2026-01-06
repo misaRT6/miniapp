@@ -4,334 +4,49 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
   <title>Gifts Wallet</title>
+
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- TON CONNECT UI (официальная библиотека) -->
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+
   <style>
-    :root{
-      --bg:#0b0b0f;
-      --card:#121219;
-      --card2:#0f0f16;
-      --text:#f2f3f5;
-      --muted:rgba(255,255,255,.55);
-      --muted2:rgba(255,255,255,.35);
-      --line:rgba(255,255,255,.08);
-      --btn:#1a1a23;
-      --btn2:#171720;
-      --accent:#2f6bff;
-      --good:#3ddc84;
-      --bad:#ff5c5c;
-      --radius:18px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-    .wrap{max-width:980px;margin:0 auto;padding:14px 14px 92px;}
-    .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
-    .topbar .left{display:flex;align-items:center;gap:10px}
-    .pill{
-      display:flex;align-items:center;gap:10px;
-      padding:10px 12px;border-radius:999px;
-      background:var(--card);border:1px solid var(--line);
-    }
-    .dot{width:22px;height:22px;border-radius:8px;background:rgba(255,255,255,.08)}
-    .u1{font-weight:800}
-    .u2{font-size:12px;color:var(--muted)}
-    .tabs{
-      display:flex;gap:16px;
-      font-weight:800;font-size:26px;
-      margin:8px 0 10px;
-    }
-    .tab{color:var(--muted2);cursor:pointer}
-    .tab.active{color:var(--text)}
-    .subtabs{
-      display:flex;gap:12px;margin:10px 0 12px;
-    }
-    .seg{
-      flex:1;text-align:center;
-      padding:10px 12px;border-radius:999px;
-      background:var(--btn2);
-      border:1px solid var(--line);
-      color:var(--muted);
-      font-weight:800;
-      cursor:pointer;
-    }
-    .seg.active{background:rgba(255,255,255,.06);color:var(--text)}
-    .btnrow{display:flex;gap:10px;margin:10px 0 12px}
-    .bigbtn{
-      flex:1;
-      background:var(--btn);
-      border:1px solid var(--line);
-      color:var(--text);
-      border-radius:16px;
-      padding:14px 12px;
-      font-weight:900;
-      display:flex;flex-direction:column;gap:4px;
-      cursor:pointer;
-    }
-    .bigbtn span{font-size:12px;color:var(--muted)}
-    .filters{
-      display:flex;gap:10px;align-items:center;flex-wrap:wrap;
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:10px;
-      margin:8px 0 12px;
-    }
-    .input{
-      flex:1;min-width:180px;
-      background:var(--card2);
-      border:1px solid var(--line);
-      color:var(--text);
-      border-radius:14px;
-      padding:12px;
-      outline:none;
-    }
-    .iconbtn{
-      width:44px;height:44px;border-radius:14px;
-      background:var(--btn2);
-      border:1px solid var(--line);
-      cursor:pointer;
-    }
-    .muted{color:var(--muted);font-size:13px}
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:12px;
-    }
-    @media (min-width:860px){
-      .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-    }
-    .carditem{
-      background:linear-gradient(180deg,var(--card),var(--card2));
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:14px;
-      min-height:150px;
-      display:flex;flex-direction:column;justify-content:space-between;
-    }
-    .carditem h4{margin:0 0 6px;font-size:14px;color:var(--muted)}
-    .addr{font-size:16px;font-weight:900}
-    .meta{font-size:12px;color:var(--muted);margin-top:6px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .btn{
-      background:var(--btn);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:10px 12px;
-      color:var(--text);
-      font-weight:900;
-      cursor:pointer;
-    }
+    :root{--bg:#0b0b0f;--card:#121219;--line:rgba(255,255,255,.08);--text:#f2f3f5;--muted:rgba(255,255,255,.55);--accent:#2f6bff;--radius:18px}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    .wrap{max-width:980px;margin:0 auto;padding:14px 14px 92px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:12px 0}
+    .btn{background:#1a1a23;border:1px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--text);font-weight:900;cursor:pointer}
     .btn.primary{background:var(--accent);border-color:transparent}
-    .btn.good{background:rgba(61,220,132,.18);border-color:rgba(61,220,132,.35)}
-    .btn.bad{background:rgba(255,92,92,.14);border-color:rgba(255,92,92,.35)}
-    .panel{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:12px;
-      margin-top:12px;
-      display:none;
-    }
-    .panel h3{margin:0 0 10px;font-size:16px}
-    .hr{height:1px;background:var(--line);margin:12px 0}
-    pre{white-space:pre-wrap;word-break:break-word;color:#cbd0d6;margin:8px 0 0}
-
-    /* Wallet card (как на скрине) */
-    .walletCard{
-      border-radius:22px;
-      padding:14px;
-      background:linear-gradient(180deg, rgba(56,165,255,.85), rgba(32,108,180,.85));
-      border:1px solid rgba(255,255,255,.18);
-      overflow:hidden;
-      position:relative;
-      margin:10px 0 14px;
-    }
-    .walletTop{
-      display:flex;align-items:center;justify-content:space-between;
-      margin-bottom:10px;
-      font-weight:800;
-    }
-    .walletTop small{opacity:.9;font-weight:700}
-    .walletBal{
-      font-size:46px;
-      font-weight:1000;
-      line-height:1;
-      margin:8px 0 12px;
-      letter-spacing:-.02em;
-    }
-    .walletActions{display:flex;gap:10px}
-    .wbtn{
-      flex:1;
-      border-radius:16px;
-      padding:14px 12px;
-      border:1px solid rgba(255,255,255,.25);
-      font-weight:1000;
-      cursor:pointer;
-      background:rgba(255,255,255,.18);
-      color:var(--text);
-    }
-    .wbtn.white{
-      background:rgba(255,255,255,.92);
-      color:#0b0b0f;
-      border-color:transparent;
-    }
-
-    /* Activity list */
-    .list{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      overflow:hidden;
-    }
-    .li{
-      padding:14px 12px;
-      border-top:1px solid var(--line);
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-    }
-    .li:first-child{border-top:none}
-    .li .left{display:flex;flex-direction:column;gap:4px}
-    .li .t{font-weight:900}
-    .li .s{font-size:12px;color:var(--muted)}
-    .amt{font-weight:1000}
-    .amt.good{color:var(--good)}
-    .amt.bad{color:var(--bad)}
-
-    /* bottom nav */
-    .bottom{
-      position:fixed;left:0;right:0;bottom:0;
-      background:rgba(10,10,14,.92);
-      border-top:1px solid var(--line);
-      backdrop-filter: blur(10px);
-    }
-    .nav{
-      max-width:980px;margin:0 auto;
-      display:flex;justify-content:space-around;
-      padding:10px;
-    }
-    .nav a{
-      color:rgba(255,255,255,.55);
-      text-decoration:none;
-      font-size:12px;
-      display:flex;flex-direction:column;align-items:center;gap:6px;
-      padding:6px 10px;border-radius:14px;
-      cursor:pointer;
-    }
-    .nav a.active{color:var(--text);background:rgba(255,255,255,.06)}
-    .ico{width:22px;height:22px;border-radius:8px;background:rgba(255,255,255,.08)}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .input{width:100%;background:#0f0f16;border:1px solid var(--line);border-radius:14px;color:var(--text);padding:12px;outline:none}
+    .muted{color:var(--muted);font-size:13px}
+    pre{white-space:pre-wrap;word-break:break-word;color:#cbd0d6;margin:10px 0 0}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="topbar">
-      <div class="left">
-        <div class="pill">
-          <div class="dot"></div>
-          <div>
-            <div class="u1" id="userTag">User</div>
-            <div class="u2" id="userId">id: -</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="pill" style="justify-content:space-between;min-width:210px">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
         <div>
-          <div class="u2">Balance</div>
-          <div style="font-weight:1000" id="balTop">0 TON</div>
+          <div style="font-weight:1000;font-size:18px">Wallet</div>
+          <div class="muted" id="who">not connected</div>
         </div>
-        <button class="btn" onclick="openWallet()">Wallet</button>
-      </div>
-    </div>
-
-    <div class="tabs">
-      <div class="tab active" id="tabGifts" onclick="setMain('gifts')">Gifts</div>
-      <div class="tab" id="tabWallet" onclick="setMain('wallet')">Wallet</div>
-      <div class="tab" id="tabAct" onclick="setMain('activity')">My activity</div>
-    </div>
-
-    <!-- GIFTS SCREEN -->
-    <div id="screenGifts">
-      <div class="subtabs">
-        <div class="seg active" id="segUnlisted" onclick="setGiftSeg('unlisted')">Unlisted <span id="cntUnlisted">0</span></div>
-        <div class="seg" id="segListed" onclick="setGiftSeg('listed')">Listed <span id="cntListed">0</span></div>
+        <div id="tonconnect-button"></div>
       </div>
 
-      <div class="btnrow">
-        <button class="bigbtn" onclick="openDeposit()"><b>+</b><span>Add (Deposit)</span></button>
-        <button class="bigbtn" onclick="openWithdrawNft()"><b>⤴</b><span>Withdraw</span></button>
-        <button class="bigbtn" onclick="openSellInfo()"><b>🛒</b><span>Sell</span></button>
-        <button class="bigbtn" onclick="openSendInfo()"><b>↗</b><span>Send</span></button>
+      <div style="height:12px"></div>
+
+      <div style="font-size:42px;font-weight:1000;letter-spacing:-.02em" id="bal">0.00 TON</div>
+      <div class="muted">Deposit подтверждается через Telegram Wallet (TON Connect), как на твоём скрине.</div>
+
+      <div style="height:12px"></div>
+
+      <div class="row">
+        <button class="btn primary" onclick="openDeposit()">Deposit</button>
+        <button class="btn" onclick="refresh()">Refresh</button>
       </div>
 
-      <div class="filters">
-        <input class="input" id="giftSearch" placeholder="Search by ID or Name" oninput="renderGifts()" />
-        <button class="iconbtn" title="Refresh" onclick="refresh()">⟳</button>
-        <button class="iconbtn" title="Clear filter" onclick="clearGiftFilter()">✕</button>
-      </div>
-
-      <div class="grid" id="giftGrid"></div>
-      <div class="muted" id="giftEmpty" style="text-align:center;margin-top:22px;display:none">
-        If there are no gifts<br/>
-        <span class="muted2">You can buy them in the marketplace</span>
-      </div>
-    </div>
-
-    <!-- WALLET SCREEN -->
-    <div id="screenWallet" style="display:none">
-      <div class="walletCard">
-        <div class="walletTop">
-          <div>
-            <div style="font-weight:1000">Portals wallet balance</div>
-            <small id="walletAddrMini"></small>
-          </div>
-          <div style="opacity:.9;font-weight:900" id="walletSmall">0 TON</div>
-        </div>
-
-        <div class="walletBal" id="walletBal">0.00 TON</div>
-
-        <div class="walletActions">
-          <button class="wbtn white" onclick="openDeposit()">Deposit +</button>
-          <button class="wbtn" onclick="openWithdrawTon()">Withdraw ↑</button>
-        </div>
-      </div>
-
-      <div class="muted">
-        Deposit: вы отправляете TON на наш депозит-кошелёк. Зачисление в баланс Mini App сейчас делает админ. Позже добавим авто-зачисление.
-      </div>
-    </div>
-
-    <!-- ACTIVITY SCREEN -->
-    <div id="screenAct" style="display:none">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0 10px">
-        <div style="font-weight:1000;font-size:26px">Recent Actions</div>
-        <button class="btn" onclick="loadActivity()">Refresh</button>
-      </div>
-
-      <div class="list" id="actList"></div>
-      <div class="muted" id="actEmpty" style="display:none;margin-top:10px">No activity yet.</div>
-    </div>
-
-    <!-- PANEL / MODALS -->
-    <div class="panel" id="panel"></div>
-
-    <!-- DEBUG -->
-    <div class="panel" style="display:block">
-      <h3>Debug</h3>
-      <div class="muted">Если что-то не работает — сюда падает ошибка API.</div>
       <pre id="debug"></pre>
-    </div>
-  </div>
-
-  <div class="bottom">
-    <div class="nav">
-      <a class="active" id="navStore" onclick="setMain('gifts'); setNav('store', this)"><span class="ico"></span><span>Store</span></a>
-      <a id="navGifts" onclick="setMain('gifts'); setNav('gifts', this)"><span class="ico"></span><span>My gifts</span></a>
-      <a id="navWallet" onclick="setMain('wallet'); setNav('wallet', this)"><span class="ico"></span><span>Wallet</span></a>
-      <a id="navProfile" onclick="setMain('activity'); setNav('profile', this)"><span class="ico"></span><span>Profile</span></a>
     </div>
   </div>
 
@@ -339,357 +54,89 @@
   const tg = window.Telegram.WebApp;
   tg.ready();
 
-  // ВАЖНО: ваш быстрый API
   const API = "https://api.growagardentrade.online";
-
-  // ДЕПОЗИТНЫЙ КОШЕЛЁК (куда пользователи отправляют TON)
-  // Поставьте ваш адрес (custody) сюда:
-  const DEPOSIT_WALLET = "EQ______________________________";
-
-  let state = {
-    me: null,
-    giftSeg: "unlisted"
-  };
+  const DEPOSIT_WALLET = "EQ______________________________"; // <-- ВСТАВЬ СВОЙ
 
   function setDebug(x){ document.getElementById("debug").textContent = typeof x==="string"?x:JSON.stringify(x,null,2); }
 
   async function api(path, method="GET", body=null){
     const opt = { method, headers: { "Authorization": tg.initData } };
-    if(body){
-      opt.headers["Content-Type"]="application/json";
-      opt.body = JSON.stringify(body);
-    }
+    if(body){ opt.headers["Content-Type"]="application/json"; opt.body = JSON.stringify(body); }
     const r = await fetch(API+path, opt);
-    const txt = await r.text();
-    let data;
-    try{ data = JSON.parse(txt); }catch{ data = { raw: txt }; }
-    if(!r.ok) throw new Error(data?.error || txt);
+    const t = await r.text();
+    let data; try{ data = JSON.parse(t); }catch{ data = { raw: t }; }
+    if(!r.ok) throw new Error(data?.error || t);
     return data;
   }
 
-  function setMain(which){
-    document.getElementById("tabGifts").classList.toggle("active", which==="gifts");
-    document.getElementById("tabWallet").classList.toggle("active", which==="wallet");
-    document.getElementById("tabAct").classList.toggle("active", which==="activity");
+  // TON Connect UI init
+  const tc = new TON_CONNECT_UI.TonConnectUI({
+    manifestUrl: `${location.origin}/tonconnect-manifest.json`,
+    buttonRootId: 'tonconnect-button'
+  });
 
-    document.getElementById("screenGifts").style.display = which==="gifts" ? "" : "none";
-    document.getElementById("screenWallet").style.display = which==="wallet" ? "" : "none";
-    document.getElementById("screenAct").style.display = which==="activity" ? "" : "none";
-
-    closePanel();
-
-    if(which==="activity") loadActivity();
-  }
-  function setNav(name, el){
-    document.querySelectorAll(".nav a").forEach(a=>a.classList.remove("active"));
-    el.classList.add("active");
-  }
-  function openWallet(){
-    setMain("wallet");
-    setNav("wallet", document.getElementById("navWallet"));
-  }
-
-  function setGiftSeg(seg){
-    state.giftSeg = seg;
-    document.getElementById("segUnlisted").classList.toggle("active", seg==="unlisted");
-    document.getElementById("segListed").classList.toggle("active", seg==="listed");
-    renderGifts();
-  }
-
-  function showPanel(html){
-    const p = document.getElementById("panel");
-    p.style.display = "block";
-    p.innerHTML = html;
-    p.scrollIntoView({behavior:"smooth"});
-  }
-  function closePanel(){
-    const p = document.getElementById("panel");
-    p.style.display = "none";
-    p.innerHTML = "";
-  }
-
-  function clearGiftFilter(){
-    document.getElementById("giftSearch").value = "";
-    renderGifts();
-  }
-
-  function shortAddr(a){
-    if(!a) return "";
-    if(a.length <= 12) return a;
-    return a.slice(0,6)+"…"+a.slice(-6);
-  }
-
-  function renderGifts(){
-    const grid = document.getElementById("giftGrid");
-    const empty = document.getElementById("giftEmpty");
-    grid.innerHTML = "";
-
-    const q = (document.getElementById("giftSearch").value || "").trim().toLowerCase();
-    const all = (state.me?.my_nfts || []).map(n => ({
-      nft_address: n.nft_address,
-      status: n.status,
-      // сейчас “листинг” не реализован (аукцион/маркет)
-      listed: false
-    }));
-
-    const unlisted = all.filter(x => !x.listed && x.status !== "withdrawn");
-    const listed = all.filter(x => x.listed);
-
-    document.getElementById("cntUnlisted").textContent = unlisted.length;
-    document.getElementById("cntListed").textContent = listed.length;
-
-    const items = state.giftSeg === "listed" ? listed : unlisted;
-    const filtered = items.filter(it => !q || it.nft_address.toLowerCase().includes(q));
-
-    if(filtered.length === 0){
-      empty.style.display = "";
+  // show connected wallet
+  tc.onStatusChange((w) => {
+    const el = document.getElementById("who");
+    if(!w){
+      el.textContent = "not connected";
       return;
     }
-    empty.style.display = "none";
-
-    for(const it of filtered){
-      const el = document.createElement("div");
-      el.className = "carditem";
-      el.innerHTML = `
-        <div>
-          <h4>Gift</h4>
-          <div class="addr">${shortAddr(it.nft_address)}</div>
-          <div class="meta">Status: ${it.status}</div>
-        </div>
-        <div class="row">
-          <button class="btn" onclick="openGift('${it.nft_address}')">Open</button>
-          <button class="btn primary" onclick="openWithdrawNft('${it.nft_address}')">Withdraw</button>
-        </div>
-      `;
-      grid.appendChild(el);
-    }
-  }
-
-  function openGift(nft){
-    showPanel(`
-      <h3>Gift</h3>
-      <div class="muted">NFT: ${nft}</div>
-      <div class="hr"></div>
-      <div class="row">
-        <button class="btn primary" onclick="openWithdrawNft('${nft}')">Withdraw (0.2 TON)</button>
-        <button class="btn" onclick="closePanel()">Close</button>
-      </div>
-    `);
-  }
-
-  // Deposit “как у всех”: ton://transfer + QR + copy
-  function openDeposit(){
-    const addr = DEPOSIT_WALLET;
-    if(!addr || addr.includes("EQ_____")){
-      showPanel(`
-        <h3>Deposit</h3>
-        <div class="muted">Сначала укажи DEPOSIT_WALLET в index.html (адрес, куда принимаете TON).</div>
-        <div class="hr"></div>
-        <button class="btn" onclick="closePanel()">Close</button>
-      `);
-      return;
-    }
-
-    showPanel(`
-      <h3>Deposit TON</h3>
-      <div class="muted">Отправьте TON на адрес ниже. Затем админ начислит баланс в Mini App.</div>
-      <div class="hr"></div>
-      <div class="muted">Deposit wallet</div>
-      <div style="font-weight:1000;margin:6px 0 10px">${addr}</div>
-
-      <input class="input" id="depAmount" placeholder="Amount TON (например 6)" />
-      <div style="height:10px"></div>
-
-      <div class="row">
-        <button class="btn primary" onclick="openTonTransfer()">Open wallet</button>
-        <button class="btn" onclick="copyText('${addr}')">Copy address</button>
-        <button class="btn" onclick="renderQr()">QR</button>
-        <button class="btn" onclick="closePanel()">Close</button>
-      </div>
-
-      <div id="qrBox" style="margin-top:12px"></div>
-
-      <div class="hr"></div>
-      <div class="muted">
-        Примечание: авто-зачисление можно добавить позже (парсим входящие транзакции).
-      </div>
-    `);
-  }
-
-  function openTonTransfer(){
-    const addr = DEPOSIT_WALLET;
-    const amt = (document.getElementById("depAmount")?.value || "").trim();
-    // TON deep link expects nanotons; делаем простое: если пусто, просто открываем адрес
-    let link = `ton://transfer/${addr}`;
-    if(amt){
-      const n = Number(amt);
-      if(Number.isFinite(n) && n > 0){
-        const nanotons = Math.floor(n * 1e9);
-        link += `?amount=${nanotons}`;
-      }
-    }
-    // Telegram WebApp: openLink лучше
-    try { tg.openLink(link); } catch { window.location.href = link; }
-  }
-
-  function copyText(t){
-    navigator.clipboard?.writeText(t);
-    tg.showToast?.({text:"Copied"});
-  }
-
-  function renderQr(){
-    const addr = DEPOSIT_WALLET;
-    const amt = (document.getElementById("depAmount")?.value || "").trim();
-    let payload = `ton://transfer/${addr}`;
-    if(amt){
-      const n = Number(amt);
-      if(Number.isFinite(n) && n > 0){
-        payload += `?amount=${Math.floor(n * 1e9)}`;
-      }
-    }
-    // Без внешних библиотек: используем Google Chart QR (просто и быстро)
-    const url = "https://chart.googleapis.com/chart?cht=qr&chs=220x220&chl=" + encodeURIComponent(payload);
-    document.getElementById("qrBox").innerHTML = `
-      <div class="muted">QR</div>
-      <div style="height:8px"></div>
-      <img src="${url}" width="220" height="220" style="border-radius:16px;border:1px solid var(--line)" />
-      <div class="muted" style="margin-top:8px">Scan to pay</div>
-    `;
-  }
-
-  function openWithdrawTon(){
-    showPanel(`
-      <h3>Withdraw TON</h3>
-      <div class="muted">Создаёт заявку на вывод (пока вручную). Сумма списывается сразу с баланса.</div>
-      <div class="hr"></div>
-      <input class="input" id="wAmt" placeholder="Amount TON (например 3)" />
-      <div style="height:10px"></div>
-      <input class="input" id="wAddr" placeholder="Destination wallet (EQ...)" />
-      <div style="height:10px"></div>
-      <div class="row">
-        <button class="btn primary" onclick="doWithdrawTon()">Withdraw</button>
-        <button class="btn" onclick="closePanel()">Close</button>
-      </div>
-      <pre id="pout"></pre>
-    `);
-  }
-
-  async function doWithdrawTon(){
-    try{
-      const amount_ton = (document.getElementById("wAmt").value || "").trim();
-      const destination_wallet = (document.getElementById("wAddr").value || "").trim();
-      const res = await api("/ton/withdraw","POST",{amount_ton, destination_wallet});
-      document.getElementById("pout").textContent = JSON.stringify(res,null,2);
-      await refresh();
-    }catch(e){
-      document.getElementById("pout").textContent = String(e.message||e);
-    }
-  }
-
-  function openWithdrawNft(prefill=""){
-    showPanel(`
-      <h3>Withdraw gift (0.2 TON)</h3>
-      <div class="muted">Комиссия Telegram: 0.2 TON. Сейчас перевод NFT делается вручную (позже автоматизация).</div>
-      <div class="hr"></div>
-      <input class="input" id="wnft" placeholder="NFT address (EQ...)" value="${prefill || ""}" />
-      <div style="height:10px"></div>
-      <input class="input" id="wto" placeholder="Destination wallet (EQ...)" />
-      <div style="height:10px"></div>
-      <div class="row">
-        <button class="btn primary" onclick="doWithdrawNft()">Withdraw</button>
-        <button class="btn" onclick="closePanel()">Close</button>
-      </div>
-      <pre id="pout"></pre>
-    `);
-  }
-
-  async function doWithdrawNft(){
-    try{
-      const nft_address = (document.getElementById("wnft").value || "").trim();
-      const destination_wallet = (document.getElementById("wto").value || "").trim();
-      const res = await api("/nft/withdraw","POST",{nft_address, destination_wallet});
-      document.getElementById("pout").textContent = JSON.stringify(res,null,2);
-      await refresh();
-    }catch(e){
-      document.getElementById("pout").textContent = String(e.message||e);
-    }
-  }
-
-  function openSellInfo(){
-    showPanel(`
-      <h3>Sell</h3>
-      <div class="muted">Сейчас мы убрали аукционы из интерфейса. Позже можно добавить маркет/аукцион отдельной вкладкой.</div>
-      <div class="hr"></div>
-      <button class="btn" onclick="closePanel()">Close</button>
-    `);
-  }
-
-  function openSendInfo(){
-    showPanel(`
-      <h3>Send</h3>
-      <div class="muted">Отправка подарков пользователям будет добавлена позже (нужно учитывать custody/переводы).</div>
-      <div class="hr"></div>
-      <button class="btn" onclick="closePanel()">Close</button>
-    `);
-  }
-
-  async function loadActivity(){
-    try{
-      const r = await api("/my/withdrawals","GET");
-      const list = document.getElementById("actList");
-      const empty = document.getElementById("actEmpty");
-      list.innerHTML = "";
-
-      const items = (r.items || []).slice(0,100);
-
-      if(items.length === 0){
-        empty.style.display = "";
-        return;
-      }
-      empty.style.display = "none";
-
-      for(const it of items){
-        const dt = new Date(it.created_at).toLocaleString();
-        const el = document.createElement("div");
-        el.className = "li";
-        el.innerHTML = `
-          <div class="left">
-            <div class="t">Withdraw TON #${it.id}</div>
-            <div class="s">${dt} • ${shortAddr(it.destination_wallet)} • ${it.status}</div>
-          </div>
-          <div class="amt bad">-${it.amount_ton} TON</div>
-        `;
-        list.appendChild(el);
-      }
-    }catch(e){
-      setDebug(String(e.message||e));
-    }
-  }
+    el.textContent = `connected: ${w.account.address.slice(0,6)}…${w.account.address.slice(-6)}`;
+  });
 
   async function refresh(){
     try{
-      state.me = await api("/me");
-      const u = tg.initDataUnsafe?.user;
-      document.getElementById("userTag").textContent = u?.username ? "@"+u.username : "User";
-      document.getElementById("userId").textContent = u?.id ? "id: "+u.id : "id: -";
-
-      const bal = Number(state.me?.balance?.available_ton || 0);
-      document.getElementById("balTop").textContent = bal + " TON";
-
-      document.getElementById("walletSmall").textContent = bal + " TON";
-      document.getElementById("walletBal").textContent = (Number(bal).toFixed(2)) + " TON";
-      document.getElementById("walletAddrMini").textContent = DEPOSIT_WALLET && !DEPOSIT_WALLET.includes("EQ_____")
-        ? "Your wallet " + shortAddr(DEPOSIT_WALLET)
-        : "Set deposit wallet";
-
-      renderGifts();
+      const me = await api("/me");
+      const bal = Number(me?.balance?.available_ton || 0);
+      document.getElementById("bal").textContent = bal.toFixed(2) + " TON";
       setDebug({ok:true});
     }catch(e){
       setDebug(String(e.message||e));
     }
   }
 
-  // старт
+  // Deposit flow (как “Confirm the transaction in Wallet”)
+  async function openDeposit(){
+    try{
+      if(DEPOSIT_WALLET.includes("EQ_____")) throw new Error("Set DEPOSIT_WALLET in index.html");
+
+      // 1) запросим сумму
+      const amountStr = prompt("Amount TON (например 1):", "1");
+      if(!amountStr) return;
+      const amount = Number(amountStr);
+      if(!Number.isFinite(amount) || amount <= 0) throw new Error("Bad amount");
+
+      // 2) создаём deposit request на сервере (получаем deposit_id/comment)
+      const req = await api("/deposit/request","POST",{ amount_ton: amount });
+
+      // req должен вернуть comment (если у тебя пока link — скажи, поправим)
+      const comment = req.comment || (`DEP:${req.deposit_id}`);
+
+      const nanotons = BigInt(Math.floor(amount * 1e9));
+
+      // 3) отправляем транзакцию через TON Connect
+      //    Это и даёт модалку Telegram Wallet "Confirm the transaction in Wallet"
+      await tc.sendTransaction({
+        validUntil: Math.floor(Date.now()/1000) + 600,
+        messages: [{
+          address: DEPOSIT_WALLET,
+          amount: nanotons.toString(),
+          payload: comment
+        }]
+      });
+
+      // 4) обновим баланс с задержкой (watcher зачислит)
+      setDebug({sent:true, deposit_id: req.deposit_id, amount_ton: amount, comment});
+      setTimeout(refresh, 2500);
+      setTimeout(refresh, 6000);
+      setTimeout(refresh, 12000);
+
+    } catch(e){
+      setDebug(String(e.message||e));
+    }
+  }
+
   refresh();
 </script>
 </body>
