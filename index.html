@@ -1,143 +1,82 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
   <title>Gifts Wallet</title>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- TON CONNECT UI (официальная библиотека) -->
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 
   <style>
-    :root{--bg:#0b0b0f;--card:#121219;--line:rgba(255,255,255,.08);--text:#f2f3f5;--muted:rgba(255,255,255,.55);--accent:#2f6bff;--radius:18px}
-    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    .wrap{max-width:980px;margin:0 auto;padding:14px 14px 92px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:12px 0}
-    .btn{background:#1a1a23;border:1px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--text);font-weight:900;cursor:pointer}
-    .btn.primary{background:var(--accent);border-color:transparent}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    .input{width:100%;background:#0f0f16;border:1px solid var(--line);border-radius:14px;color:var(--text);padding:12px;outline:none}
-    .muted{color:var(--muted);font-size:13px}
-    pre{white-space:pre-wrap;word-break:break-word;color:#cbd0d6;margin:10px 0 0}
+    body{margin:0;background:#0b0b0f;color:#f2f3f5;font-family:system-ui}
+    .wrap{max-width:420px;margin:0 auto;padding:16px}
+    .card{background:#121219;border-radius:20px;padding:16px}
+    .btn{width:100%;padding:14px;border-radius:14px;border:none;font-weight:700}
+    .btn.primary{background:#2f6bff;color:#fff}
+    .input{width:100%;padding:12px;border-radius:12px;border:none;margin:10px 0}
+    .muted{opacity:.6;font-size:13px}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-        <div>
-          <div style="font-weight:1000;font-size:18px">Wallet</div>
-          <div class="muted" id="who">not connected</div>
-        </div>
-        <div id="tonconnect-button"></div>
-      </div>
-
-      <div style="height:12px"></div>
-
-      <div style="font-size:42px;font-weight:1000;letter-spacing:-.02em" id="bal">0.00 TON</div>
-      <div class="muted">Deposit подтверждается через Telegram Wallet (TON Connect), как на твоём скрине.</div>
-
-      <div style="height:12px"></div>
-
-      <div class="row">
-        <button class="btn primary" onclick="openDeposit()">Deposit</button>
-        <button class="btn" onclick="refresh()">Refresh</button>
-      </div>
-
-      <pre id="debug"></pre>
-    </div>
+<div class="wrap">
+  <div class="card">
+    <h2>Wallet</h2>
+    <div id="tonconnect-button"></div>
+    <div style="font-size:36px;font-weight:800" id="bal">0 TON</div>
+    <div class="muted">Deposit via TON Connect (Telegram Wallet)</div>
+    <input id="amt" class="input" placeholder="Amount TON" />
+    <button class="btn primary" onclick="deposit()">Deposit</button>
+    <pre id="dbg"></pre>
   </div>
+</div>
 
 <script>
-  const tg = window.Telegram.WebApp;
-  tg.ready();
+const tg = window.Telegram.WebApp; tg.ready();
+const API = "https://api.growagardentrade.online";
+const DEPOSIT_WALLET = "UQDxFs685oBQjawclpOrO-kb2n3hugWWOf51h6goSQQQLnLg";
 
-  const API = "https://api.growagardentrade.online";
-  const DEPOSIT_WALLET = "UQDxFs685oBQjawclpOrO-kb2n3hugWWOf51h6goSQQQLnLg"; // <-- ВСТАВЬ СВОЙ
+const tc = new TON_CONNECT_UI.TonConnectUI({
+  manifestUrl: "https://app.growagardentrade.online/tonconnect-manifest.json",
+  buttonRootId: "tonconnect-button"
+});
 
-  function setDebug(x){ document.getElementById("debug").textContent = typeof x==="string"?x:JSON.stringify(x,null,2); }
-
-  async function api(path, method="GET", body=null){
-    const opt = { method, headers: { "Authorization": tg.initData } };
-    if(body){ opt.headers["Content-Type"]="application/json"; opt.body = JSON.stringify(body); }
-    const r = await fetch(API+path, opt);
-    const t = await r.text();
-    let data; try{ data = JSON.parse(t); }catch{ data = { raw: t }; }
-    if(!r.ok) throw new Error(data?.error || t);
-    return data;
-  }
-
-  // TON Connect UI init
-  const tc = new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl: `${location.origin}/tonconnect-manifest.json`,
-    buttonRootId: 'tonconnect-button'
+async function api(path, body){
+  const r = await fetch(API+path,{
+    method:"POST",
+    headers:{
+      "Authorization": tg.initData,
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify(body)
   });
+  return r.json();
+}
 
-  // show connected wallet
-  tc.onStatusChange((w) => {
-    const el = document.getElementById("who");
-    if(!w){
-      el.textContent = "not connected";
-      return;
-    }
-    el.textContent = `connected: ${w.account.address.slice(0,6)}…${w.account.address.slice(-6)}`;
-  });
+async function refresh(){
+  const r = await fetch(API+"/me",{headers:{Authorization:tg.initData}});
+  const j = await r.json();
+  document.getElementById("bal").textContent = j.balance.available_ton+" TON";
+}
+refresh();
 
-  async function refresh(){
-    try{
-      const me = await api("/me");
-      const bal = Number(me?.balance?.available_ton || 0);
-      document.getElementById("bal").textContent = bal.toFixed(2) + " TON";
-      setDebug({ok:true});
-    }catch(e){
-      setDebug(String(e.message||e));
-    }
+async function deposit(){
+  try{
+    const amt = Number(document.getElementById("amt").value);
+    const r = await api("/deposit/request",{amount_ton:amt});
+    await tc.sendTransaction({
+      validUntil: Math.floor(Date.now()/1000)+600,
+      messages:[{
+        address: DEPOSIT_WALLET,
+        amount: String(Math.floor(amt*1e9)),
+        payload: r.comment
+      }]
+    });
+    setTimeout(refresh,5000);
+  }catch(e){
+    document.getElementById("dbg").textContent = e.toString();
   }
-
-  // Deposit flow (как “Confirm the transaction in Wallet”)
-  async function openDeposit(){
-    try{
-      if(DEPOSIT_WALLET.includes("EQ_____")) throw new Error("Set DEPOSIT_WALLET in index.html");
-
-      // 1) запросим сумму
-      const amountStr = prompt("Amount TON (например 1):", "1");
-      if(!amountStr) return;
-      const amount = Number(amountStr);
-      if(!Number.isFinite(amount) || amount <= 0) throw new Error("Bad amount");
-
-      // 2) создаём deposit request на сервере (получаем deposit_id/comment)
-      const req = await api("/deposit/request","POST",{ amount_ton: amount });
-
-      // req должен вернуть comment (если у тебя пока link — скажи, поправим)
-      const comment = req.comment || (`DEP:${req.deposit_id}`);
-
-      const nanotons = BigInt(Math.floor(amount * 1e9));
-
-      // 3) отправляем транзакцию через TON Connect
-      //    Это и даёт модалку Telegram Wallet "Confirm the transaction in Wallet"
-      await tc.sendTransaction({
-        validUntil: Math.floor(Date.now()/1000) + 600,
-        messages: [{
-          address: DEPOSIT_WALLET,
-          amount: nanotons.toString(),
-          payload: comment
-        }]
-      });
-
-      // 4) обновим баланс с задержкой (watcher зачислит)
-      setDebug({sent:true, deposit_id: req.deposit_id, amount_ton: amount, comment});
-      setTimeout(refresh, 2500);
-      setTimeout(refresh, 6000);
-      setTimeout(refresh, 12000);
-
-    } catch(e){
-      setDebug(String(e.message||e));
-    }
-  }
-
-  refresh();
+}
 </script>
 </body>
 </html>
