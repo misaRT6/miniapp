@@ -1,418 +1,382 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
-  <title>Gifts</title>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Gifts Auction</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   <style>
-    :root{
-      --bg:#07080c;
-      --card:#0f1118;
-      --card2:#111421;
-      --stroke:rgba(255,255,255,.08);
-      --text:#f2f4ff;
-      --muted:rgba(242,244,255,.62);
-      --accent:#2f6bff;
-      --good:#35d07f;
-      --warn:#ffcc66;
-      --bad:#ff5d5d;
-      --radius:18px;
+    :root {
+      --bg-color: #000000;
+      --card-bg: #1c1c1e;
+      --text-primary: #ffffff;
+      --text-secondary: #8e8e93;
+      --accent: #007aff; /* System Blue */
+      --accent-grad: linear-gradient(135deg, #007aff, #0056b3);
+      --success: #32d74b;
+      --danger: #ff453a;
+      --nav-bg: rgba(28, 28, 30, 0.85);
     }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    .wrap{max-width:420px;margin:0 auto;padding:14px 14px 110px}
-    .row{display:flex;gap:10px;align-items:center}
-    .space{justify-content:space-between}
-    .title{font-size:18px;font-weight:800;letter-spacing:.2px}
-    .muted{color:var(--muted);font-size:12px}
-    .card{background:linear-gradient(180deg,var(--card),rgba(15,17,24,.75));border:1px solid var(--stroke);border-radius:var(--radius);padding:14px}
-    .card2{background:var(--card2);border:1px solid var(--stroke);border-radius:var(--radius);padding:12px}
-    .big{font-size:40px;font-weight:900;line-height:1}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--stroke);font-size:12px;color:var(--muted)}
-    .btn{width:100%;border:none;border-radius:14px;padding:13px 12px;font-weight:800}
-    .btn.primary{background:var(--accent);color:white}
-    .btn.ghost{background:transparent;border:1px solid var(--stroke);color:var(--text)}
-    .btn.warn{background:rgba(255,204,102,.14);border:1px solid rgba(255,204,102,.25);color:var(--text)}
-    .btn:active{transform:translateY(1px)}
-    input,select{width:100%;background:#0b0d14;border:1px solid var(--stroke);color:var(--text);padding:12px;border-radius:14px;outline:none}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .gifts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-    .gift{background:#0b0d14;border:1px solid var(--stroke);border-radius:16px;padding:12px;min-height:86px;display:flex;flex-direction:column;justify-content:space-between}
-    .gift .name{font-weight:800;font-size:13px}
-    .gift .meta{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .section{margin-top:12px}
-    .tabs{display:flex;gap:8px}
-    .tab{flex:1;text-align:center;padding:10px;border-radius:14px;border:1px solid var(--stroke);background:transparent;color:var(--muted);font-weight:800}
-    .tab.on{background:#0b0d14;color:var(--text)}
-    .list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-    .item{display:flex;justify-content:space-between;align-items:center;background:#0b0d14;border:1px solid var(--stroke);border-radius:14px;padding:10px}
-    .badge{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid var(--stroke);color:var(--muted)}
-    .badge.good{border-color:rgba(53,208,127,.35);color:rgba(53,208,127,.9)}
-    .badge.warn{border-color:rgba(255,204,102,.35);color:rgba(255,204,102,.9)}
-    .badge.bad{border-color:rgba(255,93,93,.35);color:rgba(255,93,93,.9)}
-    .footerbar{
-      position:fixed;left:0;right:0;bottom:0;
-      background:rgba(7,8,12,.92);backdrop-filter:blur(12px);
-      border-top:1px solid var(--stroke);
-      padding:10px;
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0; padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      padding-bottom: 80px; /* Место под меню */
     }
-    .footwrap{max-width:420px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    pre{white-space:pre-wrap;color:var(--muted);font-size:12px;margin:8px 0 0}
-    a{color:var(--accent);text-decoration:none}
+
+    /* --- Typography & Layout --- */
+    h1, h2, h3 { margin: 0; font-weight: 600; }
+    .container { padding: 16px; }
+    .hidden { display: none !important; }
+    
+    /* --- Header --- */
+    .header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px;
+      position: sticky; top: 0;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+      z-index: 10;
+    }
+    .user-info { display: flex; align-items: center; gap: 10px; }
+    .avatar { 
+      width: 36px; height: 36px; 
+      border-radius: 50%; background: var(--accent); 
+      display: flex; align-items: center; justify-content: center; font-weight: bold;
+    }
+    .balance-pill {
+      background: rgba(255,255,255,0.1);
+      padding: 6px 12px; border-radius: 20px;
+      font-size: 14px; display: flex; align-items: center; gap: 6px;
+    }
+
+    /* --- Tabs (Bottom Nav) --- */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 70px;
+      background: var(--nav-bg);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex; justify-content: space-around; align-items: center;
+      z-index: 50;
+      padding-bottom: 10px; /* Safe area adjustment */
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center;
+      color: var(--text-secondary); font-size: 10px; gap: 4px;
+      cursor: pointer; transition: 0.2s;
+    }
+    .nav-item i { font-size: 24px; }
+    .nav-item.active { color: var(--accent); }
+
+    /* --- Cards --- */
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .card {
+      background: var(--card-bg); border-radius: 16px;
+      overflow: hidden; display: flex; flex-direction: column;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .card-img {
+      width: 100%; aspect-ratio: 1; object-fit: cover;
+      background: #333;
+    }
+    .card-body { padding: 12px; display: flex; flex-direction: column; gap: 4px; }
+    .card-title { font-size: 15px; }
+    .card-price { font-size: 13px; color: var(--text-secondary); }
+    .card-price b { color: var(--text-primary); font-size: 15px; }
+    
+    .btn {
+      border: none; padding: 10px; border-radius: 10px;
+      font-weight: 600; cursor: pointer; text-align: center;
+      width: 100%; margin-top: 8px; font-size: 14px;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:active { opacity: 0.8; }
+    .btn-outline { background: rgba(255,255,255,0.1); color: #fff; }
+
+    /* --- Wallet Section --- */
+    .wallet-card {
+      background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+      border-radius: 20px; padding: 24px; text-align: center;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .big-balance { font-size: 36px; font-weight: 700; margin: 10px 0; }
+    .wallet-actions { display: flex; gap: 10px; justify-content: center; }
+    .action-btn {
+      flex: 1; padding: 12px; border-radius: 12px;
+      background: rgba(255,255,255,0.1); color: #fff; border: none;
+      font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+
+    /* --- Loader --- */
+    .loader {
+      border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--accent);
+      border-radius: 50%; width: 24px; height: 24px;
+      animation: spin 1s linear infinite; margin: 20px auto;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* --- Notification --- */
+    #notification {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      background: #333; color: #fff; padding: 10px 20px;
+      border-radius: 30px; font-size: 14px; z-index: 100;
+      opacity: 0; pointer-events: none; transition: 0.3s;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    }
+    #notification.show { opacity: 1; top: 30px; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="row space">
-      <div>
-        <div class="title">Gifts</div>
-        <div class="muted" id="subtitle">Wallet • gifts storage</div>
-      </div>
-      <div id="tonconnect-button"></div>
-    </div>
 
-    <div class="section card">
-      <div class="row space">
-        <div>
-          <div class="muted">Available</div>
-          <div class="big" id="bal">—</div>
-        </div>
-        <div style="text-align:right">
-          <div class="pill" id="userpill">not authorized</div>
-          <div class="muted" style="margin-top:6px">Network: TON</div>
-        </div>
-      </div>
+  <div id="notification">Action Successful</div>
 
-      <div class="grid" style="margin-top:12px">
-        <button class="btn primary" onclick="openDeposit()">Deposit</button>
-        <button class="btn ghost" onclick="openWithdraw()">Withdraw</button>
+  <div class="header">
+    <div class="user-info">
+      <div class="avatar" id="uAvatar">U</div>
+      <div style="line-height: 1.2;">
+        <div style="font-size: 14px;" id="uName">Loading...</div>
+        <div style="font-size: 11px; color: var(--text-secondary);">Online</div>
       </div>
     </div>
-
-    <div class="section card2" id="panel-deposit" style="display:none">
-      <div class="row space">
-        <div style="font-weight:900">Deposit TON</div>
-        <div class="badge warn" id="depStatus">ready</div>
-      </div>
-      <div class="muted" style="margin-top:6px">You will confirm transaction in your wallet.</div>
-
-      <div style="margin-top:10px">
-        <input id="depAmount" inputmode="decimal" placeholder="Amount (TON), e.g. 3" />
-      </div>
-      <div class="grid" style="margin-top:10px">
-        <button class="btn primary" onclick="startDeposit()">Pay</button>
-        <button class="btn ghost" onclick="closePanels()">Close</button>
-      </div>
-
-      <pre id="depHint"></pre>
-    </div>
-
-    <div class="section card2" id="panel-withdraw" style="display:none">
-      <div class="row space">
-        <div style="font-weight:900">Withdraw TON</div>
-        <div class="badge warn">manual payout</div>
-      </div>
-      <div class="muted" style="margin-top:6px">Creates a request. Admin processes it manually.</div>
-
-      <div style="margin-top:10px">
-        <input id="wdAmount" inputmode="decimal" placeholder="Amount (TON)" />
-      </div>
-      <div style="margin-top:10px">
-        <input id="wdAddr" placeholder="Destination wallet address" />
-      </div>
-      <div class="grid" style="margin-top:10px">
-        <button class="btn warn" onclick="createWithdraw()">Create request</button>
-        <button class="btn ghost" onclick="closePanels()">Close</button>
-      </div>
-
-      <pre id="wdHint"></pre>
-    </div>
-
-    <div class="section">
-      <div class="row space">
-        <div style="font-weight:900">My gifts</div>
-        <div class="muted" id="giftCount">0</div>
-      </div>
-      <div class="gifts" id="gifts"></div>
-    </div>
-
-    <div class="section">
-      <div class="row space">
-        <div style="font-weight:900">History</div>
-        <div class="tabs" style="width:180px">
-          <button class="tab on" id="tab-activity" onclick="switchTab('activity')">Activity</button>
-          <button class="tab" id="tab-deposits" onclick="switchTab('deposits')">Deposits</button>
-        </div>
-      </div>
-
-      <div class="list" id="list"></div>
-    </div>
-
-    <pre id="dbg"></pre>
-  </div>
-
-  <div class="footerbar">
-    <div class="footwrap">
-      <button class="btn ghost" onclick="refreshAll()">Refresh</button>
-      <button class="btn primary" onclick="tgExpand()">Expand</button>
+    <div class="balance-pill">
+      <i class="ri-wallet-3-line"></i>
+      <span id="headerBal">0.0</span> TON
     </div>
   </div>
 
-<script>
-  // ====== CONFIG ======
-  const API = "https://api.growagardentrade.online";
-  const DEPOSIT_WALLET = "UQDxFs685oBQjawclpOrO-kb2n3hugWWOf51h6goSQQQLnLg";
-  const MANIFEST_URL = "https://app.growagardentrade.online/tonconnect-manifest.json";
+  <div id="tab-market" class="container screen">
+    <h2 style="margin-bottom: 16px;">Live Auctions 🔥</h2>
+    <div id="auctionsList" class="grid">
+      <div class="loader"></div>
+    </div>
+  </div>
 
-  // ====== TELEGRAM ======
-  const tg = window.Telegram.WebApp;
-  tg.ready();
+  <div id="tab-gifts" class="container screen hidden">
+    <h2 style="margin-bottom: 16px;">My Collection 💎</h2>
+    <div id="nftsList" class="grid">
+      <p style="color: #666; grid-column: 1/-1; text-align: center;">You have no items yet.</p>
+    </div>
+  </div>
 
-  function tgExpand(){ try{ tg.expand(); }catch(e){} }
+  <div id="tab-wallet" class="container screen hidden">
+    <div class="wallet-card">
+      <div style="color: #8e8e93; font-size: 14px;">Total Balance</div>
+      <div class="big-balance"><span id="walletBal">0.00</span> <span style="font-size: 16px; color:#8e8e93">TON</span></div>
+      <div class="wallet-actions">
+        <button class="action-btn" onclick="openDeposit()"><i class="ri-add-circle-line"></i> Deposit</button>
+        <button class="action-btn" onclick="openWithdraw()"><i class="ri-arrow-right-up-line"></i> Withdraw</button>
+      </div>
+    </div>
+    
+    <h3>History</h3>
+    <div id="txHistory" style="margin-top: 10px; color: #666; font-size: 13px;">
+      No recent transactions.
+    </div>
+  </div>
 
-  // ====== TON CONNECT ======
-  const tc = new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl: MANIFEST_URL,
-    buttonRootId: "tonconnect-button"
-  });
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('market', this)">
+      <i class="ri-store-2-line"></i>
+      <span>Market</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('gifts', this)">
+      <i class="ri-vip-diamond-line"></i>
+      <span>Gifts</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('wallet', this)">
+      <i class="ri-wallet-3-line"></i>
+      <span>Wallet</span>
+    </div>
+  </div>
 
-  // ====== SAFE API WRAPPER ======
-  async function api(path, method="GET", body=null){
-    const initData = tg.initData;
-    if (!initData) throw new Error("initData empty: open via bot Mini App button");
+  <script>
+    const API_URL = "https://api.growagardentrade.online"; // Замени на свой домен или localhost для тестов
+    const tg = window.Telegram.WebApp;
 
-    const opt = { method, headers: { "Authorization": initData } };
-    if(body){
-      opt.headers["Content-Type"] = "application/json";
-      opt.body = JSON.stringify(body);
-    }
+    // --- Init ---
+    tg.expand();
+    tg.enableClosingConfirmation();
+    
+    // Основная конфигурация
+    const state = {
+      user: null,
+      balance: 0
+    };
 
-    const r = await fetch(API + path, opt);
-    const text = await r.text();
-
-    let data;
-    try { data = JSON.parse(text); }
-    catch {
-      throw new Error(`NON-JSON (${r.status}) from ${API + path}:\n` + text.slice(0, 300));
-    }
-
-    if(!r.ok) throw new Error(data?.error || `HTTP ${r.status}`);
-    return data;
-  }
-
-  // ====== UI HELPERS ======
-  function setDbg(msg){ document.getElementById("dbg").textContent = msg || ""; }
-  function show(id, yes){ document.getElementById(id).style.display = yes ? "block" : "none"; }
-
-  function openDeposit(){ show("panel-deposit", true); show("panel-withdraw", false); setDbg(""); }
-  function openWithdraw(){ show("panel-withdraw", true); show("panel-deposit", false); setDbg(""); }
-  function closePanels(){ show("panel-deposit", false); show("panel-withdraw", false); setDbg(""); }
-
-  function badgeForStatus(s){
-    if(s === "confirmed") return ["good", "confirmed"];
-    if(s === "pending") return ["warn", "pending"];
-    if(s === "paid") return ["good", "paid"];
-    if(s === "rejected") return ["bad", "rejected"];
-    if(s === "expired") return ["bad", "expired"];
-    return ["warn", String(s || "—")];
-  }
-
-  // ====== DATA LOAD ======
-  let currentTab = "activity";
-
-  async function refreshMe(){
-    const j = await api("/me");
-    document.getElementById("bal").textContent = (j.balance?.available_ton ?? "0") + " TON";
-    document.getElementById("userpill").textContent = "@" + (j.user?.username || ("id" + j.user.telegram_user_id));
-
-    const gifts = j.my_nfts || [];
-    document.getElementById("giftCount").textContent = gifts.length + " items";
-    const box = document.getElementById("gifts");
-    box.innerHTML = "";
-
-    if(!gifts.length){
-      box.innerHTML = `<div class="muted">No gifts yet</div>`;
-      return;
-    }
-
-    for(const g of gifts){
-      const short = (g.nft_address || "").slice(0, 10) + "…" + (g.nft_address || "").slice(-6);
-      const el = document.createElement("div");
-      el.className = "gift";
-      el.innerHTML = `
-        <div>
-          <div class="name">Gift</div>
-          <div class="meta">${short}</div>
-        </div>
-        <div class="row space">
-          <span class="badge">${g.status}</span>
-          <button class="btn ghost" style="width:auto;padding:8px 10px;border-radius:12px" onclick="withdrawGift('${g.nft_address}')">Withdraw</button>
-        </div>
-      `;
-      box.appendChild(el);
-    }
-  }
-
-  async function refreshList(){
-    const list = document.getElementById("list");
-    list.innerHTML = "";
-
-    if(currentTab === "activity"){
-      const j = await api("/my/activity");
-      const items = j.items || [];
-      if(!items.length){
-        list.innerHTML = `<div class="muted">No activity</div>`;
-        return;
-      }
-      for(const it of items){
-        const [cls, label] = badgeForStatus(it.status);
-        const left = `${it.type.toUpperCase()} • ${Number(it.amount_ton).toFixed(3)} TON`;
-        const right = label;
-        const el = document.createElement("div");
-        el.className = "item";
-        el.innerHTML = `
-          <div>
-            <div style="font-weight:800">${left}</div>
-            <div class="muted">${new Date(it.created_at).toLocaleString()}</div>
-          </div>
-          <span class="badge ${cls}">${right}</span>
-        `;
-        list.appendChild(el);
-      }
-      return;
-    }
-
-    if(currentTab === "deposits"){
-      const j = await api("/my/deposits");
-      const items = j.items || [];
-      if(!items.length){
-        list.innerHTML = `<div class="muted">No deposits</div>`;
-        return;
-      }
-      for(const it of items){
-        const [cls, label] = badgeForStatus(it.status);
-        const el = document.createElement("div");
-        el.className = "item";
-        el.innerHTML = `
-          <div>
-            <div style="font-weight:800">${Number(it.amount_ton).toFixed(3)} TON</div>
-            <div class="muted">${it.id}</div>
-          </div>
-          <span class="badge ${cls}">${label}</span>
-        `;
-        list.appendChild(el);
+    // --- API Wrapper ---
+    async function api(path, method = 'GET', body = null) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Telegram-Init-Data': tg.initData
+      };
+      try {
+        const opts = { method, headers };
+        if (body) opts.body = JSON.stringify(body);
+        
+        const res = await fetch(`${API_URL}${path}`, opts);
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.error || 'Request failed');
+        return json;
+      } catch (e) {
+        showNotif(e.message, true);
+        throw e;
       }
     }
-  }
 
-  function switchTab(t){
-    currentTab = t;
-    document.getElementById("tab-activity").classList.toggle("on", t === "activity");
-    document.getElementById("tab-deposits").classList.toggle("on", t === "deposits");
-    refreshList().catch(e => setDbg(String(e)));
-  }
+    // --- Navigation ---
+    function switchTab(tabName, el) {
+      document.querySelectorAll('.screen').forEach(d => d.classList.add('hidden'));
+      document.getElementById('tab-' + tabName).classList.remove('hidden');
+      
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
 
-  async function refreshAll(){
-    try{
-      setDbg("");
-      await refreshMe();
-      await refreshList();
-    }catch(e){
-      setDbg(String(e));
+      if(tabName === 'market') loadAuctions();
+      if(tabName === 'gifts') loadMyNfts();
+      if(tabName === 'wallet') loadProfile();
     }
-  }
 
-  // ====== ACTIONS ======
-  async function startDeposit(){
-    try{
-      setDbg("");
-      const amt = Number(String(document.getElementById("depAmount").value).replace(",", "."));
-      if(!(amt > 0)) throw new Error("Enter amount > 0");
+    // --- Core Logic ---
+    async function loadProfile() {
+      try {
+        const res = await api('/me');
+        state.user = res.user;
+        state.balance = res.balance.available_ton;
 
-      document.getElementById("depStatus").textContent = "creating…";
+        // Update UI
+        document.getElementById('uName').innerText = state.user.firstName || 'User';
+        document.getElementById('uAvatar').innerText = (state.user.firstName || 'U')[0];
+        document.getElementById('headerBal').innerText = state.balance.toFixed(2);
+        document.getElementById('walletBal').innerText = state.balance.toFixed(2);
+      } catch (e) {
+        console.error(e);
+      }
+    }
 
-      const dep = await api("/deposit/request", "POST", { amount_ton: amt });
+    async function loadAuctions() {
+      const container = document.getElementById('auctionsList');
+      container.innerHTML = '<div class="loader"></div>';
+      
+      try {
+        const res = await api('/auctions');
+        container.innerHTML = '';
+        
+        if (res.list.length === 0) {
+            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666; margin-top: 20px;">No active auctions</p>';
+            return;
+        }
 
-      const payload = dep.comment;              // DEP:<uuid>
-      const nano = String(Math.floor(amt * 1e9));
+        res.list.forEach(auc => {
+          const div = document.createElement('div');
+          div.className = 'card';
+          // Placeholder картинка, если нет реальной ссылки
+          const imgUrl = auc.nft_address.includes('http') ? auc.nft_address : 'https://placehold.co/400x400/1c1c1e/FFF?text=NFT';
+          
+          div.innerHTML = `
+            <img src="${imgUrl}" class="card-img">
+            <div class="card-body">
+              <div class="card-title">Gift #${auc.id}</div>
+              <div class="card-price">Current: <b>${auc.current_bid} TON</b></div>
+              <button class="btn btn-primary" onclick="placeBid(${auc.id}, ${auc.current_bid}, ${auc.min_increment})">
+                Bid ${(auc.current_bid + auc.min_increment).toFixed(2)}
+              </button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      } catch (e) {
+        container.innerText = "Error loading auctions";
+      }
+    }
 
-      document.getElementById("depHint").textContent =
-        `Send ${amt} TON\nTo: ${dep.deposit_wallet}\nComment: ${payload}`;
+    async function placeBid(id, current, inc) {
+      const amount = current + inc; // Simple auto-increment bid
+      tg.HapticFeedback.impactOccurred('medium');
+      
+      if(!confirm(`Bid ${amount.toFixed(2)} TON?`)) return;
 
-      document.getElementById("depStatus").textContent = "confirm in wallet…";
+      try {
+        await api('/auctions/bid', 'POST', { auction_id: id, bid_amount: amount });
+        showNotif('Bid Placed Successfully!');
+        loadAuctions();
+        loadProfile(); // update balance
+      } catch (e) {
+        // Error handled in api wrapper
+      }
+    }
 
-      await tc.sendTransaction({
-        validUntil: Math.floor(Date.now()/1000) + 600,
-        messages: [{
-          address: DEPOSIT_WALLET,
-          amount: nano,
-          payload: payload
-        }]
+    async function loadMyNfts() {
+      const container = document.getElementById('nftsList');
+      container.innerHTML = '<div class="loader"></div>';
+      try {
+        const res = await api('/nfts/my');
+        container.innerHTML = '';
+        if(res.items.length === 0) {
+           container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666; margin-top: 40px;">Empty collection</p>';
+           return;
+        }
+        res.items.forEach(nft => {
+          const div = document.createElement('div');
+          div.className = 'card';
+          div.innerHTML = `
+            <div style="height: 140px; background: #333; display: flex; align-items: center; justify-content: center;">NFT</div>
+            <div class="card-body">
+               <div class="card-title">My Item</div>
+               <button class="btn btn-outline" onclick="sellNft('${nft.nft_address}')">Sell</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      } catch (e) {
+        container.innerHTML = 'Error';
+      }
+    }
+
+    // --- Wallet Actions ---
+    async function openDeposit() {
+      // 1. Get deposit ID
+      const res = await api('/ton/deposit_invoice', 'POST', { amount: 0 });
+      const comment = `DEP:${res.deposit_id}`;
+      const wallet = "UQDxFs685oBQjawclpOrO-kb2n3hugWWOf51h6goSQQQLnLg"; // Твой кошелек из .env
+      
+      tg.showPopup({
+        title: 'Deposit TON',
+        message: `Send TON to:\n\n${wallet.slice(0,4)}...${wallet.slice(-4)}\n\n⚠️ REQUIRED COMMENT:\n${comment}`,
+        buttons: [{type: 'ok', text: 'Copy Comment'}]
+      }, () => {
+        // Копируем комментарий в буфер (через костыль или navigator)
+        navigator.clipboard.writeText(comment);
+        showNotif('Comment copied!');
       });
-
-      // Poll status by new endpoint: /deposit/status?id=...
-      document.getElementById("depStatus").textContent = "checking…";
-      await pollDeposit(dep.deposit_id);
-
-      await refreshAll();
-      document.getElementById("depStatus").textContent = "done";
-    }catch(e){
-      document.getElementById("depStatus").textContent = "error";
-      setDbg(String(e));
     }
-  }
 
-  async function pollDeposit(depositId){
-    const started = Date.now();
-    while(Date.now() - started < 60000){
-      const s = await api(`/deposit/status?id=${encodeURIComponent(depositId)}`, "GET");
-      const st = s.status;
-      const [cls, label] = badgeForStatus(st);
-      const el = document.getElementById("depStatus");
-      el.className = "badge " + cls;
-      el.textContent = label;
+    function openWithdraw() {
+        const addr = prompt("Enter destination TON wallet address:");
+        if(!addr) return;
+        const amt = prompt("Amount to withdraw:");
+        if(!amt) return;
 
-      if(st === "confirmed") return true;
-      await new Promise(r => setTimeout(r, 2500));
+        api('/ton/withdraw', 'POST', { amount_ton: amt, destination_wallet: addr })
+         .then(() => showNotif("Withdrawal requested"))
+         .catch(() => {});
     }
-    throw new Error("Deposit not confirmed yet (wait and press Refresh)");
-  }
 
-  async function createWithdraw(){
-    try{
-      setDbg("");
-      const amt = Number(String(document.getElementById("wdAmount").value).replace(",", "."));
-      const addr = String(document.getElementById("wdAddr").value || "").trim();
-      if(!(amt > 0)) throw new Error("Enter amount > 0");
-      if(!addr) throw new Error("Enter destination wallet");
-
-      const j = await api("/ton/withdraw", "POST", { amount_ton: amt, destination_wallet: addr });
-      document.getElementById("wdHint").textContent = `Request created: #${j.withdrawal_id}`;
-      await refreshAll();
-    }catch(e){
-      setDbg(String(e));
+    function showNotif(msg, isError = false) {
+      const el = document.getElementById('notification');
+      el.innerText = msg;
+      el.style.background = isError ? '#ff453a' : '#32d74b';
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3000);
     }
-  }
 
-  async function withdrawGift(nftAddr){
-    try{
-      setDbg("");
-      const dest = prompt("Destination wallet for NFT withdraw:");
-      if(!dest) return;
-      const j = await api("/nft/withdraw", "POST", { nft_address: nftAddr, destination_wallet: dest });
-      setDbg("NFT marked for withdraw. Fee charged: " + j.charged_ton + " TON");
-      await refreshAll();
-    }catch(e){
-      setDbg(String(e));
-    }
-  }
-
-  // ====== INIT ======
-  refreshAll();
-</script>
+    // Start
+    loadProfile();
+    loadAuctions();
+  </script>
 </body>
 </html>
