@@ -41,16 +41,28 @@ const tc = new TON_CONNECT_UI.TonConnectUI({
   buttonRootId: "tonconnect-button"
 });
 
-async function api(path, body){
-  const r = await fetch(API+path,{
-    method:"POST",
-    headers:{
-      "Authorization": tg.initData,
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify(body)
-  });
-  return r.json();
+async function api(path, method="GET", body=null){
+  const initData = Telegram.WebApp.initData;
+  if (!initData) throw new Error("initData empty. Open only via Telegram bot Mini App button.");
+
+  const opt = { method, headers: { "Authorization": initData } };
+  if (body) {
+    opt.headers["Content-Type"] = "application/json";
+    opt.body = JSON.stringify(body);
+  }
+
+  const r = await fetch(API + path, opt);
+  const text = await r.text();
+
+  let data;
+  try { data = JSON.parse(text); }
+  catch {
+    // Вот тут увидим, что это за HTML
+    throw new Error(`NON-JSON (${r.status}) from ${API+path}:\n` + text.slice(0, 300));
+  }
+
+  if (!r.ok) throw new Error(data?.error || `HTTP ${r.status}`);
+  return data;
 }
 
 async function refresh(){
