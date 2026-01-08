@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
+<!DOCTYPE html><html lang="ru"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NFT App</title>
+    <title>NFT Auction</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <script src="https://unpkg.com/tonweb@0.0.66/dist/tonweb.js"></script>
@@ -87,9 +85,7 @@
         }
         .nav-item { font-size: 24px; color: #888; transition: 0.3s; }
         .nav-item.active { color: white; transform: translateY(-2px); text-shadow: 0 0 10px rgba(255,255,255,0.5); }
-    </style>
-</head>
-<body>
+    </style></head><body>
 
     <div class="header">
         <div>
@@ -150,7 +146,7 @@
 
     <script>
         // === CONFIG ===
-        const API_URL = "https://api.growagardentrade.online"; // Твой URL API
+        const API_URL = "https://api.growagardentrade.online"; 
         
         // Инициализация Telegram
         const tg = window.Telegram.WebApp;
@@ -179,7 +175,7 @@
                 const r = await fetch(API_URL + path, { method, headers, body: body ? JSON.stringify(body) : null });
                 return await r.json();
             } catch(e) {
-                tg.showAlert("Network Error");
+                tg.showAlert("Network Error: " + e.message);
                 return null;
             }
         }
@@ -189,12 +185,14 @@
             const res = await api('/me');
             if (res && res.ok) {
                 currentUser = res.user;
-                depositWallet = res.deposit_wallet;
+                depositWallet = res.deposit_wallet; // Важно: получаем кошелек с сервера
                 depositComment = String(currentUser.telegram_user_id);
                 
                 document.getElementById('username').innerText = currentUser.username || "User " + currentUser.telegram_user_id;
                 updateBalance(res.balance);
                 renderNfts(res.nfts);
+            } else {
+                tg.showAlert("Ошибка подключения к серверу. Баланс может не отображаться.");
             }
 
             // 2. Получаем аукционы
@@ -211,30 +209,38 @@
         async function doDeposit() {
             let amountInput = document.getElementById('dep_amount').value;
             
-            // Фикс: заменяем запятую на точку (для мобильных клавиатур)
+            // 1. Заменяем запятую на точку
             if (amountInput) amountInput = amountInput.replace(',', '.');
             
             const amount = parseFloat(amountInput);
             
-            // Фикс: строгая проверка на число
+            // 2. Проверка на число
             if (isNaN(amount) || amount <= 0) {
                 return tg.showAlert("Пожалуйста, введите корректную сумму (например: 1.5)");
             }
 
+            // 3. Проверка подключения TonConnect
             if (!tonConnectUI.connected) {
                 return tg.showAlert("Сначала подключите кошелек (кнопка справа сверху)");
             }
 
-            // 1. Конвертируем сумму в нанотоны (1 TON = 1e9 nano)
+            // --- КРИТИЧЕСКИ ВАЖНОЕ ИСПРАВЛЕНИЕ ---
+            // Если сервер не прислал адрес кошелька, то нельзя открывать транзакцию
+            if (!depositWallet || depositWallet === "") {
+                return tg.showAlert("Ошибка: Адрес для пополнения не получен от сервера. Попробуйте перезагрузить приложение.");
+            }
+            // -------------------------------------
+
+            // 4. Конвертация суммы
             const nanoAmount = Math.floor(amount * 1e9).toString();
 
-            // 2. Создаем тело транзакции с комментарием
+            // 5. Создаем тело транзакции с комментарием
             const cell = new TonWeb.boc.Cell();
             cell.bits.writeUint(0, 32); // Opcode (0 = text comment)
             cell.bits.writeString(depositComment); // Наш комментарий (ID юзера)
             const payloadBase64 = TonWeb.utils.bytesToBase64(await cell.toBoc());
 
-            // 3. Формируем запрос для TonConnect
+            // 6. Формируем запрос
             const transaction = {
                 validUntil: Math.floor(Date.now() / 1000) + 600, // 10 мин
                 messages: [
@@ -248,10 +254,10 @@
 
             try {
                 await tonConnectUI.sendTransaction(transaction);
-                tg.showAlert("Транзакция отправлена! Ждите пополнения баланса (около 10-20 сек).");
+                tg.showAlert("Транзакция отправлена! Ждите пополнения баланса (10-30 сек).");
             } catch (e) {
                 console.error(e);
-                // Игнорируем отмену пользователем
+                // Если юзер закрыл окно - ничего не делаем
             }
         }
 
@@ -333,6 +339,4 @@
 
         // START
         init();
-    </script>
-</body>
-</html>
+    </script></body></html>
