@@ -6,112 +6,108 @@
     <title>NFT Auction</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <script src="https://unpkg.com/tonweb@0.0.66/dist/tonweb.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; background: #0f0c29; color: #fff; margin: 0; padding-bottom: 80px; }
-        .header { padding: 20px; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; }
+        body { font-family: sans-serif; background: #0b0e11; color: #eaecef; margin: 0; padding-bottom: 70px; }
         .container { padding: 15px; display: none; }
         .active { display: block; }
-        .card { background: rgba(255,255,255,0.1); border-radius: 15px; padding: 15px; margin-bottom: 15px; }
-        .nft-img { width: 100%; border-radius: 10px; margin-bottom: 10px; }
-        .btn { background: #007aff; border: none; color: #fff; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; }
-        .nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: #1a1a1a; display: flex; justify-content: space-around; align-items: center; }
-        .nav i { font-size: 24px; color: #666; }
-        .nav .active-nav { color: #007aff; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: none; box-sizing: border-box; }
+        .card { background: #1e2329; border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid #30363d; }
+        .nft-img { width: 100%; border-radius: 8px; }
+        .btn { background: #f0b90b; border: none; color: #000; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .btn-outline { background: transparent; color: #f0b90b; border: 1px solid #f0b90b; }
+        .nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: #181a20; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #30363d; }
+        .nav i { font-size: 22px; color: #848e9c; }
+        .nav .active-nav { color: #f0b90b; }
+        input { width: 100%; padding: 10px; margin: 5px 0; border-radius: 6px; border: 1px solid #474d57; background: #1e2329; color: #fff; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div>
-            <div id="user-name" style="font-weight: bold;">Loading...</div>
-            <div id="user-balance" style="color: #4cd964;">0.00 TON</div>
-        </div>
-        <div id="ton-connect"></div>
-    </div>
-
     <div id="tab-market" class="container active">
-        <h3>Маркетплейс 🔥</h3>
+        <h3 style="color: #f0b90b">Аукционы (5 дней)</h3>
         <div id="market-list"></div>
     </div>
 
     <div id="tab-wallet" class="container">
-        <h3>Кошелек 👛</h3>
+        <h3>Кошелек</h3>
         <div class="card">
-            <small>Ваш баланс</small>
-            <h1 id="wallet-bal">0.00 TON</h1>
-            <input type="number" id="dep-amount" placeholder="Сумма TON" value="1">
-            <button class="btn" onclick="deposit()">Пополнить баланс</button>
+            <div id="user-balance" style="font-size: 24px; font-weight: bold;">0.00 TON</div>
+            <input type="number" id="dep-amount" placeholder="Сумма пополнения">
+            <button class="btn" onclick="deposit()">Пополнить через кошелек</button>
+            <hr style="border-color: #30363d; margin: 15px 0;">
+            <input type="text" id="with-address" placeholder="Адрес кошелька">
+            <input type="number" id="with-amount" placeholder="Сумма вывода">
+            <button class="btn btn-outline" onclick="withdrawTon()">Вывести TON</button>
         </div>
+        <div id="ton-connect" style="display: flex; justify-content: center;"></div>
     </div>
 
     <div id="tab-profile" class="container">
-        <h3>Мои NFT 🎨</h3>
+        <h3>Мои NFT</h3>
         <div id="my-nfts"></div>
     </div>
 
     <div class="nav">
-        <i class="ri-store-2-line active-nav" onclick="switchTab('market', this)"></i>
-        <i class="ri-wallet-3-line" onclick="switchTab('wallet', this)"></i>
-        <i class="ri-user-line" onclick="switchTab('profile', this)"></i>
+        <i class="ri-fire-line active-nav" onclick="switchTab('market', this)"></i>
+        <i class="ri-wallet-2-line" onclick="switchTab('wallet', this)"></i>
+        <i class="ri-user-3-line" onclick="switchTab('profile', this)"></i>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://app.growagardentrade.online/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect'
-        });
-
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({ manifestUrl: 'https://app.growagardentrade.online/tonconnect-manifest.json', buttonRootId: 'ton-connect' });
         const API = "https://api.growagardentrade.online/api";
-        const user = tg.initDataUnsafe.user || { id: 0, username: 'Guest' };
-        let depositWallet = "";
+        const userId = tg.initDataUnsafe.user?.id || 0;
 
         async function load() {
-            document.getElementById('user-name').innerText = user.username;
-            const res = await fetch(`${API}/me?userId=${user.id}`).then(r => r.json());
+            const res = await fetch(`${API}/me?userId=${userId}`).then(r => r.json());
             if (res.ok) {
                 document.getElementById('user-balance').innerText = res.balance.toFixed(2) + " TON";
-                document.getElementById('wallet-bal').innerText = res.balance.toFixed(2) + " TON";
-                depositWallet = res.deposit_wallet;
                 renderNfts(res.nfts);
             }
-            loadAuctions();
+            fetch(`${API}/auctions`).then(r => r.json()).then(res => {
+                const cont = document.getElementById('market-list');
+                cont.innerHTML = '';
+                res.list?.forEach(a => {
+                    const timeLeft = Math.max(0, Math.floor((a.ends_at - Date.now()) / 3600000));
+                    cont.innerHTML += `<div class="card"><img src="${a.nft_address}" class="nft-img"><b>${a.current_bid} TON</b><br><small>Осталось: ${timeLeft}ч.</small><button class="btn">Сделать ставку</button></div>`;
+                });
+            });
         }
 
         function renderNfts(nfts) {
-            const container = document.getElementById('my-nfts');
-            container.innerHTML = nfts.length ? '' : 'У вас нет NFT';
+            const cont = document.getElementById('my-nfts');
+            cont.innerHTML = nfts.length ? '' : 'Нет доступных NFT';
             nfts.forEach(n => {
-                container.innerHTML += `<div class="card"><img src="${n.nft_address}" class="nft-img"><div>Status: ${n.status}</div></div>`;
+                cont.innerHTML += `
+                    <div class="card">
+                        <img src="${n.nft_address}" class="nft-img">
+                        <input type="number" id="bid-${n.id}" placeholder="Мин. ставка TON">
+                        <button class="btn" onclick="listNft(${n.id})">На аукцион (5д)</button>
+                        <button class="btn btn-outline" onclick="withdrawNft(${n.id})">Вывести на кошелек</button>
+                    </div>`;
             });
         }
 
-        async function loadAuctions() {
-            const res = await fetch(`${API}/auctions`).then(r => r.json());
-            const container = document.getElementById('market-list');
-            container.innerHTML = '';
-            res.list?.forEach(a => {
-                container.innerHTML += `<div class="card"><img src="${a.nft_address}" class="nft-img"><b>${a.current_bid} TON</b><button class="btn">Ставка</button></div>`;
-            });
+        async function listNft(nftId) {
+            const minBid = document.getElementById(`bid-${nftId}`).value;
+            if(!minBid) return alert("Укажите цену");
+            await fetch(`${API}/list-auction`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId, nftId, minBid }) });
+            alert("Выставлено!"); load();
         }
 
-        async function deposit() {
-            const amount = document.getElementById('dep-amount').value;
-            if (!tonConnectUI.connected) return alert("Connect wallet!");
-            
-            const cell = new TonWeb.boc.Cell();
-            cell.bits.writeUint(0, 32);
-            cell.bits.writeString(user.id.toString());
-            const payload = TonWeb.utils.bytesToBase64(await cell.toBoc());
+        async function withdrawNft(nftId) {
+            const wallet = tonConnectUI.account?.address || prompt("Введите адрес кошелька:");
+            if(!wallet) return;
+            await fetch(`${API}/request-nft-withdraw`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId, nftId, wallet }) });
+            alert("Заявка отправлена админу!"); load();
+        }
 
-            const tx = {
-                validUntil: Math.floor(Date.now() / 1000) + 600,
-                messages: [{ address: depositWallet, amount: (amount * 1e9).toString(), payload: payload }]
-            };
-            await tonConnectUI.sendTransaction(tx);
+        async function withdrawTon() {
+            const amount = document.getElementById('with-amount').value;
+            const wallet = document.getElementById('with-address').value;
+            const res = await fetch(`${API}/withdraw-ton`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId, amount, wallet }) }).then(r => r.json());
+            alert(res.ok ? "Заявка на TON отправлена!" : "Ошибка: " + res.error); load();
         }
 
         function switchTab(tab, el) {
