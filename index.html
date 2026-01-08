@@ -3,84 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NFT Market</title>
+    <title>NFT Auction</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <script src="https://unpkg.com/tonweb@0.0.66/dist/tonweb.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0f0c29; color: #fff; margin: 0; padding-bottom: 80px; }
-        .header { padding: 15px; background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
-        .container { padding: 15px; display: none; animation: fadeIn 0.3s; }
+        :root { --accent: #007aff; --bg-card: rgba(255,255,255,0.08); }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0f0c29; color: #fff; margin: 0; padding-bottom: 90px; }
+        
+        /* HEADER */
+        .header { padding: 15px; background: rgba(15, 12, 41, 0.85); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        
+        /* CONTAINERS & ANIMATIONS */
+        .container { padding: 15px; display: none; animation: fadeIn 0.4s ease; }
         .active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .card { background: rgba(255,255,255,0.08); border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
-        .nft-img { width: 100%; border-radius: 12px; margin-bottom: 12px; aspect-ratio: 1/1; object-fit: cover; }
+        /* GRID LAYOUT (2 Columns) */
+        .grid-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
-        .btn { background: #007aff; border: none; color: #fff; padding: 12px; width: 100%; border-radius: 10px; font-weight: 600; font-size: 15px; margin-top: 8px; cursor: pointer; transition: 0.2s; }
-        .btn:active { transform: scale(0.97); }
-        .btn-outline { background: transparent; border: 1px solid #007aff; color: #007aff; }
-        .btn-danger { background: rgba(255, 59, 48, 0.2); color: #ff3b30; }
-
-        .row { display: flex; gap: 10px; }
+        /* CARDS */
+        .card { background: var(--bg-card); border-radius: 16px; padding: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; justify-content: space-between; animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #1a1a1a; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 10px; gap: 4px; }
-        .nav i { font-size: 24px; }
-        .active-nav { color: #007aff; }
+        .nft-img { width: 100%; border-radius: 12px; aspect-ratio: 1/1; object-fit: cover; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
         
-        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; box-sizing: border-box; outline: none; }
+        /* BUTTONS */
+        .btn { background: var(--accent); border: none; color: #fff; padding: 10px; width: 100%; border-radius: 10px; font-weight: 600; font-size: 13px; margin-top: 5px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,122,255,0.3); }
+        .btn:active { transform: scale(0.95); }
+        .btn-outline { background: rgba(0,122,255,0.15); color: #fff; margin-top: 5px; }
         
-        .balance-display { font-size: 28px; font-weight: 700; margin: 10px 0; }
-        .sub-text { color: #8e8e93; font-size: 13px; }
+        /* NAVIGATION */
+        .nav { position: fixed; bottom: 20px; left: 5%; width: 90%; height: 60px; background: rgba(30,30,30,0.9); border-radius: 20px; display: flex; justify-content: space-around; align-items: center; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 200; border: 1px solid rgba(255,255,255,0.1); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 10px; gap: 2px; transition: 0.3s; }
+        .nav i { font-size: 22px; }
+        .active-nav { color: var(--accent); transform: translateY(-2px); text-shadow: 0 0 10px rgba(0,122,255,0.5); }
+        
+        /* INPUTS */
+        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--accent); background: rgba(0,0,0,0.5); }
+        
+        /* UTILS */
+        .full-width-card { grid-column: 1 / -1; display: block; text-align: center; padding: 20px; }
+        .price-tag { font-weight: bold; color: #4cd964; font-size: 14px; margin-bottom: 5px; display: block; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div>
-            <div id="user-name" style="font-size: 14px; color: #ccc;">Loading...</div>
-            <div id="user-balance" style="font-weight: bold; color: #fff;">0.00 TON</div>
+            <div id="user-name" style="font-size: 12px; opacity: 0.7;">Loading...</div>
+            <div id="user-balance" style="font-weight: 800; font-size: 16px;">0.00 TON</div>
         </div>
         <div id="ton-connect"></div>
     </div>
 
     <div id="tab-market" class="container active">
-        <h3>🔥 Активные аукционы</h3>
-        <div id="market-list"></div>
+        <h3 style="margin-top:0;">🔥 Аукцион</h3>
+        <div id="market-list" class="grid-wrapper"></div>
     </div>
 
     <div id="tab-wallet" class="container">
-        <h3>👛 Кошелек</h3>
-        <div class="card" style="text-align: center;">
-            <div class="sub-text">Доступный баланс</div>
-            <div class="balance-display" id="wallet-bal">0.00 TON</div>
-            
-            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
-            
-            <div style="text-align: left;">
-                <label>Пополнить (Deposit)</label>
-                <input type="number" id="dep-amount" placeholder="10 TON" value="1">
-                <button class="btn" onclick="deposit()">📥 Пополнить через TON</button>
-            </div>
+        <h3 style="margin-top:0;">👛 Кошелек</h3>
+        <div class="card full-width-card">
+            <div style="font-size: 13px; opacity: 0.6;">Баланс счета</div>
+            <div style="font-size: 32px; font-weight: bold; margin: 10px 0;" id="wallet-bal">0.00</div>
             
             <div style="text-align: left; margin-top: 20px;">
-                <label>Вывести (Withdraw)</label>
+                <label style="font-size:12px;">Пополнить (Deposit)</label>
+                <input type="number" id="dep-amount" placeholder="Сумма TON" value="1">
+                <button class="btn" onclick="deposit()">📥 Пополнить</button>
+            </div>
+            
+            <div style="text-align: left; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                <label style="font-size:12px;">Вывод TON (Withdraw)</label>
                 <input type="text" id="with-addr" placeholder="Адрес кошелька (UQ...)">
                 <input type="number" id="with-amount" placeholder="Сумма">
-                <button class="btn btn-outline" onclick="withdrawTon()">📤 Запросить вывод</button>
+                <button class="btn btn-outline" onclick="withdrawTon()">📤 Вывести средства</button>
             </div>
         </div>
     </div>
 
     <div id="tab-profile" class="container">
-        <h3>🎨 Мои NFT</h3>
-        <div id="my-nfts"></div>
+        <h3 style="margin-top:0;">🎨 Моя коллекция</h3>
+        <div id="my-nfts" class="grid-wrapper"></div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active-nav" onclick="switchTab('market', this)"><i class="ri-store-2-line"></i>Маркет</div>
+        <div class="nav-item active-nav" onclick="switchTab('market', this)"><i class="ri-fire-line"></i>Маркет</div>
         <div class="nav-item" onclick="switchTab('wallet', this)"><i class="ri-wallet-3-line"></i>Кошелек</div>
         <div class="nav-item" onclick="switchTab('profile', this)"><i class="ri-user-smile-line"></i>Профиль</div>
     </div>
@@ -88,13 +99,13 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        
+        tg.enableClosingConfirmation();
+
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://app.growagardentrade.online/tonconnect-manifest.json',
             buttonRootId: 'ton-connect'
         });
 
-        // CHANGE THIS TO YOUR DOMAIN
         const API = "https://api.growagardentrade.online/api";
         const user = tg.initDataUnsafe.user || { id: 0, username: 'Guest' };
         let depositWallet = "";
@@ -117,26 +128,25 @@
         function renderNfts(nfts) {
             const container = document.getElementById('my-nfts');
             if (!nfts.length) {
-                container.innerHTML = '<div style="color:#666; text-align:center; margin-top:50px;">Пусто 🌪</div>';
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #888;">Пусто 🌪</div>';
                 return;
             }
             container.innerHTML = '';
             nfts.forEach(n => {
-                let btns = '';
+                let actionBtns = '';
                 if (n.status === 'in_app') {
-                    btns = `
-                        <div class="row">
-                            <button class="btn" onclick="sellNft(${n.id})">💸 Продать</button>
-                            <button class="btn btn-outline" onclick="withdrawNft(${n.id})">📤 Вывести</button>
-                        </div>`;
+                    actionBtns = `
+                        <button class="btn" onclick="sellNft(${n.id})">💸 Продать</button>
+                        <button class="btn btn-outline" onclick="withdrawNft(${n.id})">📤 Вывод</button>
+                    `;
                 } else {
-                    btns = `<div style="color: orange; margin-top:10px;">Статус: ${n.status}</div>`;
+                    actionBtns = `<div style="font-size:10px; color:orange; margin-top:5px; text-align:center;">${n.status}</div>`;
                 }
 
                 container.innerHTML += `
                     <div class="card">
                         <img src="${n.nft_address}" class="nft-img">
-                        ${btns}
+                        ${actionBtns}
                     </div>`;
             });
         }
@@ -147,30 +157,27 @@
                 const container = document.getElementById('market-list');
                 container.innerHTML = '';
                 if (!res.list?.length) {
-                    container.innerHTML = '<div style="color:#666; text-align:center; margin-top:50px;">Аукционов нет 😴</div>';
+                    container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #888;">Аукционов нет 😴</div>';
                     return;
                 }
                 res.list.forEach(a => {
-                    // Вычисляем оставшееся время
                     const timeLeft = Math.max(0, Math.floor((a.ends_at - Date.now()) / (1000 * 60 * 60)));
                     container.innerHTML += `
                         <div class="card">
                             <img src="${a.nft_address}" class="nft-img">
-                            <div class="row" style="justify-content: space-between; margin-bottom: 10px;">
-                                <span>Текущая ставка:</span>
-                                <b style="color: #4cd964;">${a.current_bid} TON</b>
-                            </div>
-                            <div class="sub-text">⏳ Окончание через: ${timeLeft} ч.</div>
-                            <button class="btn" onclick="bid(${a.id}, ${a.current_bid})">Сделать ставку</button>
+                            <div class="price-tag">${a.current_bid} TON</div>
+                            <div style="font-size:10px; opacity:0.7; margin-bottom:5px;">⏳ ${timeLeft}ч.</div>
+                            <button class="btn" onclick="bid(${a.id}, ${a.current_bid})">Ставка</button>
                         </div>`;
                 });
             } catch(e) { console.error(e); }
         }
 
-        // === ACTIONS ===
+        // === ДЕЙСТВИЯ ===
 
         async function sellNft(id) {
-            const price = prompt("Введите минимальную ставку (TON):");
+            tg.HapticFeedback.impactOccurred('medium');
+            const price = prompt("💰 Минимальная ставка (TON):");
             if (!price || isNaN(price)) return;
             
             const res = await fetch(`${API}/auction/create`, {
@@ -179,28 +186,39 @@
                 body: JSON.stringify({ userId: user.id, nftId: id, minBid: parseFloat(price) })
             }).then(r => r.json());
 
-            if (res.ok) { alert("Выставлено на 5 дней!"); load(); }
-            else alert(res.error);
+            if (res.ok) { 
+                tg.showAlert("✅ Лот выставлен на 5 дней!"); 
+                load(); 
+            } else {
+                tg.showAlert("❌ Ошибка: " + res.error);
+            }
         }
 
         async function withdrawNft(id) {
-            const addr = prompt("Введите адрес TON кошелька для получения NFT:");
-            if (!addr) return;
+            tg.HapticFeedback.impactOccurred('medium');
+            // Запрашиваем именно USERNAME
+            const username = prompt("Введите Telegram Username для получения (без @):", user.username || "");
+            if (!username) return;
 
             const res = await fetch(`${API}/withdraw/nft`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ userId: user.id, nftId: id, address: addr })
+                body: JSON.stringify({ userId: user.id, nftId: id, username: username })
             }).then(r => r.json());
 
-            if (res.ok) { alert("Заявка отправлена админу!"); load(); }
-            else alert(res.error);
+            if (res.ok) { 
+                tg.showAlert("✅ Заявка отправлена админу!"); 
+                load(); 
+            } else {
+                tg.showAlert("❌ Ошибка: " + res.error);
+            }
         }
 
         async function withdrawTon() {
+            tg.HapticFeedback.impactOccurred('light');
             const amount = document.getElementById('with-amount').value;
             const addr = document.getElementById('with-addr').value;
-            if (!amount || !addr) return alert("Заполните поля");
+            if (!amount || !addr) return tg.showAlert("Заполните все поля");
 
             const res = await fetch(`${API}/withdraw/ton`, {
                 method: 'POST',
@@ -208,12 +226,13 @@
                 body: JSON.stringify({ userId: user.id, amount: parseFloat(amount), address: addr })
             }).then(r => r.json());
 
-            if (res.ok) { alert("Заявка принята!"); load(); }
-            else alert(res.error || "Ошибка");
+            if (res.ok) { tg.showAlert("Заявка принята!"); load(); }
+            else tg.showAlert(res.error);
         }
 
         async function bid(auctionId, currentBid) {
-            const newBid = prompt(`Текущая: ${currentBid} TON. Ваша ставка?`, currentBid + 1);
+            tg.HapticFeedback.impactOccurred('heavy');
+            const newBid = prompt(`Текущая: ${currentBid} TON. Ваша ставка?`, (currentBid + 1));
             if (!newBid) return;
 
             const res = await fetch(`${API}/bid`, {
@@ -222,13 +241,14 @@
                 body: JSON.stringify({ userId: user.id, auctionId, amount: parseFloat(newBid) })
             }).then(r => r.json());
 
-            if (res.ok) { alert("Ставка принята!"); load(); }
-            else alert(res.error || "Ошибка (проверьте баланс)");
+            if (res.ok) { tg.showAlert("Ставка принята!"); load(); }
+            else tg.showAlert("Ошибка: " + res.error);
         }
 
         async function deposit() {
+            tg.HapticFeedback.impactOccurred('light');
             const amount = document.getElementById('dep-amount').value;
-            if (!tonConnectUI.connected) return alert("Подключите кошелек!");
+            if (!tonConnectUI.connected) return tg.showAlert("Подключите кошелек!");
             
             const cell = new TonWeb.boc.Cell();
             cell.bits.writeUint(0, 32);
@@ -241,11 +261,11 @@
             };
             try {
                 await tonConnectUI.sendTransaction(tx);
-                alert("Транзакция отправлена! Ждите подтверждения.");
-            } catch(e) { alert("Отмена транзакции"); }
+            } catch(e) {}
         }
 
         function switchTab(tab, el) {
+            tg.HapticFeedback.selectionChanged();
             document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active-nav'));
