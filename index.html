@@ -11,52 +11,40 @@
     <style>
         :root { --accent: #007aff; --bg-card: rgba(255,255,255,0.08); --bg-modal: #1c1c1e; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0f0c29; color: #fff; margin: 0; padding-bottom: 90px; }
-        
-        /* HEADER */
         .header { padding: 15px; background: rgba(15, 12, 41, 0.85); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05); }
-        
-        /* CONTAINERS */
         .container { padding: 15px; display: none; animation: fadeIn 0.4s ease; }
         .active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* GRID LAYOUT (2 Columns) */
         .grid-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        
-        /* CARDS */
-        .card { background: var(--bg-card); border-radius: 16px; padding: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); cursor: pointer; transition: transform 0.1s; }
+        .card { background: var(--bg-card); border-radius: 16px; padding: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; cursor: pointer; transition: transform 0.1s; }
         .card:active { transform: scale(0.98); }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .nft-img { width: 100%; border-radius: 12px; aspect-ratio: 1/1; object-fit: cover; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        .price-tag { font-weight: 700; color: #fff; font-size: 15px; margin-top: auto; display: flex; align-items: center; gap: 4px; }
-        .price-tag span { color: #4cd964; }
-
-        /* BUTTONS */
-        .btn { background: var(--accent); border: none; color: #fff; padding: 12px; width: 100%; border-radius: 12px; font-weight: 600; font-size: 14px; margin-top: 10px; cursor: pointer; transition: 0.2s; }
-        .btn:active { opacity: 0.7; }
+        .nft-img { width: 100%; border-radius: 12px; aspect-ratio: 1/1; object-fit: cover; margin-bottom: 8px; }
+        .price-tag { font-weight: 700; color: #fff; font-size: 15px; margin-top: auto; display: flex; align-items: center; gap: 4px; justify-content: space-between; }
+        .btn { background: var(--accent); border: none; color: #fff; padding: 12px; width: 100%; border-radius: 12px; font-weight: 600; font-size: 14px; margin-top: 10px; cursor: pointer; }
         .btn-outline { background: rgba(255,255,255,0.1); color: #fff; margin-top: 5px; }
+        
+        /* LIST STYLE FOR HISTORY */
+        .history-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 12px; border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .h-left { display: flex; flex-direction: column; }
+        .h-type { font-size: 14px; font-weight: 600; }
+        .h-date { font-size: 11px; opacity: 0.5; margin-top: 2px; }
+        .h-amount { font-weight: 700; font-size: 15px; }
+        .plus { color: #4cd964; } .minus { color: #ff3b30; }
 
-        /* MODAL (POPUP) */
+        /* MODAL */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.open { display: flex; opacity: 1; }
-        .modal-content { background: var(--bg-modal); width: 85%; max-width: 350px; border-radius: 24px; padding: 20px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.6); transform: scale(0.9); transition: transform 0.3s; border: 1px solid rgba(255,255,255,0.1); }
+        .modal-content { background: var(--bg-modal); width: 85%; max-width: 350px; border-radius: 24px; padding: 20px; position: relative; border: 1px solid rgba(255,255,255,0.1); }
         .modal-overlay.open .modal-content { transform: scale(1); }
-        .close-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.1); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
-        
+        .close-btn { position: absolute; top: 15px; right: 15px; width: 30px; height: 30px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .modal-info-row { display: flex; justify-content: space-between; margin: 10px 0; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
-        .modal-label { color: #888; }
-        .modal-val { font-weight: 600; }
 
-        /* NAVIGATION */
+        /* NAV */
         .nav { position: fixed; bottom: 20px; left: 5%; width: 90%; height: 60px; background: rgba(30,30,30,0.9); border-radius: 20px; display: flex; justify-content: space-around; align-items: center; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 200; border: 1px solid rgba(255,255,255,0.1); }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 10px; gap: 2px; transition: 0.3s; }
         .nav i { font-size: 22px; }
-        .active-nav { color: var(--accent); transform: translateY(-2px); text-shadow: 0 0 10px rgba(0,122,255,0.5); }
-        
-        /* INPUTS */
+        .active-nav { color: var(--accent); transform: translateY(-2px); }
         input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; box-sizing: border-box; outline: none; }
-        input:focus { border-color: var(--accent); background: rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
@@ -70,7 +58,7 @@
     </div>
 
     <div id="tab-market" class="container active">
-        <h3 style="margin-top:0;">🔥 Активные аукционы</h3>
+        <h3 style="margin-top:0;">🔥 Аукционы</h3>
         <div id="market-list" class="grid-wrapper"></div>
     </div>
 
@@ -79,20 +67,23 @@
         <div class="card" style="display: block; cursor: default;">
             <div style="font-size: 13px; opacity: 0.6;">Баланс счета</div>
             <div style="font-size: 32px; font-weight: bold; margin: 10px 0;" id="wallet-bal">0.00</div>
-            
             <div style="margin-top: 20px;">
                 <label style="font-size:12px;">Пополнить (Deposit)</label>
                 <input type="number" id="dep-amount" placeholder="Сумма TON" value="1">
                 <button class="btn" onclick="deposit()">📥 Пополнить</button>
             </div>
-            
             <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                 <label style="font-size:12px;">Вывод TON</label>
-                <input type="text" id="with-addr" placeholder="Адрес кошелька (UQ...)">
+                <input type="text" id="with-addr" placeholder="Адрес (UQ...)">
                 <input type="number" id="with-amount" placeholder="Сумма">
                 <button class="btn btn-outline" onclick="withdrawTon()">📤 Вывести</button>
             </div>
         </div>
+    </div>
+    
+    <div id="tab-history" class="container">
+        <h3 style="margin-top:0;">📜 История операций</h3>
+        <div id="history-list"></div>
     </div>
 
     <div id="tab-profile" class="container">
@@ -103,6 +94,7 @@
     <div class="nav">
         <div class="nav-item active-nav" onclick="switchTab('market', this)"><i class="ri-fire-line"></i>Маркет</div>
         <div class="nav-item" onclick="switchTab('wallet', this)"><i class="ri-wallet-3-line"></i>Кошелек</div>
+        <div class="nav-item" onclick="switchTab('history', this)"><i class="ri-history-line"></i>История</div>
         <div class="nav-item" onclick="switchTab('profile', this)"><i class="ri-user-smile-line"></i>Профиль</div>
     </div>
 
@@ -112,23 +104,26 @@
             <img id="m-img" src="" style="width:100%; border-radius:16px; margin-bottom:15px; max-height: 250px; object-fit: contain;">
             
             <div class="modal-info-row">
+                <span class="modal-label">ID Аукциона</span>
+                <span class="modal-val" id="m-id">#0</span>
+            </div>
+            <div class="modal-info-row">
+                <span class="modal-label">Лидер</span>
+                <span class="modal-val" id="m-leader" style="color: #4cd964;">-</span>
+            </div>
+            <div class="modal-info-row">
                 <span class="modal-label">Продавец</span>
                 <span class="modal-val" id="m-seller">@username</span>
             </div>
-            <div class="modal-info-row">
-                <span class="modal-label">Завершение через</span>
-                <span class="modal-val" id="m-time">0ч 0м</span>
-            </div>
             <div class="modal-info-row" style="border:none;">
                 <span class="modal-label">Текущая цена</span>
-                <span class="modal-val" style="font-size:18px; color:#4cd964;" id="m-price">10 TON</span>
+                <span class="modal-val" style="font-size:18px; color:#4cd964;" id="m-price">0 TON</span>
             </div>
 
             <div style="background: rgba(255,255,255,0.05); padding:10px; border-radius:12px; margin-top:10px;">
                 <label style="font-size:12px; opacity:0.7;">Ваша ставка</label>
                 <input type="number" id="m-bid-input" placeholder="Введите сумму">
             </div>
-            
             <button class="btn" id="m-bid-btn">Сделать ставку</button>
         </div>
     </div>
@@ -136,22 +131,17 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.enableClosingConfirmation();
-
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://app.growagardentrade.online/tonconnect-manifest.json',
             buttonRootId: 'ton-connect'
         });
-
         const API = "https://api.growagardentrade.online/api";
         const user = tg.initDataUnsafe.user || { id: 0, username: 'Guest' };
         let depositWallet = "";
-        let currentAuctionId = null;
 
         async function load() {
             document.getElementById('user-name').innerText = user.username ? '@' + user.username : 'ID: ' + user.id;
             try {
-                // Загружаем профиль
                 const res = await fetch(`${API}/me?userId=${user.id}`).then(r => r.json());
                 if (res.ok) {
                     const bal = res.balance.toFixed(2) + " TON";
@@ -160,194 +150,152 @@
                     depositWallet = res.deposit_wallet;
                     renderNfts(res.nfts);
                 }
-                // Загружаем аукционы
                 loadAuctions();
+                loadHistory(); // Загрузка истории
             } catch (e) { console.error(e); }
+        }
+
+        async function loadHistory() {
+            try {
+                const res = await fetch(`${API}/history?userId=${user.id}`).then(r => r.json());
+                const list = document.getElementById('history-list');
+                list.innerHTML = '';
+                
+                if (!res.list || !res.list.length) {
+                    list.innerHTML = '<div style="text-align:center; opacity:0.5; margin-top:20px;">История пуста</div>';
+                    return;
+                }
+
+                res.list.forEach(item => {
+                    const isIncome = ['deposit', 'sale_income', 'bid_refund', 'auction_refund'].includes(item.type);
+                    const sign = isIncome ? '+' : '-';
+                    const colorClass = isIncome ? 'plus' : 'minus';
+                    const date = new Date(item.created_at).toLocaleDateString() + ' ' + new Date(item.created_at).toLocaleTimeString();
+                    
+                    list.innerHTML += `
+                        <div class="history-item">
+                            <div class="h-left">
+                                <span class="h-type">${formatType(item.type)}</span>
+                                <span class="h-date">${date}</span>
+                                <span style="font-size:10px; color:#777;">${item.description}</span>
+                            </div>
+                            <div class="h-amount ${colorClass}">${sign}${item.amount.toFixed(2)} TON</div>
+                        </div>
+                    `;
+                });
+            } catch (e) {}
+        }
+
+        function formatType(type) {
+            const map = {
+                'deposit': 'Пополнение',
+                'withdraw_hold': 'Вывод (Hold)',
+                'withdraw_done': 'Вывод завершен',
+                'withdraw_refund': 'Возврат вывода',
+                'bid_hold': 'Ставка',
+                'bid_refund': 'Перебив (Возврат)',
+                'sale_income': 'Продажа NFT',
+                'auction_refund': 'Отмена аукциона'
+            };
+            return map[type] || type;
         }
 
         function renderNfts(nfts) {
             const container = document.getElementById('my-nfts');
-            if (!nfts.length) {
-                container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px; opacity: 0.5;">У вас нет NFT 🌪</div>';
-                return;
-            }
-            container.innerHTML = '';
+            container.innerHTML = nfts.length ? '' : '<div style="grid-column:1/-1; text-align:center; padding:20px; opacity:0.5;">Пусто 🌪</div>';
             nfts.forEach(n => {
-                let actionBtns = '';
-                // КНОПКА "ВЫСТАВИТЬ" вместо Продать
                 if (n.status === 'in_app') {
-                    actionBtns = `
-                        <button class="btn" onclick="sellNft(${n.id})">🏷 Выставить</button>
-                        <button class="btn btn-outline" onclick="withdrawNft(${n.id})">📤 Вывод</button>
-                    `;
-                } else {
-                    actionBtns = `<div style="font-size:10px; color:orange; margin-top:5px; text-align:center; padding:10px;">Статус: ${n.status}</div>`;
+                    container.innerHTML += `
+                        <div class="card" style="cursor:default;">
+                            <img src="${n.nft_address}" class="nft-img" onerror="this.src='https://placehold.co/400'">
+                            <button class="btn" onclick="sellNft(${n.id})">🏷 Выставить</button>
+                            <button class="btn btn-outline" onclick="withdrawNft(${n.id})">📤 Вывод</button>
+                        </div>`;
                 }
-
-                container.innerHTML += `
-                    <div class="card" style="cursor: default;">
-                        <img src="${n.nft_address}" class="nft-img">
-                        ${actionBtns}
-                    </div>`;
             });
         }
 
         async function loadAuctions() {
-            try {
-                const res = await fetch(`${API}/auctions`).then(r => r.json());
-                const container = document.getElementById('market-list');
-                container.innerHTML = '';
-                
-                if (!res.list?.length) {
-                    container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px; opacity: 0.5;">Аукционов нет 😴</div>';
-                    return;
-                }
-
-                res.list.forEach(a => {
-                    // Храним объект данных в атрибуте data-json для модального окна
-                    const dataStr = encodeURIComponent(JSON.stringify(a));
-                    
-                    container.innerHTML += `
-                        <div class="card" onclick="openModal('${dataStr}')">
-                            <img src="${a.nft_address}" class="nft-img">
-                            <div class="price-tag">
-                                <span>${a.current_bid} TON</span>
-                            </div>
-                        </div>`;
-                });
-            } catch(e) { console.error(e); }
+            const res = await fetch(`${API}/auctions`).then(r => r.json());
+            const container = document.getElementById('market-list');
+            container.innerHTML = res.list?.length ? '' : '<div style="grid-column:1/-1; text-align:center; padding:20px; opacity:0.5;">Нет аукционов 😴</div>';
+            res.list?.forEach(a => {
+                const dataStr = encodeURIComponent(JSON.stringify(a));
+                container.innerHTML += `
+                    <div class="card" onclick="openModal('${dataStr}')">
+                        <div style="position:absolute; background:rgba(0,0,0,0.6); padding:4px 8px; border-radius:8px; font-size:10px; top:15px; left:15px;">#${a.id}</div>
+                        <img src="${a.nft_address}" class="nft-img" onerror="this.src='https://placehold.co/400'">
+                        <div class="price-tag">
+                            <span>${a.current_bid} TON</span>
+                            <span style="font-size:10px; opacity:0.7;">${a.leader_name ? '👑 ' + a.leader_name : 'Нет ставок'}</span>
+                        </div>
+                    </div>`;
+            });
         }
 
-        // === МОДАЛЬНОЕ ОКНО ===
-
         function openModal(dataStr) {
-            tg.HapticFeedback.selectionChanged();
             const data = JSON.parse(decodeURIComponent(dataStr));
-            currentAuctionId = data.id;
-
             document.getElementById('m-img').src = data.nft_address;
+            document.getElementById('m-id').innerText = '#' + data.id;
             document.getElementById('m-seller').innerText = data.seller_name ? '@' + data.seller_name : 'ID ' + data.seller_id;
+            document.getElementById('m-leader').innerText = data.leader_name ? '@' + data.leader_name : 'Нет ставок';
             document.getElementById('m-price').innerText = data.current_bid + ' TON';
             
-            // Расчет времени
-            const timeLeftMs = data.ends_at - Date.now();
-            const hours = Math.floor(timeLeftMs / (1000 * 60 * 60));
-            document.getElementById('m-time').innerText = hours > 0 ? `${hours}ч` : '< 1ч';
-            
-            // Подготовка инпута
             const input = document.getElementById('m-bid-input');
             input.value = '';
-            input.placeholder = `Мин: ${data.current_bid + 1}`;
-
-            // Привязка кнопки
+            input.placeholder = `Мин: ${data.current_bid + 0.1}`;
             document.getElementById('m-bid-btn').onclick = () => doBid(data.id, data.current_bid);
-
             document.getElementById('auction-modal').classList.add('open');
         }
 
-        function closeModal() {
-            document.getElementById('auction-modal').classList.remove('open');
-        }
-
-        // === ДЕЙСТВИЯ ===
+        function closeModal() { document.getElementById('auction-modal').classList.remove('open'); }
 
         async function doBid(auctionId, currentBid) {
-            const inputVal = document.getElementById('m-bid-input').value;
-            const amount = parseFloat(inputVal);
-
-            if (!amount || amount <= currentBid) {
-                tg.showAlert("Ставка должна быть выше текущей цены!");
-                return;
-            }
-
-            tg.HapticFeedback.impactOccurred('medium');
-            const res = await fetch(`${API}/bid`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ userId: user.id, auctionId, amount })
-            }).then(r => r.json());
-
-            if (res.ok) { 
-                closeModal();
-                tg.showAlert("✅ Ставка принята!"); 
-                load(); 
-            } else {
-                tg.showAlert("❌ Ошибка: " + res.error);
-            }
+            const amount = parseFloat(document.getElementById('m-bid-input').value);
+            if (!amount || amount <= currentBid) return tg.showAlert("Ставка должна быть выше!");
+            const res = await fetch(`${API}/bid`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, auctionId, amount }) }).then(r => r.json());
+            if (res.ok) { closeModal(); tg.showAlert("✅ Ставка принята!"); load(); } else tg.showAlert("❌ " + res.error);
         }
 
         async function sellNft(id) {
-            tg.HapticFeedback.impactOccurred('medium');
-            const price = prompt("💰 Введите начальную цену аукциона (TON):");
+            const price = prompt("💰 Начальная цена (TON):");
             if (!price || isNaN(price)) return;
-            
-            const res = await fetch(`${API}/auction/create`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ userId: user.id, nftId: id, minBid: parseFloat(price) })
-            }).then(r => r.json());
-
-            if (res.ok) { 
-                tg.showAlert("✅ Лот выставлен на аукцион!"); 
-                load(); 
-            } else {
-                tg.showAlert("❌ Ошибка: " + res.error);
-            }
+            const res = await fetch(`${API}/auction/create`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, nftId: id, minBid: parseFloat(price) }) }).then(r => r.json());
+            if (res.ok) { tg.showAlert("✅ Лот создан!"); load(); } else tg.showAlert("❌ " + res.error);
         }
 
         async function withdrawNft(id) {
-            const username = prompt("Введите Telegram Username для получения (без @):", user.username || "");
+            const username = prompt("Username для получения (без @):");
             if (!username) return;
-
-            const res = await fetch(`${API}/withdraw/nft`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ userId: user.id, nftId: id, username: username })
-            }).then(r => r.json());
-
-            if (res.ok) { tg.showAlert("✅ Заявка отправлена!"); load(); }
-            else tg.showAlert("❌ " + res.error);
+            const res = await fetch(`${API}/withdraw/nft`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, nftId: id, username }) }).then(r => r.json());
+            if (res.ok) { tg.showAlert("✅ Заявка отправлена!"); load(); } else tg.showAlert("❌ " + res.error);
         }
 
         async function withdrawTon() {
             const amount = document.getElementById('with-amount').value;
             const addr = document.getElementById('with-addr').value;
-            if (!amount || !addr) return tg.showAlert("Заполните все поля");
-
-            const res = await fetch(`${API}/withdraw/ton`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ userId: user.id, amount: parseFloat(amount), address: addr })
-            }).then(r => r.json());
-
-            if (res.ok) { tg.showAlert("Заявка принята!"); load(); }
-            else tg.showAlert(res.error);
+            if (!amount || !addr) return tg.showAlert("Заполните поля");
+            const res = await fetch(`${API}/withdraw/ton`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, amount: parseFloat(amount), address: addr }) }).then(r => r.json());
+            if (res.ok) { tg.showAlert("Заявка принята!"); load(); } else tg.showAlert(res.error);
         }
 
         async function deposit() {
             const amount = document.getElementById('dep-amount').value;
-            if (!tonConnectUI.connected) return tg.showAlert("Сначала подключите кошелек (кнопка сверху)!");
-            
+            if (!tonConnectUI.connected) return tg.showAlert("Подключите кошелек!");
             const cell = new TonWeb.boc.Cell();
             cell.bits.writeUint(0, 32);
             cell.bits.writeString(user.id.toString());
             const payload = TonWeb.utils.bytesToBase64(await cell.toBoc());
-
-            const tx = {
-                validUntil: Math.floor(Date.now() / 1000) + 600,
-                messages: [{ address: depositWallet, amount: (amount * 1e9).toString(), payload: payload }]
-            };
+            const tx = { validUntil: Math.floor(Date.now() / 1000) + 600, messages: [{ address: depositWallet, amount: (amount * 1e9).toString(), payload: payload }] };
             try { await tonConnectUI.sendTransaction(tx); } catch(e) {}
         }
 
         function switchTab(tab, el) {
-            tg.HapticFeedback.selectionChanged();
             document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active-nav'));
             el.classList.add('active-nav');
         }
-
         load();
     </script>
 </body>
