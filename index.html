@@ -23,7 +23,14 @@
         .btn { background: var(--accent); border: none; color: #fff; padding: 12px; width: 100%; border-radius: 12px; font-weight: 600; font-size: 14px; margin-top: 10px; cursor: pointer; }
         .btn-outline { background: rgba(255,255,255,0.1); color: #fff; margin-top: 5px; }
         
-        /* LIST STYLE FOR HISTORY */
+        /* FILTERS */
+        .filters-container { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; -webkit-overflow-scrolling: touch; }
+        .filter-box { background: #2c2c2e; border-radius: 12px; padding: 8px 12px; min-width: 100px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
+        .filter-label { font-size: 10px; color: #888; display: block; margin-bottom: 2px; }
+        .filter-select { background: transparent; color: #fff; border: none; font-size: 14px; font-weight: bold; width: 100%; outline: none; appearance: none; }
+        .filter-select:disabled { opacity: 0.5; }
+
+        /* HISTORY */
         .history-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 12px; border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
         .h-left { display: flex; flex-direction: column; }
         .h-type { font-size: 14px; font-weight: 600; }
@@ -34,10 +41,12 @@
         /* MODAL */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.open { display: flex; opacity: 1; }
-        .modal-content { background: var(--bg-modal); width: 85%; max-width: 350px; border-radius: 24px; padding: 20px; position: relative; border: 1px solid rgba(255,255,255,0.1); }
-        .modal-overlay.open .modal-content { transform: scale(1); }
+        .modal-content { background: var(--bg-modal); width: 85%; max-width: 350px; border-radius: 24px; padding: 20px; position: relative; border: 1px solid rgba(255,255,255,0.1); max-height: 90vh; overflow-y: auto; }
         .close-btn { position: absolute; top: 15px; right: 15px; width: 30px; height: 30px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .modal-info-row { display: flex; justify-content: space-between; margin: 10px 0; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+        
+        .bid-history-list { margin-top: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px; }
+        .bid-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
         /* NAV */
         .nav { position: fixed; bottom: 20px; left: 5%; width: 90%; height: 60px; background: rgba(30,30,30,0.9); border-radius: 20px; display: flex; justify-content: space-around; align-items: center; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 200; border: 1px solid rgba(255,255,255,0.1); }
@@ -59,6 +68,31 @@
 
     <div id="tab-market" class="container active">
         <h3 style="margin-top:0;">🔥 Аукционы</h3>
+        
+        <div class="filters-container">
+            <div class="filter-box">
+                <span class="filter-label">Collection</span>
+                <select class="filter-select" id="f-col" onchange="onCollectionChange()">
+                    <option value="All">All</option>
+                    </select>
+            </div>
+            <div class="filter-box">
+                <span class="filter-label">Model</span>
+                <select class="filter-select" id="f-mod" onchange="loadAuctions()" disabled>
+                    <option value="All">All</option>
+                </select>
+            </div>
+            <div class="filter-box">
+                <span class="filter-label">Backdrop</span>
+                <select class="filter-select" id="f-bg" onchange="loadAuctions()">
+                    <option value="All">All</option>
+                    <option value="Black">Black</option>
+                    <option value="Gold">Gold</option>
+                    <option value="Neon">Neon</option>
+                </select>
+            </div>
+        </div>
+
         <div id="market-list" class="grid-wrapper"></div>
     </div>
 
@@ -104,16 +138,17 @@
             <img id="m-img" src="" style="width:100%; border-radius:16px; margin-bottom:15px; max-height: 250px; object-fit: contain;">
             
             <div class="modal-info-row">
-                <span class="modal-label">ID Аукциона</span>
-                <span class="modal-val" id="m-id">#0</span>
+                <span class="modal-label">Коллекция</span>
+                <span class="modal-val" id="m-coll">-</span>
             </div>
+            <div class="modal-info-row">
+                <span class="modal-label">Модель</span>
+                <span class="modal-val" id="m-model">-</span>
+            </div>
+
             <div class="modal-info-row">
                 <span class="modal-label">Лидер</span>
                 <span class="modal-val" id="m-leader" style="color: #4cd964;">-</span>
-            </div>
-            <div class="modal-info-row">
-                <span class="modal-label">Продавец</span>
-                <span class="modal-val" id="m-seller">@username</span>
             </div>
             <div class="modal-info-row" style="border:none;">
                 <span class="modal-label">Текущая цена</span>
@@ -121,10 +156,14 @@
             </div>
 
             <div style="background: rgba(255,255,255,0.05); padding:10px; border-radius:12px; margin-top:10px;">
-                <label style="font-size:12px; opacity:0.7;">Ваша ставка</label>
                 <input type="number" id="m-bid-input" placeholder="Введите сумму">
             </div>
             <button class="btn" id="m-bid-btn">Сделать ставку</button>
+            
+            <h4 style="margin: 15px 0 5px 0; font-size:13px; opacity:0.7;">История ставок</h4>
+            <div id="m-history" class="bid-history-list">
+                <div style="text-align:center; font-size:12px; opacity:0.5;">Загрузка...</div>
+            </div>
         </div>
     </div>
 
@@ -139,6 +178,48 @@
         const user = tg.initDataUnsafe.user || { id: 0, username: 'Guest' };
         let depositWallet = "";
 
+        // === НАСТРОЙКА КОЛЛЕКЦИЙ ===
+        // Здесь пропишите свои коллекции и соответствующие им модели
+        const COLLECTION_DATA = {
+            "Plush pepe": ["Midas pepe", "Holo pepe", "Common pepe"],
+            "Pixel Cat": ["Golden Cat", "Zombie Cat"],
+            "Cyber Dog": ["Neon Dog", "Mecha Dog"]
+        };
+
+        function initFilters() {
+            const colSelect = document.getElementById('f-col');
+            // Заполняем коллекции из константы
+            Object.keys(COLLECTION_DATA).forEach(col => {
+                const opt = document.createElement('option');
+                opt.value = col;
+                opt.innerText = col;
+                colSelect.appendChild(opt);
+            });
+        }
+
+        function onCollectionChange() {
+            const col = document.getElementById('f-col').value;
+            const modSelect = document.getElementById('f-mod');
+            
+            modSelect.innerHTML = '<option value="All">All</option>'; // Сброс
+            
+            if (col === 'All') {
+                modSelect.disabled = true;
+            } else {
+                modSelect.disabled = false;
+                // Добавляем модели для выбранной коллекции
+                if (COLLECTION_DATA[col]) {
+                    COLLECTION_DATA[col].forEach(model => {
+                        const opt = document.createElement('option');
+                        opt.value = model;
+                        opt.innerText = model;
+                        modSelect.appendChild(opt);
+                    });
+                }
+            }
+            loadAuctions();
+        }
+
         async function load() {
             document.getElementById('user-name').innerText = user.username ? '@' + user.username : 'ID: ' + user.id;
             try {
@@ -151,101 +232,84 @@
                     renderNfts(res.nfts);
                 }
                 loadAuctions();
-                loadHistory(); // Загрузка истории
+                loadHistory();
             } catch (e) { console.error(e); }
         }
 
-        async function loadHistory() {
-            try {
-                const res = await fetch(`${API}/history?userId=${user.id}`).then(r => r.json());
-                const list = document.getElementById('history-list');
-                list.innerHTML = '';
-                
-                if (!res.list || !res.list.length) {
-                    list.innerHTML = '<div style="text-align:center; opacity:0.5; margin-top:20px;">История пуста</div>';
-                    return;
-                }
-
-                res.list.forEach(item => {
-                    const isIncome = ['deposit', 'sale_income', 'bid_refund', 'auction_refund'].includes(item.type);
-                    const sign = isIncome ? '+' : '-';
-                    const colorClass = isIncome ? 'plus' : 'minus';
-                    const date = new Date(item.created_at).toLocaleDateString() + ' ' + new Date(item.created_at).toLocaleTimeString();
-                    
-                    list.innerHTML += `
-                        <div class="history-item">
-                            <div class="h-left">
-                                <span class="h-type">${formatType(item.type)}</span>
-                                <span class="h-date">${date}</span>
-                                <span style="font-size:10px; color:#777;">${item.description}</span>
-                            </div>
-                            <div class="h-amount ${colorClass}">${sign}${item.amount.toFixed(2)} TON</div>
-                        </div>
-                    `;
-                });
-            } catch (e) {}
-        }
-
-        function formatType(type) {
-            const map = {
-                'deposit': 'Пополнение',
-                'withdraw_hold': 'Вывод (Hold)',
-                'withdraw_done': 'Вывод завершен',
-                'withdraw_refund': 'Возврат вывода',
-                'bid_hold': 'Ставка',
-                'bid_refund': 'Перебив (Возврат)',
-                'sale_income': 'Продажа NFT',
-                'auction_refund': 'Отмена аукциона'
-            };
-            return map[type] || type;
-        }
-
-        function renderNfts(nfts) {
-            const container = document.getElementById('my-nfts');
-            container.innerHTML = nfts.length ? '' : '<div style="grid-column:1/-1; text-align:center; padding:20px; opacity:0.5;">Пусто 🌪</div>';
-            nfts.forEach(n => {
-                if (n.status === 'in_app') {
-                    container.innerHTML += `
-                        <div class="card" style="cursor:default;">
-                            <img src="${n.nft_address}" class="nft-img" onerror="this.src='https://placehold.co/400'">
-                            <button class="btn" onclick="sellNft(${n.id})">🏷 Выставить</button>
-                            <button class="btn btn-outline" onclick="withdrawNft(${n.id})">📤 Вывод</button>
-                        </div>`;
-                }
-            });
-        }
-
         async function loadAuctions() {
-            const res = await fetch(`${API}/auctions`).then(r => r.json());
+            const col = document.getElementById('f-col').value;
+            const mod = document.getElementById('f-mod').value;
+            const bg = document.getElementById('f-bg').value;
+
+            // Отправляем параметры фильтрации
+            const res = await fetch(`${API}/auctions?collection=${col}&model=${mod}&backdrop=${bg}`).then(r => r.json());
             const container = document.getElementById('market-list');
             container.innerHTML = res.list?.length ? '' : '<div style="grid-column:1/-1; text-align:center; padding:20px; opacity:0.5;">Нет аукционов 😴</div>';
+            
             res.list?.forEach(a => {
                 const dataStr = encodeURIComponent(JSON.stringify(a));
                 container.innerHTML += `
                     <div class="card" onclick="openModal('${dataStr}')">
                         <div style="position:absolute; background:rgba(0,0,0,0.6); padding:4px 8px; border-radius:8px; font-size:10px; top:15px; left:15px;">#${a.id}</div>
-                        <img src="${a.nft_address}" class="nft-img" onerror="this.src='https://placehold.co/400'">
+                        <img src="${a.image_url || a.nft_address}" class="nft-img" onerror="this.src='https://placehold.co/400'">
+                        <div style="font-size:11px; color:#aaa; margin-bottom:5px;">${a.collection} | ${a.model}</div>
                         <div class="price-tag">
                             <span>${a.current_bid} TON</span>
-                            <span style="font-size:10px; opacity:0.7;">${a.leader_name ? '👑 ' + a.leader_name : 'Нет ставок'}</span>
+                            <span style="font-size:10px; opacity:0.7;">${a.leader_name ? '👑 ' + a.leader_name : 'Ставок нет'}</span>
                         </div>
                     </div>`;
             });
         }
 
+        async function loadAuctionHistory(auctionId) {
+            const container = document.getElementById('m-history');
+            container.innerHTML = '<div style="text-align:center; font-size:12px; opacity:0.5;">Загрузка...</div>';
+            
+            try {
+                const res = await fetch(`${API}/auction/history?auctionId=${auctionId}`).then(r => r.json());
+                if (res.ok && res.history.length > 0) {
+                    container.innerHTML = '';
+                    res.history.forEach(h => {
+                        // Определяем тип записи
+                        const isRefund = h.description.includes('Outbid');
+                        const color = isRefund ? '#ff3b30' : '#4cd964';
+                        const text = isRefund ? 'Перебита' : 'Ставка';
+                        const name = h.username ? '@' + h.username : 'User ' + h.user_id; // user_id не приходит в join, но username есть
+                        
+                        container.innerHTML += `
+                            <div class="bid-row">
+                                <div>
+                                    <span style="color:${color}; font-weight:bold;">${text}</span> 
+                                    <span>${name}</span>
+                                </div>
+                                <div style="font-weight:bold;">${h.amount} TON</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    container.innerHTML = '<div style="text-align:center; font-size:12px; opacity:0.5;">Истории пока нет</div>';
+                }
+            } catch (e) {
+                container.innerHTML = '<div style="text-align:center; font-size:12px; opacity:0.5;">Ошибка загрузки</div>';
+            }
+        }
+
         function openModal(dataStr) {
             const data = JSON.parse(decodeURIComponent(dataStr));
-            document.getElementById('m-img').src = data.nft_address;
-            document.getElementById('m-id').innerText = '#' + data.id;
-            document.getElementById('m-seller').innerText = data.seller_name ? '@' + data.seller_name : 'ID ' + data.seller_id;
+            document.getElementById('m-img').src = data.image_url || data.nft_address;
+            document.getElementById('m-coll').innerText = data.collection;
+            document.getElementById('m-model').innerText = data.model;
             document.getElementById('m-leader').innerText = data.leader_name ? '@' + data.leader_name : 'Нет ставок';
             document.getElementById('m-price').innerText = data.current_bid + ' TON';
             
             const input = document.getElementById('m-bid-input');
             input.value = '';
-            input.placeholder = `Мин: ${data.current_bid + 0.1}`;
+            input.placeholder = `Мин: ${(data.current_bid + 0.1).toFixed(2)}`;
             document.getElementById('m-bid-btn').onclick = () => doBid(data.id, data.current_bid);
             document.getElementById('auction-modal').classList.add('open');
+            
+            // Грузим историю ставок
+            loadAuctionHistory(data.id);
         }
 
         function closeModal() { document.getElementById('auction-modal').classList.remove('open'); }
@@ -254,9 +318,45 @@
             const amount = parseFloat(document.getElementById('m-bid-input').value);
             if (!amount || amount <= currentBid) return tg.showAlert("Ставка должна быть выше!");
             const res = await fetch(`${API}/bid`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, auctionId, amount }) }).then(r => r.json());
-            if (res.ok) { closeModal(); tg.showAlert("✅ Ставка принята!"); load(); } else tg.showAlert("❌ " + res.error);
+            if (res.ok) { 
+                closeModal(); 
+                tg.showAlert("✅ Ставка принята!"); 
+                load(); // Перезагружаем список
+            } else tg.showAlert("❌ " + res.error);
         }
 
+        // Отрисовка NFT профиля
+        function renderNfts(nfts) {
+            const container = document.getElementById('my-nfts');
+            container.innerHTML = nfts.length ? '' : '<div style="grid-column:1/-1; text-align:center; padding:20px; opacity:0.5;">Пусто 🌪</div>';
+            nfts.forEach(n => {
+                if (n.status === 'in_app') {
+                    container.innerHTML += `
+                        <div class="card" style="cursor:default;">
+                            <img src="${n.image_url || n.nft_address}" class="nft-img" onerror="this.src='https://placehold.co/400'">
+                            <div style="font-size:10px; opacity:0.7; margin-bottom:5px;">${n.collection}</div>
+                            <button class="btn" onclick="sellNft(${n.id})">🏷 Выставить</button>
+                            <button class="btn btn-outline" onclick="withdrawNft(${n.id})">📤 Вывод</button>
+                        </div>`;
+                }
+            });
+        }
+        
+        async function loadHistory() {
+             const res = await fetch(`${API}/history?userId=${user.id}`).then(r => r.json());
+             const list = document.getElementById('history-list');
+             list.innerHTML = '';
+             if(!res.list || !res.list.length) { list.innerHTML = '<div style="text-align:center; opacity:0.5;">Пусто</div>'; return; }
+             res.list.forEach(item => {
+                 const isIncome = ['deposit', 'sale_income', 'bid_refund', 'auction_refund'].includes(item.type);
+                 list.innerHTML += `<div class="history-item">
+                    <div class="h-left"><span class="h-type">${item.type}</span><span class="h-date">${new Date(item.created_at).toLocaleString()}</span></div>
+                    <div class="h-amount ${isIncome?'plus':'minus'}">${isIncome?'+':'-'}${item.amount.toFixed(2)}</div>
+                 </div>`;
+             });
+        }
+
+        // Остальные функции (sellNft, withdraw...) без изменений, но убедитесь, что они есть в вашем коде
         async function sellNft(id) {
             const price = prompt("💰 Начальная цена (TON):");
             if (!price || isNaN(price)) return;
@@ -270,7 +370,7 @@
             const res = await fetch(`${API}/withdraw/nft`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, nftId: id, username }) }).then(r => r.json());
             if (res.ok) { tg.showAlert("✅ Заявка отправлена!"); load(); } else tg.showAlert("❌ " + res.error);
         }
-
+        
         async function withdrawTon() {
             const amount = document.getElementById('with-amount').value;
             const addr = document.getElementById('with-addr').value;
@@ -296,6 +396,9 @@
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active-nav'));
             el.classList.add('active-nav');
         }
+
+        // Запуск
+        initFilters();
         load();
     </script>
 </body>
