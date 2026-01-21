@@ -72,7 +72,7 @@
             color: var(--accent);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            text-shadow: 0 0 15px var(--accent-glow); /* Неоновое свечение */
+            text-shadow: 0 0 15px var(--accent-glow);
             animation: pulseGlow 3s infinite alternate;
         }
 
@@ -121,8 +121,8 @@
             100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); }
         }
 
-        /* --- SEARCH --- */
-        .search-wrapper { padding: 15px; }
+        /* --- SEARCH & FILTERS --- */
+        .search-wrapper { padding: 15px 15px 5px 15px; }
         .search-bar { 
             width: 100%; 
             background: rgba(255,255,255,0.05); 
@@ -141,6 +141,35 @@
             background: rgba(0,0,0,0.3);
         }
 
+        .filters-container {
+            display: flex;
+            gap: 8px;
+            padding: 0 15px 15px 15px;
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+        }
+        .filters-container::-webkit-scrollbar { display: none; }
+
+        .filter-select {
+            background: rgba(20, 30, 60, 0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007aff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 10px;
+            padding-right: 25px;
+            min-width: 100px;
+            flex-shrink: 0;
+        }
+        .filter-select:focus { border-color: var(--accent); outline: none; }
+        .filter-select:disabled { opacity: 0.5; cursor: not-allowed; }
+
         /* --- GRID & CARDS --- */
         .container { padding: 15px; display: none; }
         .container.active { display: block; }
@@ -154,11 +183,10 @@
             border: 1px solid rgba(255,255,255,0.05); 
             backdrop-filter: blur(10px);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            animation: fadeInUp 0.6s backwards; /* Анимация появления */
+            animation: fadeInUp 0.6s backwards; 
             position: relative;
         }
         
-        /* Эффект при наведении/нажатии */
         .card:active { transform: scale(0.95); }
         .card:hover { 
             transform: translateY(-5px); 
@@ -270,7 +298,18 @@
     </div>
 
     <div class="search-wrapper">
-        <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Find collection, item or color...">
+        <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Search items...">
+    </div>
+    <div class="filters-container">
+        <select id="filter-collection" class="filter-select">
+            <option value="all">📚 All Collections</option>
+        </select>
+        <select id="filter-model" class="filter-select" disabled>
+            <option value="all">🤖 All Models</option>
+        </select>
+        <select id="filter-background" class="filter-select">
+            <option value="all">🖼 All Backgrounds</option>
+        </select>
     </div>
 
     <div class="container active" id="tab-market">
@@ -320,10 +359,9 @@
         tg.headerColor = '#020410'; 
         tg.enableClosingConfirmation();
 
-        // !ВАЖНО! Замени на свой реальный URL сервера
+        // ЗАМЕНИ НА СВОЙ URL
         const API = 'https://твоя-ссылка-на-сервер.com'; 
         
-        // Данные юзера (фоллбек для теста в браузере)
         const user = tg.initDataUnsafe.user || { id: 7879865609, first_name: 'Tester', username: 'tester', photo_url: 'https://placehold.co/100' };
         
         if (user.photo_url) document.getElementById('header-avatar').src = user.photo_url;
@@ -333,101 +371,201 @@
             buttonRootId: 'ton-connect'
         });
 
-        // --- CORE LOGIC ---
-        let searchTimer;
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            clearTimeout(searchTimer);
-            searchTimer = setTimeout(() => { load(); }, 400);
+        // --- GLOBAL DATA STORAGE FOR FILTERING ---
+        let allItems = []; // Сюда грузим всё с сервера (или профиля или маркета)
+        let currentTab = 'market';
+
+        // --- FILTER ELEMENTS ---
+        const sInput = document.getElementById('searchInput');
+        const fCollection = document.getElementById('filter-collection');
+        const fModel = document.getElementById('filter-model');
+        const fBackground = document.getElementById('filter-background');
+
+        // --- EVENT LISTENERS ---
+        sInput.addEventListener('input', applyFilters);
+        fCollection.addEventListener('change', () => {
+            updateModelDropdown();
+            applyFilters();
         });
+        fModel.addEventListener('change', applyFilters);
+        fBackground.addEventListener('change', applyFilters);
 
+        // --- CORE LOAD FUNCTION ---
         async function load() {
-            const query = document.getElementById('searchInput').value;
-            const searchParam = query ? `?search=${encodeURIComponent(query)}` : '';
+            const isMarket = currentTab === 'market';
+            const gridId = isMarket ? 'market-grid' : 'profile-grid';
+            
+            // Сбрасываем фильтры при смене вкладки, чтобы не путать пользователя
+            resetFiltersUI();
 
-            // 1. Market Load
             try {
-                const mRes = await fetch(`${API}/api/auctions${searchParam}`).then(r => r.json());
-                const mGrid = document.getElementById('market-grid');
-                mGrid.innerHTML = '';
-                
-                if (mRes.ok) {
-                    mRes.list.forEach((auc, index) => {
-                        const traits = JSON.parse(auc.attributes || '[]');
-                        const traitsHtml = traits.slice(0, 2).map(t => `<span class="trait-tag">${t.value || t}</span>`).join('');
-                        // Добавляем задержку для анимации (каскад)
-                        const delay = index * 0.05;
-                        
-                        mGrid.innerHTML += `
-                            <div class="card" style="animation-delay: ${delay}s" onclick="openAuction(${auc.id}, ${auc.current_bid}, '${auc.name}')">
-                                <img src="${auc.image_url}" loading="lazy">
-                                <div class="card-info">
-                                    <span class="nft-name">${auc.name || 'Garden NFT'}</span>
-                                    <div class="nft-price">${auc.current_bid} TON</div>
-                                    <div style="margin-top:5px; display:flex; flex-wrap:wrap;">${traitsHtml}</div>
-                                </div>
-                            </div>`;
-                    });
-                }
-            } catch(e) { console.error("Market error:", e); }
-
-            // 2. Profile Load
-            try {
-                const pRes = await fetch(`${API}/api/user${searchParam}`, { headers: {'x-user-id': user.id} }).then(r => r.json());
-                const pGrid = document.getElementById('profile-grid');
-                const hList = document.getElementById('history-list');
-                
-                pGrid.innerHTML = '';
-                hList.innerHTML = '';
-
-                if (pRes.ok) {
-                    // Анимация чисел
-                    animateValue("balance", parseFloat(document.getElementById('balance').innerText), pRes.balance, 1000);
-                    
-                    document.getElementById('stat-count').innerText = pRes.nfts.length;
-                    document.getElementById('stat-value').innerText = (pRes.balance + (pRes.nfts.length * 2.5)).toFixed(1);
-
-                    if (pRes.nfts.length === 0) pGrid.innerHTML = '<div style="grid-column: span 2; text-align:center; color:#555; padding: 20px;">Empty inventory</div>';
-                    
-                    pRes.nfts.forEach((nft, index) => {
-                        const traits = JSON.parse(nft.attributes || '[]');
-                        const traitsHtml = traits.slice(0, 2).map(t => `<span class="trait-tag">${t.value || t}</span>`).join('');
-                        const delay = index * 0.05;
-
-                        pGrid.innerHTML += `
-                            <div class="card" style="animation-delay: ${delay}s" onclick="openNftActions(${nft.id}, '${nft.name}')">
-                                <img src="${nft.image_url}" loading="lazy">
-                                <div class="card-info">
-                                    <span class="nft-name">${nft.name || 'My NFT'}</span>
-                                    <div style="color:var(--text-sec); font-size:11px;">In Wallet</div>
-                                    <div style="margin-top:5px; display:flex; flex-wrap:wrap;">${traitsHtml}</div>
-                                </div>
-                            </div>`;
-                    });
-
-                    if (pRes.history && pRes.history.length > 0) {
-                        pRes.history.forEach(tx => {
-                            const isDep = tx.type === 'deposit';
-                            const color = isDep ? '#4cd964' : '#ff3b30';
-                            const icon = isDep ? 'ri-arrow-left-down-line' : 'ri-arrow-right-up-line';
-                            hList.innerHTML += `
-                                <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                                    <div style="display:flex; align-items:center; gap:10px;">
-                                        <i class="${icon}" style="color:${color}; font-size:18px;"></i>
-                                        <span>${tx.description}</span>
-                                    </div>
-                                    <span style="color:${color}; font-weight:700;">${isDep ? '+' : '-'}${tx.amount}</span>
-                                </div>
-                            `;
-                        });
-                    } else {
-                        hList.innerHTML = '<div style="padding:10px; text-align:center;">No history yet</div>';
+                // Fetch data
+                let items = [];
+                if (isMarket) {
+                    const res = await fetch(`${API}/api/auctions`).then(r => r.json());
+                    if (res.ok) items = res.list;
+                } else {
+                    const res = await fetch(`${API}/api/user`, { headers: {'x-user-id': user.id} }).then(r => r.json());
+                    if (res.ok) {
+                        items = res.nfts;
+                        // Update stats
+                        animateValue("balance", parseFloat(document.getElementById('balance').innerText), res.balance, 1000);
+                        document.getElementById('stat-count').innerText = res.nfts.length;
+                        document.getElementById('stat-value').innerText = (res.balance + (res.nfts.length * 2.5)).toFixed(1); // Fake value calc
+                        renderHistory(res.history);
                     }
                 }
-            } catch(e) { console.error("Profile error:", e); }
+
+                // Prepare data: Parse attributes once
+                allItems = items.map(item => {
+                    let traits = [];
+                    try { traits = typeof item.attributes === 'string' ? JSON.parse(item.attributes) : item.attributes; } catch(e){}
+                    
+                    // Extract Helper Keys
+                    const getTrait = (key) => traits.find(t => t.trait_type.toLowerCase() === key.toLowerCase())?.value || 'Unknown';
+                    
+                    return {
+                        ...item,
+                        parsedTraits: traits,
+                        collection: getTrait('Collection'),
+                        model: getTrait('Model'),
+                        background: getTrait('Background')
+                    };
+                });
+
+                // Populate Filter Dropdowns
+                populateFilters(allItems);
+                
+                // Render initial Grid
+                renderGrid(allItems, gridId, isMarket);
+
+            } catch(e) { console.error("Load error:", e); }
+        }
+
+        // --- FILTER LOGIC ---
+        function populateFilters(items) {
+            // Get unique Collections & Backgrounds
+            const collections = [...new Set(items.map(i => i.collection))].sort();
+            const backgrounds = [...new Set(items.map(i => i.background))].sort();
+
+            // Fill Collection Select
+            fCollection.innerHTML = '<option value="all">📚 All Collections</option>';
+            collections.forEach(c => fCollection.innerHTML += `<option value="${c}">${c}</option>`);
+
+            // Fill Background Select
+            fBackground.innerHTML = '<option value="all">🖼 All Backgrounds</option>';
+            backgrounds.forEach(b => fBackground.innerHTML += `<option value="${b}">${b}</option>`);
+
+            // Reset Model
+            fModel.innerHTML = '<option value="all">🤖 All Models</option>';
+            fModel.disabled = true;
+        }
+
+        function updateModelDropdown() {
+            const selectedCol = fCollection.value;
+            fModel.innerHTML = '<option value="all">🤖 All Models</option>';
+            
+            if (selectedCol === 'all') {
+                fModel.disabled = true;
+                return;
+            }
+
+            // Find models ONLY in this collection
+            const models = [...new Set(allItems
+                .filter(i => i.collection === selectedCol)
+                .map(i => i.model)
+            )].sort();
+
+            models.forEach(m => fModel.innerHTML += `<option value="${m}">${m}</option>`);
+            fModel.disabled = false;
+        }
+
+        function applyFilters() {
+            const txt = sInput.value.toLowerCase();
+            const col = fCollection.value;
+            const mod = fModel.value;
+            const bg = fBackground.value;
+
+            const filtered = allItems.filter(item => {
+                // Text Search
+                const matchText = (item.name || '').toLowerCase().includes(txt);
+                
+                // Selects
+                const matchCol = col === 'all' || item.collection === col;
+                const matchMod = mod === 'all' || item.model === mod; // If disabled, value is 'all'
+                const matchBg = bg === 'all' || item.background === bg;
+
+                return matchText && matchCol && matchMod && matchBg;
+            });
+
+            const gridId = currentTab === 'market' ? 'market-grid' : 'profile-grid';
+            renderGrid(filtered, gridId, currentTab === 'market');
+        }
+
+        function resetFiltersUI() {
+            sInput.value = '';
+            fCollection.value = 'all';
+            fModel.value = 'all';
+            fBackground.value = 'all';
+            fModel.disabled = true;
+        }
+
+        // --- RENDER LOGIC ---
+        function renderGrid(items, elementId, isMarket) {
+            const el = document.getElementById(elementId);
+            el.innerHTML = '';
+
+            if(items.length === 0) {
+                el.innerHTML = '<div style="grid-column: span 2; text-align:center; color:#555; padding: 20px;">No items found</div>';
+                return;
+            }
+
+            items.forEach((item, index) => {
+                const traitsHtml = item.parsedTraits.slice(0, 2).map(t => `<span class="trait-tag">${t.value || t}</span>`).join('');
+                const delay = index * 0.05;
+                const priceDisplay = isMarket ? `<div class="nft-price">${item.current_bid} TON</div>` : '<div style="color:var(--text-sec); font-size:11px;">In Wallet</div>';
+                const clickAction = isMarket 
+                    ? `openAuction(${item.id}, ${item.current_bid}, '${item.name}')`
+                    : `openNftActions(${item.id}, '${item.name}')`;
+
+                el.innerHTML += `
+                    <div class="card" style="animation-delay: ${delay}s" onclick="${clickAction}">
+                        <img src="${item.image_url}" loading="lazy">
+                        <div class="card-info">
+                            <span class="nft-name">${item.name || 'Unknown'}</span>
+                            ${priceDisplay}
+                            <div style="margin-top:5px; display:flex; flex-wrap:wrap;">${traitsHtml}</div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function renderHistory(history) {
+            const hList = document.getElementById('history-list');
+            hList.innerHTML = '';
+            if (!history || history.length === 0) {
+                hList.innerHTML = '<div style="padding:10px; text-align:center;">No history yet</div>';
+                return;
+            }
+            history.forEach(tx => {
+                const isDep = tx.type === 'deposit';
+                const color = isDep ? '#4cd964' : '#ff3b30';
+                const icon = isDep ? 'ri-arrow-left-down-line' : 'ri-arrow-right-up-line';
+                const desc = tx.type === 'deposit' ? 'Deposit' : (tx.type === 'withdraw_ton' ? 'Withdraw' : tx.type);
+                hList.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="${icon}" style="color:${color}; font-size:18px;"></i>
+                            <span>${desc}</span>
+                        </div>
+                        <span style="color:${color}; font-weight:700;">${isDep ? '+' : ''}${tx.amount}</span>
+                    </div>`;
+            });
         }
 
         // --- UI UTILS ---
         function switchTab(tab, el) {
+            currentTab = tab;
             document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active-nav'));
@@ -436,7 +574,6 @@
             load();
         }
 
-        // Анимация счета чисел
         function animateValue(id, start, end, duration) {
             if (start === end) return;
             const obj = document.getElementById(id);
@@ -455,7 +592,7 @@
             document.getElementById('modal-body').innerHTML = content;
             const m = document.getElementById('modal');
             m.style.display = 'flex';
-            setTimeout(() => m.classList.add('open'), 10); // Trigger transition
+            setTimeout(() => m.classList.add('open'), 10);
         }
 
         function closeModal() { 
@@ -478,7 +615,6 @@
 
         async function placeBid(id) {
             const amount = parseFloat(document.getElementById('bid-amount').value);
-            // Тут fetch к твоему серверу...
             const res = await fetch(`${API}/api/auction/bid`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, auctionId: id, amount }) }).then(r => r.json());
             if (res.ok) { tg.showAlert("Bid placed successfully!"); closeModal(); load(); }
             else tg.showAlert(res.error);
@@ -502,14 +638,16 @@
         async function createAuction(id) {
             const price = parseFloat(document.getElementById('auc-price').value);
             const hours = parseInt(document.getElementById('auc-hours').value);
-            const res = await fetch(`${API}/api/auction/create`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, nftId: id, price, durationHours: hours }) }).then(r => r.json());
+            const res = await fetch(`${API}/api/auction/create`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, nftId: id, price, duration: hours }) }).then(r => r.json());
             if (res.ok) { tg.showAlert("Auction Created!"); closeModal(); load(); }
             else tg.showAlert(res.error);
         }
 
         async function withdrawNft(id) {
-            if(!confirm("Withdraw item to external wallet?")) return;
-            // ... fetch logic similar to above
+            if(!confirm("Withdraw item to external wallet? Fee applies.")) return;
+            const res = await fetch(`${API}/api/withdraw/nft`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, nftId: id }) }).then(r => r.json());
+            if (res.ok) { tg.showAlert("Withdraw requested!"); closeModal(); load(); }
+            else tg.showAlert(res.error);
         }
 
         // --- DEPOSIT ---
@@ -556,6 +694,7 @@
             else tg.showAlert(res.error);
         }
 
+        // Initial Load
         load();
     </script>
     <div id="ton-connect" style="display:none;"></div>
