@@ -1,702 +1,611 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AucTON</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <script src="https://unpkg.com/tonweb@0.0.66/dist/tonweb.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <style>
-        :root { 
-            --bg-body: #020410;
-            --bg-card: rgba(20, 30, 60, 0.4); 
-            --bg-modal: #0b1121;
-            --accent: #007aff;
-            --accent-glow: rgba(0, 122, 255, 0.6);
-            --text-sec: #8e9bb3;
-        }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg-body); 
-            color: #fff; 
-            margin: 0; 
-            padding-bottom: 100px; 
-            overflow-x: hidden; 
-            -webkit-tap-highlight-color: transparent;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>AucTON</title>
 
-        /* --- 1. ЖИВОЙ ФОН (АНИМАЦИЯ) --- */
-        .ambient-light {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            overflow: hidden;
-            pointer-events: none;
-        }
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.4;
-            animation: float 10s infinite ease-in-out;
-        }
-        .orb-1 { width: 300px; height: 300px; background: #0033ff; top: -10%; left: -10%; animation-delay: 0s; }
-        .orb-2 { width: 200px; height: 200px; background: #007aff; bottom: 20%; right: -10%; animation-delay: -5s; }
-        
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(30px, 50px); }
-        }
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@2.0.10/dist/tonconnect-ui.min.js"></script>
 
-        /* --- HEADER --- */
-        .header { 
-            padding: 12px 16px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-            backdrop-filter: blur(15px); 
-            background: rgba(2, 4, 16, 0.7);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            animation: slideDown 0.5s ease-out;
-        }
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --card:rgba(255,255,255,0.06);
+      --card2:rgba(255,255,255,0.08);
+      --stroke:rgba(255,255,255,0.08);
+      --text:#ffffff;
+      --muted:rgba(255,255,255,0.6);
+      --blue:#007aff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-        .brand-logo {
-            font-weight: 900;
-            font-size: 22px;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 15px var(--accent-glow);
-            animation: pulseGlow 3s infinite alternate;
-        }
+    .wrap{
+      padding:14px 14px 86px 14px;
+      max-width:520px;
+      margin:0 auto;
+    }
 
-        @keyframes pulseGlow {
-            0% { text-shadow: 0 0 10px var(--accent-glow); opacity: 0.9; }
-            100% { text-shadow: 0 0 25px var(--accent-glow); opacity: 1; }
-        }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
 
-        /* PROFILE PILL */
-        .profile-pill {
-            background: rgba(0, 122, 255, 0.1);
-            border-radius: 30px;
-            padding: 4px 6px 4px 4px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid rgba(0, 122, 255, 0.2);
-            box-shadow: 0 0 15px rgba(0,0,0,0.3);
-            transition: 0.3s;
-        }
-        .profile-pill:active { transform: scale(0.95); }
+    .brand{
+      font-weight:900;
+      letter-spacing:0.3px;
+      font-size:18px;
+      opacity:0.95;
+    }
 
-        .user-avatar {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--accent);
-        }
+    .wallet-pill{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:18px;
+      background:var(--card);
+      border:1px solid var(--stroke);
+      min-height:44px;
+    }
 
-        .balance-text { font-size: 13px; font-weight: 700; color: #fff; }
+    .balance{
+      display:flex;
+      flex-direction:column;
+      line-height:1.05;
+      gap:2px;
+    }
+    .balance .val{
+      font-weight:900;
+      font-size:16px;
+      white-space:nowrap;
+    }
+    .balance .sub{
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
 
-        .deposit-btn-mini {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            color: #fff;
-            background: var(--accent);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 0 10px var(--accent-glow);
-            animation: pulseBtn 2s infinite;
-        }
-        @keyframes pulseBtn {
-            0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(0, 122, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); }
-        }
+    .pay-toggle{
+      display:flex;
+      gap:6px;
+      padding:4px;
+      border-radius:18px;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+    .pay-btn{
+      border:0;
+      padding:8px 10px;
+      border-radius:14px;
+      font-weight:900;
+      font-size:12px;
+      color:#cfe3ff;
+      background:transparent;
+      cursor:pointer;
+    }
+    .pay-btn.active{
+      background:linear-gradient(135deg, #007aff, #005ec4);
+      color:#fff;
+      box-shadow:0 5px 18px rgba(0,122,255,0.35);
+    }
 
-        /* --- SEARCH & FILTERS --- */
-        .search-wrapper { padding: 15px 15px 5px 15px; }
-        .search-bar { 
-            width: 100%; 
-            background: rgba(255,255,255,0.05); 
-            border: 1px solid rgba(255,255,255,0.1); 
-            padding: 14px 20px; 
-            border-radius: 20px; 
-            color: #fff; 
-            box-sizing: border-box; 
-            font-size: 15px;
-            transition: 0.3s;
-        }
-        .search-bar:focus { 
-            outline: none; 
-            border-color: var(--accent); 
-            box-shadow: 0 0 20px var(--accent-glow);
-            background: rgba(0,0,0,0.3);
-        }
+    .tabs{
+      display:flex;
+      gap:10px;
+      margin:10px 0 14px;
+    }
+    .tabbtn{
+      padding:10px 12px;
+      border-radius:16px;
+      background:transparent;
+      border:1px solid transparent;
+      color:var(--muted);
+      font-weight:900;
+      cursor:pointer;
+    }
+    .tabbtn.active{
+      color:#fff;
+      background:var(--card);
+      border:1px solid var(--stroke);
+    }
 
-        .filters-container {
-            display: flex;
-            gap: 8px;
-            padding: 0 15px 15px 15px;
-            overflow-x: auto;
-            scrollbar-width: none; /* Firefox */
-        }
-        .filters-container::-webkit-scrollbar { display: none; }
+    .panel{
+      display:none;
+    }
+    .panel.active{
+      display:block;
+    }
 
-        .filter-select {
-            background: rgba(20, 30, 60, 0.6);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007aff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            background-size: 10px;
-            padding-right: 25px;
-            min-width: 100px;
-            flex-shrink: 0;
-        }
-        .filter-select:focus { border-color: var(--accent); outline: none; }
-        .filter-select:disabled { opacity: 0.5; cursor: not-allowed; }
+    .section-title{
+      font-weight:900;
+      font-size:18px;
+      margin:8px 0 12px;
+    }
 
-        /* --- GRID & CARDS --- */
-        .container { padding: 15px; display: none; }
-        .container.active { display: block; }
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin:0 0 14px;
+    }
+    .act{
+      padding:14px;
+      border-radius:18px;
+      border:1px solid var(--stroke);
+      background:var(--card);
+      color:#fff;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .act:active{transform:scale(0.99)}
+    .act.primary{
+      background:linear-gradient(135deg, rgba(0,122,255,0.95), rgba(0,94,196,0.95));
+      border-color:rgba(0,122,255,0.35);
+      box-shadow:0 10px 30px rgba(0,122,255,0.18);
+    }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        
-        .card { 
-            background: var(--bg-card); 
-            border-radius: 20px; 
-            overflow: hidden; 
-            border: 1px solid rgba(255,255,255,0.05); 
-            backdrop-filter: blur(10px);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            animation: fadeInUp 0.6s backwards; 
-            position: relative;
-        }
-        
-        .card:active { transform: scale(0.95); }
-        .card:hover { 
-            transform: translateY(-5px); 
-            box-shadow: 0 10px 20px rgba(0, 122, 255, 0.2);
-            border-color: rgba(0, 122, 255, 0.3);
-        }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    .card{
+      border-radius:18px;
+      background:var(--card);
+      border:1px solid var(--stroke);
+      overflow:hidden;
+    }
+    .card .img{
+      height:130px;
+      background:rgba(255,255,255,0.04);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+    .card .img img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .card .meta{
+      padding:10px 10px 12px;
+    }
+    .card .name{
+      font-weight:900;
+      font-size:13px;
+      margin:0 0 4px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .card .traits{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+    .chip{
+      font-size:11px;
+      padding:6px 8px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.08);
+      color:rgba(255,255,255,0.8);
+    }
 
-        .card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
-        .card-info { padding: 12px; background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.6)); }
-        
-        .nft-name { font-weight: 700; font-size: 14px; margin-bottom: 6px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .nft-price { color: var(--accent); font-weight: 800; font-size: 15px; text-shadow: 0 0 10px rgba(0,122,255,0.5); }
-        .trait-tag { display: inline-block; background: rgba(0, 122, 255, 0.15); color: #6db0ff; font-size: 9px; padding: 3px 8px; border-radius: 6px; margin: 4px 4px 0 0; border: 1px solid rgba(0, 122, 255, 0.3); }
+    .nav{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+      background:rgba(10,14,19,0.92);
+      backdrop-filter: blur(14px);
+      border-top:1px solid rgba(255,255,255,0.06);
+    }
+    .navrow{
+      max-width:520px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:10px;
+    }
+    .navbtn{
+      padding:12px 10px;
+      border-radius:18px;
+      border:1px solid transparent;
+      background:transparent;
+      color:rgba(255,255,255,0.65);
+      font-weight:900;
+      cursor:pointer;
+    }
+    .navbtn.active{
+      background:var(--card);
+      border-color:var(--stroke);
+      color:#fff;
+    }
 
-        /* --- STATS --- */
-        .stats-box {
-            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-            border-radius: 24px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            justify-content: space-around;
-            text-align: center;
-            animation: fadeIn 0.8s;
-        }
-        .stat-val { font-size: 22px; font-weight: 900; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
-        .stat-label { font-size: 12px; color: var(--text-sec); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* --- NAV --- */
-        .bottom-nav { 
-            position: fixed; bottom: 20px; left: 20px; right: 20px; 
-            background: rgba(10, 15, 30, 0.9); 
-            border-radius: 24px;
-            display: flex; justify-content: space-around; 
-            padding: 15px 0; 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255,255,255,0.1); 
-            z-index: 90; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .nav-item { color: #5c6b8f; font-size: 24px; text-decoration: none; transition: 0.3s; position: relative; }
-        .active-nav { color: var(--accent); transform: translateY(-5px); filter: drop-shadow(0 0 8px var(--accent)); }
-        
-        /* --- MODAL --- */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: none; justify-content: center; align-items: flex-end; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s; }
-        .modal.open { opacity: 1; }
-        .modal-content { 
-            background: var(--bg-modal); 
-            width: 100%; 
-            border-radius: 30px 30px 0 0; 
-            padding: 30px 25px; 
-            box-sizing: border-box; 
-            transform: translateY(100%); 
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 -10px 50px rgba(0, 122, 255, 0.1);
-        }
-        .modal.open .modal-content { transform: translateY(0); }
-        
-        /* --- BUTTONS & INPUTS --- */
-        .btn { width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; font-size: 16px; margin-top: 15px; transition: 0.2s; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-primary { 
-            background: linear-gradient(135deg, #007aff, #005ec4); 
-            color: #fff; 
-            box-shadow: 0 5px 20px rgba(0, 122, 255, 0.4);
-        }
-        .btn-primary:active { box-shadow: 0 2px 10px rgba(0, 122, 255, 0.4); transform: scale(0.98); }
-        
-        .btn-secondary { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.05); }
-        
-        input { 
-            width: 100%; padding: 16px; border-radius: 16px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            background: rgba(0,0,0,0.3); 
-            color: #fff; margin: 8px 0; 
-            box-sizing: border-box; font-size: 16px;
-        }
-        input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 10px rgba(0, 122, 255, 0.2); }
-
-        /* Animation Keyframes */
-        @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    </style>
+    .modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      background:rgba(0,0,0,0.55);
+      padding:14px;
+    }
+    .modal.show{display:flex}
+    .sheet{
+      width:100%;
+      max-width:520px;
+      border-radius:22px;
+      background:rgba(18,22,28,0.98);
+      border:1px solid rgba(255,255,255,0.08);
+      padding:16px;
+    }
+    .sheet .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .sheet h3{
+      margin:0;
+      font-size:18px;
+      font-weight:900;
+    }
+    .xbtn{
+      width:38px;
+      height:38px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.06);
+      color:#fff;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .field{
+      margin-top:12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .inp{
+      width:100%;
+      padding:14px 14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.05);
+      color:#fff;
+      font-weight:900;
+      outline:none;
+      font-size:14px;
+    }
+    .hint{
+      color:rgba(255,255,255,0.6);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .btn{
+      margin-top:12px;
+      width:100%;
+      padding:14px;
+      border-radius:18px;
+      border:0;
+      cursor:pointer;
+      font-weight:900;
+      color:#fff;
+      background:linear-gradient(135deg, rgba(0,122,255,0.95), rgba(0,94,196,0.95));
+      box-shadow:0 10px 30px rgba(0,122,255,0.18);
+    }
+    .btn.secondary{
+      background:rgba(255,255,255,0.07);
+      border:1px solid rgba(255,255,255,0.10);
+      box-shadow:none;
+    }
+  </style>
 </head>
+
 <body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">AucTON</div>
 
-    <div class="ambient-light">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-    </div>
-
-    <div class="header">
-        <div class="brand-logo">AUCTON</div>
-        
-        <div class="profile-pill">
-            <img src="https://placehold.co/100" id="header-avatar" class="user-avatar" onclick="switchTab('profile', document.getElementById('nav-profile'))">
-            <span class="balance-text" onclick="switchTab('profile', document.getElementById('nav-profile'))">
-                <span id="balance">0.0</span> TON
-            </span>
-            <div class="deposit-btn-mini" onclick="openDeposit()"><i class="ri-add-line"></i></div>
+      <div class="wallet-pill">
+        <div class="balance">
+          <div class="val"><span id="balVal">0.0000</span> TON</div>
+          <div class="sub">Balance</div>
         </div>
-    </div>
 
-    <div class="search-wrapper">
-        <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Search items...">
-    </div>
-    <div class="filters-container">
-        <select id="filter-collection" class="filter-select">
-            <option value="all">📚 All Collections</option>
-        </select>
-        <select id="filter-model" class="filter-select" disabled>
-            <option value="all">🤖 All Models</option>
-        </select>
-        <select id="filter-background" class="filter-select">
-            <option value="all">🖼 All Backgrounds</option>
-        </select>
-    </div>
-
-    <div class="container active" id="tab-market">
-        <div class="grid" id="market-grid">
-            </div>
-    </div>
-
-    <div class="container" id="tab-profile">
-        <div class="stats-box">
-            <div>
-                <div class="stat-val" id="stat-count">0</div>
-                <div class="stat-label">Assets</div>
-            </div>
-            <div>
-                <div class="stat-val" id="stat-value">0.0</div>
-                <div class="stat-label">Value (TON)</div>
-            </div>
+        <div class="pay-toggle">
+          <button class="pay-btn active" id="btn-pay-ton" onclick="openDeposit()">Pay in TON</button>
+          <button class="pay-btn" id="btn-pay-stars" onclick="openStars()">Pay in Stars</button>
         </div>
-        
-        <h3 style="margin-bottom: 15px; font-weight: 700; font-size: 18px;">Your Collection</h3>
-        <div class="grid" id="profile-grid"></div>
-        
-        <h3 style="margin-top: 30px; font-weight: 700; font-size: 18px;">Recent Activity</h3>
-        <div id="history-list" style="font-size: 12px; color: var(--text-sec);"></div>
-
-        <div style="margin-top: 30px; margin-bottom: 50px;">
-            <button class="btn btn-secondary" onclick="openWithdraw()">Withdraw Funds</button>
-        </div>
+      </div>
     </div>
 
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <h2 id="modal-title" style="margin-top:0; font-size: 24px; font-weight: 800;">Action</h2>
-            <div id="modal-body"></div>
-            <button class="btn btn-secondary" onclick="closeModal()">Close</button>
-        </div>
+    <div class="tabs">
+      <button class="tabbtn active" id="t1" onclick="switchPanel('market')">Auction</button>
+      <button class="tabbtn" id="t2" onclick="switchPanel('inventory')">Inventory</button>
+      <button class="tabbtn" id="t3" onclick="switchPanel('profile')">Profile</button>
     </div>
 
-    <div class="bottom-nav">
-        <a href="#" class="nav-item active-nav" onclick="switchTab('market', this)"><i class="ri-apps-2-fill"></i></a>
-        <a href="#" class="nav-item" id="nav-profile" onclick="switchTab('profile', this)"><i class="ri-user-5-fill"></i></a>
+    <div class="panel active" id="panel-market">
+      <div class="section-title">Active auctions</div>
+      <div class="hint">Список аукционов будет здесь. Сейчас фокус — кошелек/профиль/инвентарь.</div>
     </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.headerColor = '#020410'; 
-        tg.enableClosingConfirmation();
+    <div class="panel" id="panel-inventory">
+      <div class="section-title">My gifts</div>
 
-        // ЗАМЕНИ НА СВОЙ URL
-        const API = 'https://твоя-ссылка-на-сервер.com'; 
-        
-        const user = tg.initDataUnsafe.user || { id: 7879865609, first_name: 'Tester', username: 'tester', photo_url: 'https://placehold.co/100' };
-        
-        if (user.photo_url) document.getElementById('header-avatar').src = user.photo_url;
+      <div class="actions">
+        <button class="act primary" onclick="openDeposit()">Deposit</button>
+        <button class="act" onclick="openWithdraw()">Withdraw TON</button>
+        <button class="act" onclick="tg.showAlert('Вывод NFT: выбери NFT и нажми Withdraw NFT (добавим в карточку)')">Withdraw NFT</button>
+        <button class="act" onclick="tg.showAlert('Send: будет отправка NFT в будущем')">Send</button>
+      </div>
 
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://raw.githubusercontent.com/ton-community/tutorials/main/03-client/test/public/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect'
-        });
+      <div class="grid" id="nftGrid"></div>
+    </div>
 
-        // --- GLOBAL DATA STORAGE FOR FILTERING ---
-        let allItems = []; // Сюда грузим всё с сервера (или профиля или маркета)
-        let currentTab = 'market';
+    <div class="panel" id="panel-profile">
+      <div class="section-title">Wallet</div>
 
-        // --- FILTER ELEMENTS ---
-        const sInput = document.getElementById('searchInput');
-        const fCollection = document.getElementById('filter-collection');
-        const fModel = document.getElementById('filter-model');
-        const fBackground = document.getElementById('filter-background');
+      <div class="actions">
+        <button class="act primary" onclick="openDeposit()">Deposit</button>
+        <button class="act" onclick="openWithdraw()">Withdraw TON</button>
+        <button class="act" onclick="tg.showAlert('Withdraw NFT: открой инвентарь и выбери NFT')">Withdraw NFT</button>
+        <button class="act" onclick="tg.showAlert('Auction: создадим аукцион из выбранного NFT')">Auction</button>
+      </div>
 
-        // --- EVENT LISTENERS ---
-        sInput.addEventListener('input', applyFilters);
-        fCollection.addEventListener('change', () => {
-            updateModelDropdown();
-            applyFilters();
-        });
-        fModel.addEventListener('change', applyFilters);
-        fBackground.addEventListener('change', applyFilters);
+      <div class="section-title">My collection</div>
+      <div class="grid" id="nftGridProfile"></div>
+    </div>
+  </div>
 
-        // --- CORE LOAD FUNCTION ---
-        async function load() {
-            const isMarket = currentTab === 'market';
-            const gridId = isMarket ? 'market-grid' : 'profile-grid';
-            
-            // Сбрасываем фильтры при смене вкладки, чтобы не путать пользователя
-            resetFiltersUI();
+  <div class="nav">
+    <div class="navrow">
+      <button class="navbtn active" id="nav1" onclick="switchPanel('market')">Auction</button>
+      <button class="navbtn" id="nav2" onclick="switchPanel('inventory')">My gifts</button>
+      <button class="navbtn" id="nav3" onclick="switchPanel('profile')">Profile</button>
+    </div>
+  </div>
 
-            try {
-                // Fetch data
-                let items = [];
-                if (isMarket) {
-                    const res = await fetch(`${API}/api/auctions`).then(r => r.json());
-                    if (res.ok) items = res.list;
-                } else {
-                    const res = await fetch(`${API}/api/user`, { headers: {'x-user-id': user.id} }).then(r => r.json());
-                    if (res.ok) {
-                        items = res.nfts;
-                        // Update stats
-                        animateValue("balance", parseFloat(document.getElementById('balance').innerText), res.balance, 1000);
-                        document.getElementById('stat-count').innerText = res.nfts.length;
-                        document.getElementById('stat-value').innerText = (res.balance + (res.nfts.length * 2.5)).toFixed(1); // Fake value calc
-                        renderHistory(res.history);
-                    }
-                }
+  <div class="modal" id="depositModal">
+    <div class="sheet">
+      <div class="row">
+        <h3>Deposit</h3>
+        <button class="xbtn" onclick="closeDeposit()">✕</button>
+      </div>
 
-                // Prepare data: Parse attributes once
-                allItems = items.map(item => {
-                    let traits = [];
-                    try { traits = typeof item.attributes === 'string' ? JSON.parse(item.attributes) : item.attributes; } catch(e){}
-                    
-                    // Extract Helper Keys
-                    const getTrait = (key) => traits.find(t => t.trait_type.toLowerCase() === key.toLowerCase())?.value || 'Unknown';
-                    
-                    return {
-                        ...item,
-                        parsedTraits: traits,
-                        collection: getTrait('Collection'),
-                        model: getTrait('Model'),
-                        background: getTrait('Background')
-                    };
-                });
+      <div class="field">
+        <div class="hint">Top-up only in TON. To credit automatically, send TON to the wallet and put your Telegram ID in the comment/message.</div>
+        <input class="inp" id="depAmount" placeholder="Amount (TON), e.g. 3" inputmode="decimal" />
+        <button class="btn" onclick="sendDeposit()">Pay in TON</button>
+        <button class="btn secondary" onclick="copyDepositInstruction()">Copy deposit instruction</button>
+      </div>
+    </div>
+  </div>
 
-                // Populate Filter Dropdowns
-                populateFilters(allItems);
-                
-                // Render initial Grid
-                renderGrid(allItems, gridId, isMarket);
+  <div class="modal" id="withdrawModal">
+    <div class="sheet">
+      <div class="row">
+        <h3>Withdraw TON</h3>
+        <button class="xbtn" onclick="closeWithdraw()">✕</button>
+      </div>
 
-            } catch(e) { console.error("Load error:", e); }
+      <div class="field">
+        <div class="hint">Вывод TON: будет реализован следующим шагом. Сейчас можно тестировать пополнение.</div>
+        <button class="btn secondary" onclick="closeWithdraw()">Close</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const tg = window.Telegram.WebApp;
+  tg.expand();
+
+  const API = 'https://api.growagardentrade.online';
+  const MANIFEST = 'https://app.growagardentrade.online/tonconnect-manifest.json';
+
+  const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+    manifestUrl: MANIFEST
+  });
+
+  let USER_ID = null;
+
+  function switchPanel(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+
+    document.querySelectorAll('.tabbtn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'));
+
+    if (name === 'market') { document.getElementById('t1').classList.add('active'); document.getElementById('nav1').classList.add('active'); }
+    if (name === 'inventory') { document.getElementById('t2').classList.add('active'); document.getElementById('nav2').classList.add('active'); }
+    if (name === 'profile') { document.getElementById('t3').classList.add('active'); document.getElementById('nav3').classList.add('active'); }
+  }
+
+  function setActivePay(mode) {
+    document.getElementById('btn-pay-ton').classList.toggle('active', mode === 'ton');
+    document.getElementById('btn-pay-stars').classList.toggle('active', mode === 'stars');
+  }
+
+  function openDeposit() {
+    setActivePay('ton');
+    document.getElementById('depositModal').classList.add('show');
+  }
+  function closeDeposit() {
+    document.getElementById('depositModal').classList.remove('show');
+  }
+
+  function openWithdraw() {
+    document.getElementById('withdrawModal').classList.add('show');
+  }
+  function closeWithdraw() {
+    document.getElementById('withdrawModal').classList.remove('show');
+  }
+
+  function openStars() {
+    setActivePay('stars');
+    tg.showAlert("Stars deposit: делается через инвойс от бота. Добавлю это в bot.js отдельной командой.");
+  }
+
+  function renderNfts(list) {
+    const grid1 = document.getElementById('nftGrid');
+    const grid2 = document.getElementById('nftGridProfile');
+    grid1.innerHTML = '';
+    grid2.innerHTML = '';
+
+    (list || []).forEach(n => {
+      const el = document.createElement('div');
+      el.className = 'card';
+
+      const img = document.createElement('div');
+      img.className = 'img';
+      if (n.image_url) {
+        const im = document.createElement('img');
+        im.src = n.image_url;
+        img.appendChild(im);
+      } else {
+        img.innerHTML = '<div style="opacity:.6;font-weight:900">NFT</div>';
+      }
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+
+      const name = document.createElement('div');
+      name.className = 'name';
+      name.textContent = (n.name || n.id || 'NFT');
+
+      const traits = document.createElement('div');
+      traits.className = 'traits';
+
+      const c1 = document.createElement('div');
+      c1.className = 'chip';
+      c1.textContent = (n.collection_name ? n.collection_name : 'Collection');
+
+      const c2 = document.createElement('div');
+      c2.className = 'chip';
+      c2.textContent = (n.model ? ('Model: ' + n.model) : 'Model');
+
+      const c3 = document.createElement('div');
+      c3.className = 'chip';
+      c3.textContent = (n.backdrop ? ('Backdrop: ' + n.backdrop) : 'Backdrop');
+
+      traits.appendChild(c1);
+      traits.appendChild(c2);
+      traits.appendChild(c3);
+
+      meta.appendChild(name);
+      meta.appendChild(traits);
+
+      el.appendChild(img);
+      el.appendChild(meta);
+
+      grid1.appendChild(el.cloneNode(true));
+      grid2.appendChild(el);
+    });
+  }
+
+  async function apiGetUser() {
+    if (!USER_ID) return null;
+    const r = await fetch(API + '/api/user', {
+      headers: { 'x-user-id': String(USER_ID) }
+    });
+    const j = await r.json();
+    return j;
+  }
+
+  async function refresh() {
+    try {
+      const me = tg.initDataUnsafe?.user;
+      if (!me || !me.id) {
+        tg.showAlert('Ошибка: нет user id (открывай через Telegram mini app)');
+        return;
+      }
+      USER_ID = me.id;
+
+      const data = await apiGetUser();
+      if (!data || !data.ok) return;
+
+      document.getElementById('balVal').textContent = Number(data.balance || 0).toFixed(4);
+      renderNfts(data.nfts || []);
+    } catch (e) {
+      tg.showAlert('Ошибка обновления: ' + (e?.message || e));
+    }
+  }
+
+  async function copyDepositInstruction() {
+    const me = tg.initDataUnsafe?.user;
+    const uid = me?.id ? String(me.id) : '';
+    const text = `Send TON to deposit wallet.\nComment/message: ${uid}\nAfter that balance will update automatically.`;
+    try {
+      await navigator.clipboard.writeText(text);
+      tg.showAlert('Copied');
+    } catch {
+      tg.showAlert(text);
+    }
+  }
+
+  async function sendDeposit() {
+    try {
+      const amt = Number(String(document.getElementById('depAmount').value || '').replace(',', '.'));
+      if (!(amt > 0)) return tg.showAlert('Введите сумму TON');
+
+      if (!tonConnectUI.connected) {
+        try {
+          await tonConnectUI.openModal();
+        } catch (e) {
+          tg.showAlert('Не удалось открыть кошелек. Проверь tonconnect-manifest.json на домене app.growagardentrade.online');
         }
+        return;
+      }
 
-        // --- FILTER LOGIC ---
-        function populateFilters(items) {
-            // Get unique Collections & Backgrounds
-            const collections = [...new Set(items.map(i => i.collection))].sort();
-            const backgrounds = [...new Set(items.map(i => i.background))].sort();
+      const wallet = tonConnectUI.wallet;
+      if (!wallet?.account?.address) {
+        return tg.showAlert('Кошелек подключен, но адрес не найден');
+      }
 
-            // Fill Collection Select
-            fCollection.innerHTML = '<option value="all">📚 All Collections</option>';
-            collections.forEach(c => fCollection.innerHTML += `<option value="${c}">${c}</option>`);
+      // Тут нужно отправлять TON на твой DEPOSIT_WALLET.
+      // Важно: чтобы авто-зачисление работало, в payload/комментарий кладём Telegram ID.
+      // TonConnect transaction payload — base64; делаем простой текст.
+      const to = "UQDxFs685oBQjawclpOrO-kb2n3hugWWOf51h6goSQQQLnLg"; // твой deposit wallet
+      const payloadText = String(USER_ID || '');
+      const payloadBase64 = btoa(unescape(encodeURIComponent(payloadText)));
 
-            // Fill Background Select
-            fBackground.innerHTML = '<option value="all">🖼 All Backgrounds</option>';
-            backgrounds.forEach(b => fBackground.innerHTML += `<option value="${b}">${b}</option>`);
+      const tx = {
+        validUntil: Math.floor(Date.now() / 1000) + 300,
+        messages: [
+          {
+            address: to,
+            amount: String(Math.floor(amt * 1e9)),
+            payload: payloadBase64
+          }
+        ]
+      };
 
-            // Reset Model
-            fModel.innerHTML = '<option value="all">🤖 All Models</option>';
-            fModel.disabled = true;
-        }
+      await tonConnectUI.sendTransaction(tx);
+      closeDeposit();
+      tg.showAlert('Транзакция отправлена. Баланс обновится автоматически через watcher.');
+      setTimeout(refresh, 2500);
+    } catch (e) {
+      tg.showAlert('Ошибка оплаты: ' + (e?.message || e));
+    }
+  }
 
-        function updateModelDropdown() {
-            const selectedCol = fCollection.value;
-            fModel.innerHTML = '<option value="all">🤖 All Models</option>';
-            
-            if (selectedCol === 'all') {
-                fModel.disabled = true;
-                return;
-            }
-
-            // Find models ONLY in this collection
-            const models = [...new Set(allItems
-                .filter(i => i.collection === selectedCol)
-                .map(i => i.model)
-            )].sort();
-
-            models.forEach(m => fModel.innerHTML += `<option value="${m}">${m}</option>`);
-            fModel.disabled = false;
-        }
-
-        function applyFilters() {
-            const txt = sInput.value.toLowerCase();
-            const col = fCollection.value;
-            const mod = fModel.value;
-            const bg = fBackground.value;
-
-            const filtered = allItems.filter(item => {
-                // Text Search
-                const matchText = (item.name || '').toLowerCase().includes(txt);
-                
-                // Selects
-                const matchCol = col === 'all' || item.collection === col;
-                const matchMod = mod === 'all' || item.model === mod; // If disabled, value is 'all'
-                const matchBg = bg === 'all' || item.background === bg;
-
-                return matchText && matchCol && matchMod && matchBg;
-            });
-
-            const gridId = currentTab === 'market' ? 'market-grid' : 'profile-grid';
-            renderGrid(filtered, gridId, currentTab === 'market');
-        }
-
-        function resetFiltersUI() {
-            sInput.value = '';
-            fCollection.value = 'all';
-            fModel.value = 'all';
-            fBackground.value = 'all';
-            fModel.disabled = true;
-        }
-
-        // --- RENDER LOGIC ---
-        function renderGrid(items, elementId, isMarket) {
-            const el = document.getElementById(elementId);
-            el.innerHTML = '';
-
-            if(items.length === 0) {
-                el.innerHTML = '<div style="grid-column: span 2; text-align:center; color:#555; padding: 20px;">No items found</div>';
-                return;
-            }
-
-            items.forEach((item, index) => {
-                const traitsHtml = item.parsedTraits.slice(0, 2).map(t => `<span class="trait-tag">${t.value || t}</span>`).join('');
-                const delay = index * 0.05;
-                const priceDisplay = isMarket ? `<div class="nft-price">${item.current_bid} TON</div>` : '<div style="color:var(--text-sec); font-size:11px;">In Wallet</div>';
-                const clickAction = isMarket 
-                    ? `openAuction(${item.id}, ${item.current_bid}, '${item.name}')`
-                    : `openNftActions(${item.id}, '${item.name}')`;
-
-                el.innerHTML += `
-                    <div class="card" style="animation-delay: ${delay}s" onclick="${clickAction}">
-                        <img src="${item.image_url}" loading="lazy">
-                        <div class="card-info">
-                            <span class="nft-name">${item.name || 'Unknown'}</span>
-                            ${priceDisplay}
-                            <div style="margin-top:5px; display:flex; flex-wrap:wrap;">${traitsHtml}</div>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        function renderHistory(history) {
-            const hList = document.getElementById('history-list');
-            hList.innerHTML = '';
-            if (!history || history.length === 0) {
-                hList.innerHTML = '<div style="padding:10px; text-align:center;">No history yet</div>';
-                return;
-            }
-            history.forEach(tx => {
-                const isDep = tx.type === 'deposit';
-                const color = isDep ? '#4cd964' : '#ff3b30';
-                const icon = isDep ? 'ri-arrow-left-down-line' : 'ri-arrow-right-up-line';
-                const desc = tx.type === 'deposit' ? 'Deposit' : (tx.type === 'withdraw_ton' ? 'Withdraw' : tx.type);
-                hList.innerHTML += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <i class="${icon}" style="color:${color}; font-size:18px;"></i>
-                            <span>${desc}</span>
-                        </div>
-                        <span style="color:${color}; font-weight:700;">${isDep ? '+' : ''}${tx.amount}</span>
-                    </div>`;
-            });
-        }
-
-        // --- UI UTILS ---
-        function switchTab(tab, el) {
-            currentTab = tab;
-            document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active-nav'));
-            if(el) el.classList.add('active-nav');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            load();
-        }
-
-        function animateValue(id, start, end, duration) {
-            if (start === end) return;
-            const obj = document.getElementById(id);
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerHTML = (progress * (end - start) + start).toFixed(2);
-                if (progress < 1) window.requestAnimationFrame(step);
-            };
-            window.requestAnimationFrame(step);
-        }
-
-        function openModal(title, content) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-body').innerHTML = content;
-            const m = document.getElementById('modal');
-            m.style.display = 'flex';
-            setTimeout(() => m.classList.add('open'), 10);
-        }
-
-        function closeModal() { 
-            const m = document.getElementById('modal');
-            m.classList.remove('open');
-            setTimeout(() => m.style.display = 'none', 300);
-        }
-
-        // --- ACTIONS ---
-        function openAuction(id, price, name) {
-            openModal(`Bid on ${name}`, `
-                <p style="color:#aaa; text-align:center;">Current High Bid: <b style="color:#fff">${price} TON</b></p>
-                <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-bottom:15px; text-align:center;">
-                    <span style="font-size:12px; color:#aaa;">Your Offer</span>
-                    <input type="number" id="bid-amount" style="text-align:center; font-size:24px; font-weight:bold; background:transparent; border:none;" value="${(price + 0.5).toFixed(1)}" step="0.1">
-                </div>
-                <button class="btn btn-primary" onclick="placeBid(${id})">Place Bid</button>
-            `);
-        }
-
-        async function placeBid(id) {
-            const amount = parseFloat(document.getElementById('bid-amount').value);
-            const res = await fetch(`${API}/api/auction/bid`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, auctionId: id, amount }) }).then(r => r.json());
-            if (res.ok) { tg.showAlert("Bid placed successfully!"); closeModal(); load(); }
-            else tg.showAlert(res.error);
-        }
-
-        function openNftActions(id, name) {
-            openModal(name, `
-                <button class="btn btn-primary" onclick="setupAuction(${id})">Sell on Market</button>
-                <button class="btn btn-secondary" onclick="withdrawNft(${id})">Send to Wallet</button>
-            `);
-        }
-
-        function setupAuction(id) {
-            openModal("Sell Item", `
-                <input type="number" id="auc-price" placeholder="Start Price (TON)">
-                <input type="number" id="auc-hours" placeholder="Duration (Hours)" value="24">
-                <button class="btn btn-primary" onclick="createAuction(${id})">Start Auction</button>
-            `);
-        }
-        
-        async function createAuction(id) {
-            const price = parseFloat(document.getElementById('auc-price').value);
-            const hours = parseInt(document.getElementById('auc-hours').value);
-            const res = await fetch(`${API}/api/auction/create`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, nftId: id, price, duration: hours }) }).then(r => r.json());
-            if (res.ok) { tg.showAlert("Auction Created!"); closeModal(); load(); }
-            else tg.showAlert(res.error);
-        }
-
-        async function withdrawNft(id) {
-            if(!confirm("Withdraw item to external wallet? Fee applies.")) return;
-            const res = await fetch(`${API}/api/withdraw/nft`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, nftId: id }) }).then(r => r.json());
-            if (res.ok) { tg.showAlert("Withdraw requested!"); closeModal(); load(); }
-            else tg.showAlert(res.error);
-        }
-
-        // --- DEPOSIT ---
-        function openDeposit() {
-            openModal("Add Funds", `
-                <div style="text-align:center; margin-bottom:20px;">
-                    <div style="font-size:40px; margin-bottom:10px;">💎</div>
-                    <p style="color:#aaa; font-size:14px;">Deposit TON to bid on exclusive items.</p>
-                </div>
-                <input type="number" id="dep-amount" placeholder="Amount (e.g. 5.0)" value="1.0">
-                <button class="btn btn-primary" onclick="sendDeposit()">Pay with Wallet</button>
-            `);
-        }
-
-        async function sendDeposit() {
-            const amount = document.getElementById('dep-amount').value;
-            if (!tonConnectUI.connected) { await tonConnectUI.openModal(); return; }
-            
-            const cell = new TonWeb.boc.Cell();
-            cell.bits.writeUint(0, 32);
-            cell.bits.writeString(user.id.toString());
-            const payload = TonWeb.utils.bytesToBase64(await cell.toBoc());
-
-            const tx = {
-                validUntil: Math.floor(Date.now() / 1000) + 600,
-                messages: [{ address: 'UQDxFs685oBQjawclpOrO-kb2n3hugWWOf51h6goSQQQLnLg', amount: (amount * 1e9).toString(), payload: payload }]
-            };
-            try { await tonConnectUI.sendTransaction(tx); tg.showAlert("Transaction sent!"); closeModal(); } catch(e) {}
-        }
-
-        function openWithdraw() {
-            openModal("Withdraw TON", `
-                <input type="number" id="w-amount" placeholder="Amount">
-                <input type="text" id="w-addr" placeholder="Destination Address">
-                <button class="btn btn-primary" onclick="confirmWithdraw()">Confirm</button>
-            `);
-        }
-        
-        async function confirmWithdraw() {
-            const amount = parseFloat(document.getElementById('w-amount').value);
-            const address = document.getElementById('w-addr').value;
-            const res = await fetch(`${API}/api/withdraw/ton`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ userId: user.id, amount, address }) }).then(r => r.json());
-            if (res.ok) { tg.showAlert("Request sent!"); closeModal(); load(); }
-            else tg.showAlert(res.error);
-        }
-
-        // Initial Load
-        load();
-    </script>
-    <div id="ton-connect" style="display:none;"></div>
+  refresh();
+  setInterval(refresh, 4000);
+</script>
 </body>
 </html>
