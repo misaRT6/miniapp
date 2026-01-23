@@ -1,5 +1,7 @@
 {
   "url": "https://app.growagardentrade.online",
   "name": "AucTon",
-  "iconUrl": "https://app.growagardentrade.online/icon.png"
+  "iconUrl": "https://app.growagardentrade.online/icon.png",
+  "termsOfUseUrl": "https://app.growagardentrade.online/terms.html",
+  "privacyPolicyUrl": "https://app.growagardentrade.online/privacy.html"
 }
