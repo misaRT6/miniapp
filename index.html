@@ -1,828 +1,1077 @@
 <!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>AucTon</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AucTon</title>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://unpkg.com/@tonconnect/ui@2.0.10/dist/tonconnect-ui.min.js"></script>
-    <script src="https://unpkg.com/tonweb@0.0.66/dist/tonweb.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@2.0.10/dist/tonconnect-ui.min.js"></script>
+  <script src="https://unpkg.com/tonweb@0.0.66/dist/tonweb.js"></script>
 
-    <style>
-        :root {
-            --bg: #0b0d12;
-            --panel: #111522;
-            --panel2: #0f1320;
-            --text: #e7ebff;
-            --muted: rgba(231,235,255,.75);
-            --line: rgba(255,255,255,.10);
-            --accent: #7c5cff;
-            --accent2: #31d0aa;
-            --danger: #ff5470;
-            --shadow: 0 10px 30px rgba(0,0,0,.45);
-            --r: 16px;
-        }
-        * { box-sizing: border-box; }
-        html, body { height: 100%; }
-        body {
-            margin: 0;
-            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-            background: radial-gradient(1000px 600px at 20% -10%, rgba(124,92,255,.25), transparent 60%),
-                        radial-gradient(900px 500px at 90% 0%, rgba(49,208,170,.18), transparent 55%),
-                        var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-        }
-        .wrap { max-width: 980px; margin: 0 auto; padding: 16px 16px 110px; }
-        .topbar {
-            position: sticky; top: 0; z-index: 50;
-            backdrop-filter: blur(10px);
-            background: linear-gradient(to bottom, rgba(11,13,18,.92), rgba(11,13,18,.60));
-            border-bottom: 1px solid var(--line);
-            padding: 12px 0;
-        }
-        .topbar .inner {
-            max-width: 980px; margin: 0 auto; padding: 0 16px;
-            display: flex; align-items: center; justify-content: space-between; gap: 12px;
-        }
-        .brand { display: flex; align-items: center; gap: 10px; }
-        .logo {
-            width: 38px; height: 38px; border-radius: 12px;
-            background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(49,208,170,.85));
-            box-shadow: 0 10px 25px rgba(124,92,255,.25);
-        }
-        .brand .name { line-height: 1.05; }
-        .brand .name b { display:block; font-size: 14px; letter-spacing: .2px; }
-        .brand .name span { display:block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --panel: rgba(255,255,255,.045);
+      --panel2: rgba(0,0,0,.22);
+      --text: #e7ebff;
+      --muted: rgba(231,235,255,.72);
+      --line: rgba(255,255,255,.11);
+      --accent: #7c5cff;
+      --accent2: #31d0aa;
+      --danger: #ff5470;
+      --shadow: 0 18px 70px rgba(0,0,0,.55);
+      --r: 18px;
+      --r2: 14px;
+      --speed: 240ms;
+      --ease: cubic-bezier(.2,.9,.2,1);
+    }
 
-        .walletArea { display:flex; align-items:center; gap: 10px; }
-        .balance-pill {
-            display:flex; align-items:center; gap: 10px;
-            padding: 8px 10px;
-            border-radius: 14px;
-            background: rgba(255,255,255,.06);
-            border: 1px solid var(--line);
-            box-shadow: 0 10px 24px rgba(0,0,0,.25);
-            min-width: 190px;
-            justify-content: space-between;
-        }
-        .balance-left { display:flex; flex-direction: column; gap: 2px; }
-        .balance-left .lbl { font-size: 11px; color: var(--muted); }
-        .balance-left .val { font-weight: 700; font-size: 14px; letter-spacing: .2px; }
-        .deposit-btn-mini {
-            width: 34px; height: 34px; border-radius: 12px;
-            border: 1px solid rgba(255,255,255,.12);
-            background: rgba(124,92,255,.18);
-            color: var(--text);
-            font-weight: 800;
-            cursor: pointer;
-        }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(1200px 700px at 20% -15%, rgba(124,92,255,.28), transparent 58%),
+        radial-gradient(900px 520px at 92% 0%, rgba(49,208,170,.18), transparent 54%),
+        radial-gradient(700px 420px at 70% 110%, rgba(124,92,255,.12), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      animation: bgFloat 10s ease-in-out infinite alternate;
+    }
 
-        .tabs {
-            display:flex; gap: 8px; margin: 16px 0 10px;
-        }
-        .tab {
-            flex: 1;
-            padding: 10px 12px;
-            border-radius: 14px;
-            border: 1px solid var(--line);
-            background: rgba(255,255,255,.04);
-            color: var(--muted);
-            cursor: pointer;
-            text-align: center;
-            font-weight: 650;
-        }
-        .tab.active {
-            color: var(--text);
-            background: linear-gradient(135deg, rgba(124,92,255,.22), rgba(49,208,170,.12));
-            border-color: rgba(124,92,255,.35);
-            box-shadow: 0 10px 28px rgba(124,92,255,.14);
-        }
+    @keyframes bgFloat {
+      from { filter: saturate(1) brightness(1); }
+      to { filter: saturate(1.05) brightness(1.02); }
+    }
 
-        .panel {
-            background: rgba(255,255,255,.04);
-            border: 1px solid var(--line);
-            border-radius: var(--r);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-        .panelHead {
-            padding: 12px 14px;
-            display:flex; align-items:center; justify-content: space-between;
-            border-bottom: 1px solid var(--line);
-            background: linear-gradient(to bottom, rgba(255,255,255,.04), rgba(255,255,255,.02));
-        }
-        .panelHead b { font-size: 13px; }
-        .panelHead span { font-size: 12px; color: var(--muted); }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 30px; }
 
-        .searchRow {
-            padding: 12px 14px;
-            display:flex; gap: 10px; align-items:center; flex-wrap: wrap;
-            border-bottom: 1px solid var(--line);
-        }
-        .inp {
-            flex: 1;
-            min-width: 210px;
-            padding: 10px 12px;
-            border-radius: 14px;
-            border: 1px solid rgba(255,255,255,.12);
-            background: rgba(0,0,0,.20);
-            color: var(--text);
-            outline: none;
-        }
-        .sel {
-            padding: 10px 12px;
-            border-radius: 14px;
-            border: 1px solid rgba(255,255,255,.12);
-            background: rgba(0,0,0,.20);
-            color: var(--text);
-            outline: none;
-            min-width: 160px;
-        }
-        .btn {
-            padding: 10px 12px;
-            border-radius: 14px;
-            border: 1px solid rgba(255,255,255,.12);
-            background: rgba(255,255,255,.06);
-            color: var(--text);
-            cursor: pointer;
-            font-weight: 700;
-        }
-        .btn-primary {
-            background: rgba(124,92,255,.22);
-            border-color: rgba(124,92,255,.35);
-        }
-        .btn-secondary {
-            background: rgba(49,208,170,.14);
-            border-color: rgba(49,208,170,.25);
-        }
-        .grid {
-            padding: 14px;
-            display:grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-        }
-        .card {
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,.10);
-            background: rgba(0,0,0,.22);
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform .12s ease, border-color .12s ease;
-        }
-        .card:hover { transform: translateY(-2px); border-color: rgba(124,92,255,.35); }
-        .thumb {
-            height: 140px;
-            background: rgba(255,255,255,.04);
-            display:flex; align-items:center; justify-content: center;
-            overflow: hidden;
-        }
-        .thumb img { width: 100%; height: 100%; object-fit: cover; display:block; }
-        .cardBody { padding: 10px 10px 12px; }
-        .title { font-weight: 800; font-size: 13px; margin-bottom: 6px; }
-        .meta { font-size: 12px; color: var(--muted); display:flex; gap: 8px; flex-wrap: wrap; }
-        .tag {
-            padding: 4px 8px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,.12);
-            background: rgba(255,255,255,.05);
-        }
-        .priceRow { margin-top: 10px; display:flex; align-items:center; justify-content: space-between; }
-        .price { font-weight: 900; }
-        .time { font-size: 12px; color: var(--muted); }
+    .topbar {
+      position: sticky; top: 0; z-index: 60;
+      backdrop-filter: blur(12px);
+      background: linear-gradient(to bottom, rgba(11,13,18,.92), rgba(11,13,18,.62));
+      border-bottom: 1px solid var(--line);
+    }
 
-        .modalBack {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,.55);
-            display:none;
-            align-items:center; justify-content:center;
-            padding: 18px;
-            z-index: 200;
-        }
-        .modal {
-            width: min(520px, 100%);
-            border-radius: 18px;
-            border: 1px solid rgba(255,255,255,.14);
-            background: linear-gradient(180deg, rgba(17,21,34,.98), rgba(13,16,26,.96));
-            box-shadow: 0 18px 60px rgba(0,0,0,.55);
-            overflow:hidden;
-        }
-        .modalHead {
-            padding: 14px 14px;
-            display:flex; align-items:center; justify-content: space-between;
-            border-bottom: 1px solid var(--line);
-        }
-        .modalHead b { font-size: 14px; }
-        .close {
-            width: 34px; height: 34px; border-radius: 12px;
-            border: 1px solid rgba(255,255,255,.12);
-            background: rgba(255,255,255,.06);
-            color: var(--text);
-            cursor: pointer;
-            font-weight: 900;
-        }
-        .modalBody { padding: 14px; }
-        .row { display:flex; gap: 10px; align-items:center; flex-wrap: wrap; }
-        .hint { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.35; }
+    .topbar .inner {
+      max-width: 980px; margin: 0 auto; padding: 12px 16px;
+      display:flex; align-items:center; justify-content:space-between; gap: 12px;
+    }
 
-        .toast {
-            position: fixed;
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: 90px;
-            background: rgba(0,0,0,.72);
-            border: 1px solid rgba(255,255,255,.14);
-            color: var(--text);
-            padding: 10px 12px;
-            border-radius: 14px;
-            display:none;
-            z-index: 500;
-            max-width: min(520px, calc(100% - 30px));
-        }
-        .footerNav {
-            position: fixed; left:0; right:0; bottom:0;
-            background: rgba(11,13,18,.88);
-            border-top: 1px solid var(--line);
-            padding: 10px 16px;
-            display:flex; gap: 10px; justify-content: center;
-            backdrop-filter: blur(12px);
-            z-index: 100;
-        }
-        .pill {
-            flex: 1;
-            max-width: 240px;
-            padding: 12px 14px;
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,.12);
-            background: rgba(255,255,255,.05);
-            color: var(--muted);
-            font-weight: 800;
-            cursor: pointer;
-            text-align: center;
-        }
-        .pill.active {
-            color: var(--text);
-            background: linear-gradient(135deg, rgba(124,92,255,.20), rgba(49,208,170,.10));
-            border-color: rgba(124,92,255,.35);
-        }
-    </style>
+    .brand { display:flex; align-items:center; gap: 10px; user-select:none; }
+    .logo {
+      width: 38px; height: 38px; border-radius: 13px;
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(49,208,170,.85));
+      box-shadow: 0 14px 30px rgba(124,92,255,.22);
+      position: relative;
+      overflow: hidden;
+    }
+    .logo::after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.18) 45%, transparent 60%);
+      transform: translateX(-40%) rotate(10deg);
+      animation: shimmer 3.4s ease-in-out infinite;
+    }
+    @keyframes shimmer{
+      0% { transform: translateX(-70%) rotate(12deg); opacity:.0; }
+      20%{ opacity:.9; }
+      60%{ opacity:.35; }
+      100%{ transform: translateX(80%) rotate(12deg); opacity:.0; }
+    }
+
+    .brand .name { line-height: 1.08; }
+    .brand .name b { display:block; font-size: 14px; letter-spacing: .2px; }
+    .brand .name span { display:block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .walletArea { display:flex; align-items:center; gap: 10px; }
+
+    .balance-pill {
+      display:flex; align-items:center; gap: 10px;
+      padding: 8px 10px;
+      border-radius: 15px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 14px 30px rgba(0,0,0,.28);
+      min-width: 210px;
+      justify-content: space-between;
+      transition: transform var(--speed) var(--ease);
+    }
+    .balance-pill:active { transform: scale(.99); }
+
+    .balance-left { display:flex; flex-direction: column; gap: 2px; }
+    .balance-left .lbl { font-size: 11px; color: var(--muted); }
+    .balance-left .val { font-weight: 900; font-size: 14px; letter-spacing: .2px; }
+
+    .iconPlus {
+      width: 34px; height: 34px; border-radius: 13px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(135deg, rgba(124,92,255,.22), rgba(49,208,170,.10));
+      color: var(--text);
+      font-weight: 900;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Tabs (single navigation) */
+    .tabsWrap {
+      max-width: 980px; margin: 0 auto; padding: 0 16px 12px;
+    }
+
+    .tabs {
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content: center;
+      padding: 10px 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      box-shadow: 0 16px 50px rgba(0,0,0,.28);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      cursor: pointer;
+      text-align: center;
+      font-weight: 850;
+      letter-spacing: .2px;
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--speed) var(--ease), background var(--speed) var(--ease), border-color var(--speed) var(--ease);
+    }
+    .tab:hover { transform: translateY(-1px); }
+    .tab:active { transform: translateY(0px) scale(.99); }
+
+    .tab.active {
+      color: var(--text);
+      background: linear-gradient(135deg, rgba(124,92,255,.20), rgba(49,208,170,.10));
+      border-color: rgba(124,92,255,.35);
+      box-shadow: 0 16px 42px rgba(124,92,255,.14);
+    }
+
+    /* animated indicator */
+    .indicator {
+      position:absolute;
+      bottom: 8px;
+      height: 4px;
+      width: calc(50% - 16px);
+      left: 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(124,92,255,.95), rgba(49,208,170,.75));
+      box-shadow: 0 8px 18px rgba(124,92,255,.22);
+      transition: transform var(--speed) var(--ease);
+    }
+    .indicator.right { transform: translateX(calc(100% + 20px)); }
+
+    /* Panels */
+    .panel {
+      margin-top: 14px;
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transform-origin: top center;
+      animation: panelIn 420ms var(--ease) both;
+    }
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateY(10px) scale(.99); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .panelHead {
+      padding: 12px 14px;
+      display:flex; align-items:center; justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(to bottom, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    }
+    .panelHead b { font-size: 13px; }
+    .panelHead span { font-size: 12px; color: var(--muted); }
+
+    .searchRow {
+      padding: 12px 14px;
+      display:flex; gap: 10px; align-items:center; flex-wrap: wrap;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .inp {
+      flex: 1;
+      min-width: 240px;
+      padding: 11px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--speed) var(--ease), transform var(--speed) var(--ease);
+    }
+    .inp:focus { border-color: rgba(124,92,255,.40); }
+
+    .sel {
+      padding: 11px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      outline: none;
+      min-width: 160px;
+      transition: border-color var(--speed) var(--ease);
+    }
+    .sel:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .btn {
+      padding: 11px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 900;
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--speed) var(--ease), border-color var(--speed) var(--ease), background var(--speed) var(--ease);
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0px) scale(.99); }
+    .btn-primary { background: rgba(124,92,255,.22); border-color: rgba(124,92,255,.35); }
+    .btn-secondary { background: rgba(49,208,170,.14); border-color: rgba(49,208,170,.25); }
+
+    /* Ripple effect */
+    .ripple::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at var(--rx, 50%) var(--ry, 50%), rgba(255,255,255,.22), transparent 55%);
+      opacity: 0;
+      transition: opacity 240ms var(--ease);
+    }
+    .ripple:active::after { opacity: 1; }
+
+    /* Cards */
+    .grid {
+      padding: 14px;
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform var(--speed) var(--ease), border-color var(--speed) var(--ease);
+      animation: cardIn 380ms var(--ease) both;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0px); }
+    }
+    .card:hover { transform: translateY(-2px); border-color: rgba(124,92,255,.33); }
+    .card:active { transform: translateY(0px) scale(.995); }
+
+    .thumb {
+      height: 140px;
+      background: rgba(255,255,255,.04);
+      display:flex; align-items:center; justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display:block; }
+    .thumb::after{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(to top, rgba(0,0,0,.35), transparent 55%);
+      pointer-events:none;
+    }
+
+    .cardBody { padding: 10px 10px 12px; }
+    .title { font-weight: 950; font-size: 13px; margin-bottom: 6px; }
+    .meta { font-size: 12px; color: var(--muted); display:flex; gap: 8px; flex-wrap: wrap; }
+    .tag {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+    }
+    .priceRow { margin-top: 10px; display:flex; align-items:center; justify-content: space-between; }
+    .price { font-weight: 950; }
+    .time { font-size: 12px; color: var(--muted); }
+
+    /* Skeleton loading */
+    .skeleton {
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+      overflow: hidden;
+      position: relative;
+      height: 210px;
+    }
+    .skeleton::after {
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.14) 45%, transparent 60%);
+      transform: translateX(-60%) rotate(10deg);
+      animation: sk 1.4s ease-in-out infinite;
+    }
+    @keyframes sk {
+      from { transform: translateX(-70%) rotate(10deg); }
+      to { transform: translateX(70%) rotate(10deg); }
+    }
+
+    /* Modal / bottom sheet (animated) */
+    .modalBack {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.56);
+      display:none;
+      align-items:flex-end; justify-content:center;
+      padding: 18px;
+      z-index: 200;
+      opacity: 0;
+      transition: opacity 220ms var(--ease);
+    }
+    .modalBack.open { display:flex; opacity: 1; }
+
+    .sheet {
+      width: min(560px, 100%);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(17,21,34,.98), rgba(13,16,26,.96));
+      box-shadow: 0 22px 80px rgba(0,0,0,.65);
+      overflow:hidden;
+      transform: translateY(16px);
+      opacity: 0;
+      transition: transform 280ms var(--ease), opacity 280ms var(--ease);
+    }
+    .modalBack.open .sheet { transform: translateY(0px); opacity: 1; }
+
+    .modalHead {
+      padding: 14px 14px;
+      display:flex; align-items:center; justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    .modalHead b { font-size: 14px; }
+    .close {
+      width: 34px; height: 34px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 900;
+      transition: transform var(--speed) var(--ease);
+    }
+    .close:hover { transform: rotate(3deg); }
+    .close:active { transform: rotate(0deg) scale(.98); }
+
+    .modalBody { padding: 14px; }
+    .row { display:flex; gap: 10px; align-items:center; flex-wrap: wrap; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.35; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 26px;
+      background: rgba(0,0,0,.74);
+      border: 1px solid rgba(255,255,255,.14);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      display:none;
+      z-index: 500;
+      max-width: min(560px, calc(100% - 30px));
+      box-shadow: 0 14px 40px rgba(0,0,0,.55);
+      animation: toastIn 240ms var(--ease) both;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0px); }
+    }
+
+    .divider { height: 1px; background: rgba(255,255,255,.08); margin: 12px 0; }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+      body { animation: none !important; }
+    }
+  </style>
 </head>
 
 <body>
-    <div class="topbar">
-        <div class="inner">
-            <div class="brand">
-                <div class="logo"></div>
-                <div class="name">
-                    <b>AucTon</b>
-                    <span>NFT auctions • TON</span>
-                </div>
-            </div>
-
-            <div class="walletArea">
-                <div id="tonconnect"></div>
-
-                <div class="balance-pill">
-                    <div class="balance-left">
-                        <div class="lbl">Balance</div>
-                        <div class="val"><span id="bal">0</span> TON</div>
-                    </div>
-                    <button class="deposit-btn-mini" onclick="openWalletMenu()">+</button>
-                </div>
-            </div>
+  <div class="topbar">
+    <div class="inner">
+      <div class="brand">
+        <div class="logo"></div>
+        <div class="name">
+          <b>AucTon</b>
+          <span>NFT auctions • TON</span>
         </div>
+      </div>
+
+      <div class="walletArea">
+        <div id="tonconnect"></div>
+
+        <div class="balance-pill">
+          <div class="balance-left">
+            <div class="lbl">Balance</div>
+            <div class="val"><span id="bal">0.000</span> TON</div>
+          </div>
+          <button class="iconPlus ripple" onclick="openWalletMenu(event)">+</button>
+        </div>
+      </div>
     </div>
 
-    <div class="wrap">
-        <div class="tabs">
-            <button id="tabMarket" class="tab active" onclick="switchTab('market')">Auction</button>
-            <button id="tabProfile" class="tab" onclick="switchTab('profile')">Withdraw</button>
-        </div>
+    <!-- single navigation tabs (only here) -->
+    <div class="tabsWrap">
+      <div class="tabs">
+        <button id="tabAuction" class="tab active ripple" onclick="switchTab('auction', event)">Auction</button>
+        <button id="tabProfile" class="tab ripple" onclick="switchTab('profile', event)">Profile</button>
+        <div id="indicator" class="indicator"></div>
+      </div>
+    </div>
+  </div>
 
-        <div id="marketPanel" class="panel">
-            <div class="panelHead">
-                <b>Active auctions</b>
-                <span id="marketCount">0 items</span>
-            </div>
+  <div class="wrap">
+    <!-- Auction -->
+    <div id="auctionPanel" class="panel">
+      <div class="panelHead">
+        <b>Active auctions</b>
+        <span id="auctionCount">0 items</span>
+      </div>
 
-            <div class="searchRow">
-                <input id="searchMarket" class="inp" placeholder="Search by ID or name..." oninput="applyFilters()" />
-                <select id="fCollection" class="sel" onchange="applyFilters()">
-                    <option value="">Collection</option>
-                </select>
-                <select id="fModel" class="sel" onchange="applyFilters()">
-                    <option value="">Model</option>
-                </select>
-                <select id="fBackdrop" class="sel" onchange="applyFilters()">
-                    <option value="">Backdrop</option>
-                </select>
-                <button class="btn" onclick="load()">Refresh</button>
-            </div>
+      <div class="searchRow">
+        <input id="searchAuction" class="inp" placeholder="Search by ID or name..." oninput="applyAuctionFilters()" />
+        <select id="fCollection" class="sel" onchange="onCollectionChange(); applyAuctionFilters();">
+          <option value="">Collection</option>
+        </select>
+        <select id="fModel" class="sel" onchange="applyAuctionFilters()" disabled>
+          <option value="">Model</option>
+        </select>
+        <select id="fBackdrop" class="sel" onchange="applyAuctionFilters()">
+          <option value="">Backdrop</option>
+        </select>
+        <button class="btn ripple" onclick="loadAll(event)">Refresh</button>
+      </div>
 
-            <div id="marketGrid" class="grid"></div>
-        </div>
-
-        <div id="profilePanel" class="panel" style="display:none;">
-            <div class="panelHead">
-                <b>Inventory</b>
-                <span id="profileCount">0 items</span>
-            </div>
-
-            <div class="searchRow">
-                <input id="searchProfile" class="inp" placeholder="Search by ID or name..." oninput="applyProfileFilters()" />
-                <button class="btn btn-secondary" onclick="openWithdraw()">Withdraw TON</button>
-                <button class="btn btn-primary" onclick="openDeposit()">Deposit TON</button>
-            </div>
-
-            <div id="profileGrid" class="grid"></div>
-
-            <div class="panelHead" style="border-top:1px solid var(--line);">
-                <b>History</b>
-                <span>last 50</span>
-            </div>
-            <div id="history" style="padding:14px; display:flex; flex-direction:column; gap:10px;"></div>
-        </div>
+      <div id="auctionGrid" class="grid"></div>
     </div>
 
-    <div class="footerNav">
-        <button id="pillMarket" class="pill active" onclick="switchTab('market')">Auction</button>
-        <button id="pillProfile" class="pill" onclick="switchTab('profile')">Withdraw</button>
+    <!-- Profile -->
+    <div id="profilePanel" class="panel" style="display:none;">
+      <div class="panelHead">
+        <b>Inventory</b>
+        <span id="profileCount">0 items</span>
+      </div>
+
+      <div class="searchRow">
+        <input id="searchProfile" class="inp" placeholder="Search by ID or name..." oninput="applyProfileFilters()" />
+        <button class="btn btn-secondary ripple" onclick="openWithdraw(event)">Withdraw TON</button>
+        <button class="btn btn-primary ripple" onclick="openDeposit(event)">Deposit TON</button>
+      </div>
+
+      <div id="profileGrid" class="grid"></div>
+
+      <div class="panelHead" style="border-top:1px solid rgba(255,255,255,.08);">
+        <b>History</b>
+        <span>last 50</span>
+      </div>
+      <div id="history" style="padding:14px; display:flex; flex-direction:column; gap:10px;"></div>
     </div>
+  </div>
 
-    <div id="modalBack" class="modalBack" onclick="if(event.target===this) closeModal()">
-        <div class="modal">
-            <div class="modalHead">
-                <b id="modalTitle">Modal</b>
-                <button class="close" onclick="closeModal()">✕</button>
-            </div>
-            <div class="modalBody" id="modalBody"></div>
-        </div>
+  <!-- bottom sheet modal -->
+  <div id="modalBack" class="modalBack" onclick="if(event.target===this) closeModal()">
+    <div class="sheet">
+      <div class="modalHead">
+        <b id="modalTitle">Modal</b>
+        <button class="close ripple" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modalBody" id="modalBody"></div>
     </div>
+  </div>
 
-    <div id="toast" class="toast"></div>
+  <div id="toast" class="toast"></div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+  <script>
+    const tg = window.Telegram?.WebApp;
+    try { tg?.expand?.(); } catch {}
 
-        const API = 'https://api.growagardentrade.online';
-        function baseHeaders() {
-            const tg = window.Telegram?.WebApp;
-            const u = tg?.initDataUnsafe?.user || {};
-            const h = {};
-            if (u.id) h['x-user-id'] = String(u.id);
-            if (tg?.initData) h['x-init-data'] = tg.initData;
-            if (u.username) h['x-username'] = u.username;
-            if (u.first_name) h['x-first-name'] = u.first_name;
-            return h;
+    const API = 'https://api.growagardentrade.online';
+
+    function baseHeaders() {
+      const u = tg?.initDataUnsafe?.user || {};
+      const h = {};
+      if (u.id) h['x-user-id'] = String(u.id);
+      if (tg?.initData) h['x-init-data'] = tg.initData;
+      if (u.username) h['x-username'] = u.username;
+      if (u.first_name) h['x-first-name'] = u.first_name;
+      return h;
+    }
+
+    async function apiFetch(url, options) {
+      const opt = options ? { ...options } : {};
+      opt.headers = { ...baseHeaders(), ...(opt.headers || {}) };
+
+      const r = await fetch(url, opt);
+      const text = await r.text();
+
+      try {
+        return JSON.parse(text);
+      } catch {
+        console.error('Bad JSON', { url, status: r.status, head: text.slice(0, 200) });
+        return { ok: false, error: 'SERVER_RETURNED_NON_JSON', status: r.status };
+      }
+    }
+
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: 'https://app.growagardentrade.online/tonconnect-manifest.json',
+      buttonRootId: 'tonconnect'
+    });
+
+    let auctions = [];
+    let inventory = [];
+    let modelsByCollection = {};
+    let collections = new Set();
+    let backdrops = new Set();
+
+    function esc(s) {
+      return (s || '').toString()
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => t.style.display = 'none', 2200);
+    }
+
+    function setRipple(e) {
+      const el = e.currentTarget;
+      const rect = el.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      el.style.setProperty('--rx', x + '%');
+      el.style.setProperty('--ry', y + '%');
+    }
+    document.addEventListener('pointerdown', (e) => {
+      const b = e.target.closest('.ripple');
+      if (b) setRipple({ currentTarget: b, clientX: e.clientX, clientY: e.clientY });
+    }, { passive: true });
+
+    function timeLeft(ts) {
+      const ms = ts - Date.now();
+      if (ms <= 0) return 'ended';
+      const s = Math.floor(ms / 1000);
+      const d = Math.floor(s / 86400);
+      const h = Math.floor((s % 86400) / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      if (d > 0) return `${d}d ${h}h`;
+      if (h > 0) return `${h}h ${m}m`;
+      return `${m}m`;
+    }
+
+    function parseAttrs(attributes) {
+      let attrs = [];
+      try {
+        if (typeof attributes === 'string') attrs = JSON.parse(attributes);
+        else if (Array.isArray(attributes)) attrs = attributes;
+      } catch {}
+
+      const out = { Collection: '', Model: '', Backdrop: '' };
+      for (const a of attrs) {
+        if (!a) continue;
+        const k = (a.trait_type || a.key || '').toString().trim();
+        const v = (a.value || '').toString().trim();
+        if (!k || !v) continue;
+
+        const kl = k.toLowerCase();
+        if (kl === 'collection') out.Collection = v;
+        if (kl === 'model') out.Model = v;
+        if (kl === 'background' || kl === 'backdrop') out.Backdrop = v;
+      }
+      return out;
+    }
+
+    function setIndicator(tab) {
+      const ind = document.getElementById('indicator');
+      ind.classList.toggle('right', tab === 'profile');
+    }
+
+    function switchTab(tab) {
+      const a = document.getElementById('auctionPanel');
+      const p = document.getElementById('profilePanel');
+
+      a.style.display = (tab === 'auction') ? '' : 'none';
+      p.style.display = (tab === 'profile') ? '' : 'none';
+
+      document.getElementById('tabAuction').classList.toggle('active', tab === 'auction');
+      document.getElementById('tabProfile').classList.toggle('active', tab === 'profile');
+
+      setIndicator(tab);
+
+      const panel = (tab === 'auction') ? a : p;
+      panel.style.animation = 'none';
+      void panel.offsetWidth;
+      panel.style.animation = '';
+    }
+
+    function openModal(title, html) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').innerHTML = html;
+      const b = document.getElementById('modalBack');
+      b.classList.add('open');
+    }
+    function closeModal() {
+      const b = document.getElementById('modalBack');
+      b.classList.remove('open');
+      setTimeout(() => {
+        if (!b.classList.contains('open')) {
+          document.getElementById('modalBody').innerHTML = '';
         }
+      }, 260);
+    }
 
-        async function apiFetch(url, options) {
-            const opt = options ? { ...options } : {};
-            opt.headers = { ...baseHeaders(), ...(opt.headers || {}) };
+    function showSkeleton(gridId, count=6) {
+      const g = document.getElementById(gridId);
+      g.innerHTML = Array.from({length: count}).map(() => `<div class="skeleton"></div>`).join('');
+    }
 
-            const r = await fetch(url, opt);
-            const text = await r.text();
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error('Bad JSON from', url, 'status', r.status, 'body', text.slice(0, 200));
-                return { ok: false, error: 'SERVER_RETURNED_NON_JSON', status: r.status };
-            }
+    function buildFilters(list) {
+      collections = new Set();
+      backdrops = new Set();
+      modelsByCollection = {};
+
+      for (const it of list) {
+        it.traits = parseAttrs(it.attributes);
+        if (it.traits.Collection) {
+          collections.add(it.traits.Collection);
+          if (!modelsByCollection[it.traits.Collection]) modelsByCollection[it.traits.Collection] = new Set();
+          if (it.traits.Model) modelsByCollection[it.traits.Collection].add(it.traits.Model);
         }
+        if (it.traits.Backdrop) backdrops.add(it.traits.Backdrop);
+      }
 
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://app.growagardentrade.online/tonconnect-manifest.json',
-            buttonRootId: 'tonconnect'
+      const colSel = document.getElementById('fCollection');
+      const modelSel = document.getElementById('fModel');
+      const backSel = document.getElementById('fBackdrop');
+
+      const prevC = colSel.value;
+      const prevM = modelSel.value;
+      const prevB = backSel.value;
+
+      colSel.innerHTML = `<option value="">Collection</option>` + [...collections].sort().map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
+      backSel.innerHTML = `<option value="">Backdrop</option>` + [...backdrops].sort().map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
+
+      if ([...collections].includes(prevC)) colSel.value = prevC;
+      if ([...backdrops].includes(prevB)) backSel.value = prevB;
+
+      onCollectionChange(prevM);
+    }
+
+    function onCollectionChange(forceModelValue) {
+      const col = document.getElementById('fCollection').value;
+      const modelSel = document.getElementById('fModel');
+
+      if (!col) {
+        modelSel.disabled = true;
+        modelSel.innerHTML = `<option value="">Model</option>`;
+        modelSel.value = '';
+        return;
+      }
+
+      const models = modelsByCollection[col] ? [...modelsByCollection[col]].sort() : [];
+      modelSel.disabled = false;
+      modelSel.innerHTML = `<option value="">Model</option>` + models.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
+
+      if (forceModelValue && models.includes(forceModelValue)) modelSel.value = forceModelValue;
+      else modelSel.value = '';
+    }
+
+    function renderAuction(list) {
+      const g = document.getElementById('auctionGrid');
+      if (!list.length) {
+        g.innerHTML = `<div style="padding:12px;color:var(--muted);">Empty</div>`;
+        return;
+      }
+
+      g.innerHTML = list.map((it, idx) => {
+        const t = it.traits || parseAttrs(it.attributes);
+        const tags = [
+          t.Collection ? `<span class="tag">${esc(t.Collection)}</span>` : '',
+          t.Model ? `<span class="tag">${esc(t.Model)}</span>` : '',
+          t.Backdrop ? `<span class="tag">${esc(t.Backdrop)}</span>` : ''
+        ].join('');
+
+        const price = Number(it.current_bid || 0).toFixed(2);
+        const tl = timeLeft(it.ends_at);
+
+        return `
+          <div class="card" style="animation-delay:${Math.min(idx*20, 180)}ms"
+               onclick="openAuction(${it.id}, ${Number(it.current_bid || 0)}, '${esc(it.name || '')}')">
+            <div class="thumb">
+              <img src="${esc(it.image_url || '')}" onerror="this.style.display='none'; this.parentNode.innerHTML='<span style=&quot;color:var(--muted)&quot;>no image</span>';">
+            </div>
+            <div class="cardBody">
+              <div class="title">#${it.id} ${esc(it.name || '')}</div>
+              <div class="meta">${tags}</div>
+              <div class="priceRow">
+                <div class="price">${price} TON</div>
+                <div class="time">${tl}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderProfile(list) {
+      const g = document.getElementById('profileGrid');
+      if (!list.length) {
+        g.innerHTML = `<div style="padding:12px;color:var(--muted);">Empty</div>`;
+        return;
+      }
+
+      g.innerHTML = list.map((it, idx) => {
+        const t = it.traits || parseAttrs(it.attributes);
+        const tags = [
+          t.Collection ? `<span class="tag">${esc(t.Collection)}</span>` : '',
+          t.Model ? `<span class="tag">${esc(t.Model)}</span>` : '',
+          t.Backdrop ? `<span class="tag">${esc(t.Backdrop)}</span>` : ''
+        ].join('');
+
+        return `
+          <div class="card" style="animation-delay:${Math.min(idx*20, 180)}ms"
+               onclick="openNftActions(${it.id}, '${esc(it.name || '')}')">
+            <div class="thumb">
+              <img src="${esc(it.image_url || '')}" onerror="this.style.display='none'; this.parentNode.innerHTML='<span style=&quot;color:var(--muted)&quot;>no image</span>';">
+            </div>
+            <div class="cardBody">
+              <div class="title">#${it.id} ${esc(it.name || '')}</div>
+              <div class="meta">${tags}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function applyAuctionFilters() {
+      const q = (document.getElementById('searchAuction').value || '').trim().toLowerCase();
+      const c = document.getElementById('fCollection').value;
+      const m = document.getElementById('fModel').value;
+      const b = document.getElementById('fBackdrop').value;
+
+      const filtered = auctions.filter(it => {
+        const name = (it.name || '').toLowerCase();
+        const id = String(it.id);
+        const t = it.traits || parseAttrs(it.attributes);
+
+        if (q && !(name.includes(q) || id.includes(q))) return false;
+        if (c && t.Collection !== c) return false;
+        if (m && t.Model !== m) return false;
+        if (b && t.Backdrop !== b) return false;
+        return true;
+      });
+
+      document.getElementById('auctionCount').textContent = `${filtered.length} items`;
+      renderAuction(filtered);
+    }
+
+    function applyProfileFilters() {
+      const q = (document.getElementById('searchProfile').value || '').trim().toLowerCase();
+      const filtered = inventory.filter(it => {
+        const name = (it.name || '').toLowerCase();
+        const id = String(it.id);
+        if (q && !(name.includes(q) || id.includes(q))) return false;
+        return true;
+      });
+
+      document.getElementById('profileCount').textContent = `${filtered.length} items`;
+      renderProfile(filtered);
+    }
+
+    function renderHistory(list) {
+      const box = document.getElementById('history');
+      if (!list || !list.length) {
+        box.innerHTML = `<div style="color:var(--muted);">No history</div>`;
+        return;
+      }
+      box.innerHTML = list.map(x => {
+        const t = new Date(x.created_at).toLocaleString();
+        return `
+          <div style="padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.10);">
+            <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;">
+              <b style="font-size:13px;">${esc(x.type)}</b>
+              <span style="color:var(--muted);font-size:12px;">${esc(t)}</span>
+            </div>
+            <div style="margin-top:6px;font-weight:950;">${Number(x.amount).toFixed(6)} TON</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openWalletMenu() {
+      openModal('TON', `
+        <div class="row" style="justify-content:space-between;">
+          <button class="btn btn-primary ripple" onclick="openDeposit()">Пополнение TON</button>
+          <button class="btn btn-secondary ripple" onclick="openWithdraw()">Вывод TON</button>
+        </div>
+        <div class="hint">Операции выполняются через TON-кошелёк. Баланс обновится после подтверждения сети.</div>
+      `);
+    }
+
+    function openDeposit() {
+      openModal('Deposit TON', `
+        <div class="hint">Подключи кошелёк и отправь TON на депозитный адрес. Зачисление — автоматически.</div>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="btn btn-primary ripple" onclick="sendDeposit()">Open payment</button>
+        </div>
+      `);
+    }
+
+    function openWithdraw() {
+      openModal('Withdraw TON', `
+        <div class="row">
+          <input id="wAmount" class="inp" placeholder="Amount TON" type="number" step="0.01" min="0.01">
+          <input id="wAddress" class="inp" placeholder="Address (UQ...)" style="min-width:260px;">
+        </div>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="btn btn-primary ripple" onclick="confirmWithdraw()">Create request</button>
+        </div>
+        <div class="hint">Вывод создаётся как заявка и обрабатывается администратором.</div>
+      `);
+    }
+
+    async function confirmWithdraw() {
+      const amount = Number(document.getElementById('wAmount').value);
+      const address = (document.getElementById('wAddress').value || '').trim();
+      if (!amount || amount <= 0) return toast('Bad amount');
+      if (address.length < 10) return toast('Bad address');
+
+      const res = await apiFetch(`${API}/api/withdraw/ton`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, address })
+      });
+
+      if (!res.ok) return toast(res.error || 'Withdraw failed');
+      toast('Withdraw requested');
+      closeModal();
+      await loadAll();
+    }
+
+    async function sendDeposit() {
+      try {
+        await tonConnectUI.openModal();
+        const w = tonConnectUI.wallet;
+        if (!w) return toast('Wallet not connected');
+
+        const u = tg?.initDataUnsafe?.user;
+        if (!u?.id) return toast('No Telegram user');
+
+        const amount = prompt('Enter TON amount to deposit:', '1');
+        if (!amount) return;
+
+        const toNano = (x) => {
+          const n = Number(x);
+          if (!Number.isFinite(n) || n <= 0) throw new Error('bad amount');
+          return (n * 1e9).toFixed(0);
+        };
+
+        const bodyCell = new TonWeb.boc.Cell();
+        bodyCell.bits.writeUint(0, 32);
+        bodyCell.bits.writeString(String(u.id));
+        const payload = TonWeb.utils.bytesToBase64(await bodyCell.toBoc(false));
+
+        await tonConnectUI.sendTransaction({
+          validUntil: Math.floor(Date.now() / 1000) + 300,
+          messages: [{
+            address: 'UQDxFs685oBQjawclpOrO-kb2n3hugWWOf51h6goSQQQLnLg',
+            amount: toNano(amount),
+            payload
+          }]
         });
 
-        let mode = 'market';
-        let marketList = [];
-        let profileList = [];
-        let allCollections = new Set();
-        let allModelsByCollection = {};
-        let allBackdrops = new Set();
+        toast('Payment sent, waiting credit...');
+        closeModal();
+      } catch (e) {
+        console.error(e);
+        toast('Payment canceled');
+      }
+    }
 
-        function toast(msg) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.style.display = 'block';
-            clearTimeout(window.__toastTimer);
-            window.__toastTimer = setTimeout(() => t.style.display = 'none', 2200);
-        }
+    function openAuction(id, currentBid, name) {
+      openModal(`Auction #${id}`, `
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <div style="font-size:12px;color:var(--muted);">Current bid</div>
+            <div style="font-size:18px;font-weight:950;">${Number(currentBid||0).toFixed(2)} TON</div>
+          </div>
+          <button class="btn btn-primary ripple" onclick="placeBid(${id}, ${Number(currentBid||0)})">Bid</button>
+        </div>
+        <div class="hint">Min step: 1 TON • If bid in last minute — extends 1 minute</div>
+      `);
+    }
 
-        function switchTab(tab) {
-            mode = tab;
-            document.getElementById('marketPanel').style.display = tab === 'market' ? '' : 'none';
-            document.getElementById('profilePanel').style.display = tab === 'profile' ? '' : 'none';
+    function placeBid(auctionId, currentBid) {
+      closeModal();
+      openModal(`Bid #${auctionId}`, `
+        <div class="row">
+          <input id="bidAmount" class="inp" style="min-width:160px;" type="number"
+                 value="${Math.max(1, Math.ceil(currentBid + 1))}" step="1" min="${Math.max(1, Math.ceil(currentBid + 1))}">
+          <button class="btn btn-primary ripple" onclick="confirmBid(${auctionId})">Confirm</button>
+        </div>
+        <div class="hint">Bid will lock TON until someone outbids you or auction ends.</div>
+      `);
+    }
 
-            document.getElementById('tabMarket').classList.toggle('active', tab === 'market');
-            document.getElementById('tabProfile').classList.toggle('active', tab === 'profile');
+    async function confirmBid(auctionId) {
+      const v = Number(document.getElementById('bidAmount').value);
+      if (!v || v <= 0) return toast('Bad amount');
 
-            document.getElementById('pillMarket').classList.toggle('active', tab === 'market');
-            document.getElementById('pillProfile').classList.toggle('active', tab === 'profile');
-        }
+      const res = await apiFetch(`${API}/api/auction/bid`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ auctionId, amount: v })
+      });
 
-        function openModal(title, html) {
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalBody').innerHTML = html;
-            document.getElementById('modalBack').style.display = 'flex';
-        }
-        function closeModal() {
-            document.getElementById('modalBack').style.display = 'none';
-            document.getElementById('modalBody').innerHTML = '';
-        }
+      if (!res.ok) return toast(res.error || 'Bid failed');
+      toast('Bid placed');
+      closeModal();
+      await loadAll();
+    }
 
-        function timeLeft(ts) {
-            const ms = ts - Date.now();
-            if (ms <= 0) return 'ended';
-            const s = Math.floor(ms / 1000);
-            const d = Math.floor(s / 86400);
-            const h = Math.floor((s % 86400) / 3600);
-            const m = Math.floor((s % 3600) / 60);
-            if (d > 0) return `${d}d ${h}h`;
-            if (h > 0) return `${h}h ${m}m`;
-            return `${m}m`;
-        }
+    function openNftActions(nftId, name) {
+      openModal(`NFT #${nftId}`, `
+        <div class="row" style="justify-content:space-between;">
+          <button class="btn btn-primary ripple" onclick="createAuction(${nftId})">List on auction</button>
+          <button class="btn btn-secondary ripple" onclick="withdrawNft(${nftId})">Withdraw NFT (0.2 TON)</button>
+        </div>
+        <div class="hint">${esc(name || '')}</div>
+      `);
+    }
 
-        function parseAttrs(attributes) {
-            let attrs = [];
-            try {
-                if (typeof attributes === 'string') attrs = JSON.parse(attributes);
-                else if (Array.isArray(attributes)) attrs = attributes;
-            } catch (e) {}
-            const out = { Collection: '', Model: '', Background: '' };
-            for (const a of attrs) {
-                if (!a) continue;
-                const k = (a.trait_type || a.key || '').toString();
-                const v = (a.value || '').toString();
-                if (!k || !v) continue;
-                if (k.toLowerCase() === 'collection') out.Collection = v;
-                if (k.toLowerCase() === 'model') out.Model = v;
-                if (k.toLowerCase() === 'background' || k.toLowerCase() === 'backdrop') out.Background = v;
-            }
-            return out;
-        }
+    function createAuction(nftId) {
+      closeModal();
+      openModal(`Create auction`, `
+        <div class="row">
+          <input id="startPrice" class="inp" style="min-width:160px;" type="number" step="1" min="1" value="1">
+          <button class="btn btn-primary ripple" onclick="confirmCreateAuction(${nftId})">Create</button>
+        </div>
+        <div class="hint">Duration is fixed: 5 days • Min bid: 1 TON • Min step: 1 TON</div>
+      `);
+    }
 
-        function buildFiltersFromList(list) {
-            allCollections = new Set();
-            allModelsByCollection = {};
-            allBackdrops = new Set();
+    async function confirmCreateAuction(nftId) {
+      const price = Number(document.getElementById('startPrice').value);
+      const res = await apiFetch(`${API}/api/auction/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nftId, price })
+      });
+      if (!res.ok) return toast(res.error || 'Create failed');
+      toast('Auction created');
+      closeModal();
+      await loadAll();
+      switchTab('auction');
+    }
 
-            for (const item of list) {
-                const traits = parseAttrs(item.attributes);
-                item.parsedTraits = traits;
+    async function withdrawNft(nftId) {
+      const res = await apiFetch(`${API}/api/withdraw/nft`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nftId })
+      });
+      if (!res.ok) return toast(res.error || 'Withdraw request failed');
+      toast('Withdraw requested');
+      closeModal();
+      await loadAll();
+    }
 
-                if (traits.Collection) {
-                    allCollections.add(traits.Collection);
-                    if (!allModelsByCollection[traits.Collection]) allModelsByCollection[traits.Collection] = new Set();
-                    if (traits.Model) allModelsByCollection[traits.Collection].add(traits.Model);
-                }
-                if (traits.Background) allBackdrops.add(traits.Background);
-            }
+    function animateBalance(toVal) {
+      const el = document.getElementById('bal');
+      const from = Number(el.textContent || 0);
+      const to = Number(toVal || 0);
+      const start = performance.now();
+      const dur = 420;
 
-            const colSel = document.getElementById('fCollection');
-            const modelSel = document.getElementById('fModel');
-            const backSel = document.getElementById('fBackdrop');
+      function step(t) {
+        const p = Math.min(1, (t - start) / dur);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const v = from + (to - from) * eased;
+        el.textContent = v.toFixed(3);
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
 
-            const colVal = colSel.value;
-            colSel.innerHTML = `<option value="">Collection</option>` + [...allCollections].sort().map(x => `<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join('');
-            if ([...allCollections].includes(colVal)) colSel.value = colVal;
+    async function loadAll() {
+      showSkeleton('auctionGrid', 6);
+      showSkeleton('profileGrid', 6);
 
-            const selectedCollection = colSel.value;
-            const models = selectedCollection && allModelsByCollection[selectedCollection] ? [...allModelsByCollection[selectedCollection]].sort() : [];
-            const modelVal = modelSel.value;
-            modelSel.innerHTML = `<option value="">Model</option>` + models.map(x => `<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join('');
-            if (models.includes(modelVal)) modelSel.value = modelVal;
+      const resUser = await apiFetch(`${API}/api/user`, {});
+      if (!resUser.ok) {
+        toast(resUser.error || 'User load failed');
+        return;
+      }
 
-            const backVal = backSel.value;
-            backSel.innerHTML = `<option value="">Backdrop</option>` + [...allBackdrops].sort().map(x => `<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join('');
-            if ([...allBackdrops].includes(backVal)) backSel.value = backVal;
-        }
+      animateBalance(resUser.balance || 0);
 
-        function escapeHtml(s) {
-            return (s || '').toString()
-                .replaceAll('&', '&amp;')
-                .replaceAll('<', '&lt;')
-                .replaceAll('>', '&gt;')
-                .replaceAll('"', '&quot;')
-                .replaceAll("'", '&#039;');
-        }
+      inventory = (resUser.nfts || []).map(it => {
+        it.traits = parseAttrs(it.attributes);
+        return it;
+      });
+      document.getElementById('profileCount').textContent = `${inventory.length} items`;
+      renderProfile(inventory);
+      renderHistory(resUser.history || []);
 
-        function renderGrid(list, targetId, isMarket) {
-            const grid = document.getElementById(targetId);
-            if (!list.length) {
-                grid.innerHTML = `<div style="padding:12px;color:var(--muted);">Empty</div>`;
-                return;
-            }
+      const resAuctions = await apiFetch(`${API}/api/auctions`);
+      if (!resAuctions.ok) {
+        toast(resAuctions.error || 'Auctions load failed');
+        return;
+      }
 
-            grid.innerHTML = list.map(item => {
-                const traits = item.parsedTraits || parseAttrs(item.attributes);
-                const tags = [
-                    traits.Collection ? `<span class="tag">${escapeHtml(traits.Collection)}</span>` : '',
-                    traits.Model ? `<span class="tag">${escapeHtml(traits.Model)}</span>` : '',
-                    traits.Background ? `<span class="tag">${escapeHtml(traits.Background)}</span>` : ''
-                ].join('');
+      auctions = (resAuctions.list || []).map(it => {
+        it.traits = parseAttrs(it.attributes);
+        return it;
+      });
 
-                const price = isMarket ? (Number(item.current_bid || 0).toFixed(2)) : '';
-                const time = isMarket ? timeLeft(item.ends_at) : '';
+      document.getElementById('auctionCount').textContent = `${auctions.length} items`;
+      buildFilters(auctions);
+      renderAuction(auctions);
 
-                return `
-                    <div class="card" onclick="${isMarket ? `openAuction(${item.id}, ${Number(item.current_bid || 0)}, '${escapeHtml(item.name || '')}')` : `openNftActions(${item.id}, '${escapeHtml(item.name || '')}')`}">
-                        <div class="thumb">
-                            <img src="${escapeHtml(item.image_url || '')}" onerror="this.style.display='none';this.parentNode.innerHTML='<span style=\\'color:var(--muted)\\'>no image</span>';">
-                        </div>
-                        <div class="cardBody">
-                            <div class="title">#${item.id} ${escapeHtml(item.name || '')}</div>
-                            <div class="meta">${tags}</div>
-                            <div class="priceRow">
-                                <div class="price">${isMarket ? `${price} TON` : ''}</div>
-                                <div class="time">${isMarket ? time : ''}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
+      applyAuctionFilters();
+      applyProfileFilters();
+    }
 
-        function applyFilters() {
-            const q = document.getElementById('searchMarket').value.trim().toLowerCase();
-            const c = document.getElementById('fCollection').value;
-            const m = document.getElementById('fModel').value;
-            const b = document.getElementById('fBackdrop').value;
-
-            const filtered = marketList.filter(x => {
-                const name = (x.name || '').toLowerCase();
-                const id = String(x.id);
-                const traits = x.parsedTraits || parseAttrs(x.attributes);
-
-                if (q && !(name.includes(q) || id.includes(q))) return false;
-                if (c && traits.Collection !== c) return false;
-                if (m && traits.Model !== m) return false;
-                if (b && traits.Background !== b) return false;
-                return true;
-            });
-
-            document.getElementById('marketCount').textContent = `${filtered.length} items`;
-            renderGrid(filtered, 'marketGrid', true);
-
-            const colSel = document.getElementById('fCollection');
-            const modelSel = document.getElementById('fModel');
-            const selectedCollection = colSel.value;
-
-            const models = selectedCollection && allModelsByCollection[selectedCollection] ? [...allModelsByCollection[selectedCollection]].sort() : [];
-            const modelVal = modelSel.value;
-            modelSel.innerHTML = `<option value="">Model</option>` + models.map(x => `<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join('');
-            if (models.includes(modelVal)) modelSel.value = modelVal;
-            else modelSel.value = '';
-        }
-
-        function applyProfileFilters() {
-            const q = document.getElementById('searchProfile').value.trim().toLowerCase();
-            const filtered = profileList.filter(x => {
-                const name = (x.name || '').toLowerCase();
-                const id = String(x.id);
-                if (q && !(name.includes(q) || id.includes(q))) return false;
-                return true;
-            });
-
-            document.getElementById('profileCount').textContent = `${filtered.length} items`;
-            renderGrid(filtered, 'profileGrid', false);
-        }
-
-        function openAuction(id, price, name) {
-            openModal(`Auction #${id}`, `
-                <div class="row" style="justify-content:space-between;">
-                    <div>
-                        <div style="font-size:12px;color:var(--muted);">Current bid</div>
-                        <div style="font-size:18px;font-weight:900;">${Number(price||0).toFixed(2)} TON</div>
-                    </div>
-                    <button class="btn btn-primary" onclick="placeBid(${id}, ${Number(price||0)})">Bid</button>
-                </div>
-                <div class="hint">Min step: 1 TON • If bid in last minute — extends 1 minute</div>
-            `);
-        }
-
-        async function placeBid(auctionId, price) {
-            closeModal();
-            openModal(`Bid #${auctionId}`, `
-                <div class="row">
-                    <input id="bidAmount" class="inp" style="min-width:160px;" type="number" value="${(price + 1).toFixed(0)}" step="1" min="${Math.max(1, Math.ceil(price + 1))}">
-                    <button class="btn btn-primary" onclick="confirmBid(${auctionId})">Confirm</button>
-                </div>
-                <div class="hint">Bid will lock TON until someone outbids you or auction ends.</div>
-            `);
-        }
-
-        async function confirmBid(auctionId) {
-            const v = Number(document.getElementById('bidAmount').value);
-            if (!v || v <= 0) return toast('Bad amount');
-
-            const res = await apiFetch(`${API}/api/auction/bid`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ auctionId, amount: v })
-            });
-
-            if (!res.ok) return toast(res.error || 'Bid failed');
-            toast('Bid placed');
-            closeModal();
-            await load();
-        }
-
-        function openNftActions(nftId, name) {
-            openModal(`NFT #${nftId}`, `
-                <div class="row" style="justify-content:space-between;">
-                    <button class="btn btn-primary" onclick="createAuction(${nftId})">List on auction</button>
-                    <button class="btn btn-secondary" onclick="withdrawNft(${nftId})">Withdraw NFT (0.2 TON)</button>
-                </div>
-                <div class="hint">${escapeHtml(name || '')}</div>
-            `);
-        }
-
-        function createAuction(nftId) {
-            closeModal();
-            openModal(`Create auction`, `
-                <div class="row">
-                    <input id="startPrice" class="inp" style="min-width:160px;" type="number" step="1" min="1" value="1">
-                    <button class="btn btn-primary" onclick="confirmCreateAuction(${nftId})">Create</button>
-                </div>
-                <div class="hint">Duration is fixed: 5 days • Min bid: 1 TON • Min step: 1 TON</div>
-            `);
-        }
-
-        async function confirmCreateAuction(nftId) {
-            const price = Number(document.getElementById('startPrice').value);
-            const res = await apiFetch(`${API}/api/auction/create`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nftId, price })
-            });
-            if (!res.ok) return toast(res.error || 'Create failed');
-            toast('Auction created');
-            closeModal();
-            await load();
-            switchTab('market');
-        }
-
-        async function withdrawNft(nftId) {
-            const res = await apiFetch(`${API}/api/withdraw/nft`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nftId })
-            });
-            if (!res.ok) return toast(res.error || 'Withdraw request failed');
-            toast('Withdraw requested');
-            closeModal();
-            await load();
-        }
-
-        function openWalletMenu() {
-            openModal("TON", `
-                <div style="display:flex; gap:12px; margin-top:12px;">
-                    <button class="btn btn-primary" style="margin-top:0;" onclick="openDeposit()">Пополнение TON</button>
-                    <button class="btn btn-secondary" style="margin-top:0;" onclick="openWithdraw()">Вывод TON</button>
-                </div>
-            `);
-        }
-
-        function openDeposit() {
-            openModal('Deposit TON', `
-                <div class="hint">Connect wallet and send TON to deposit wallet. After transfer it will be credited automatically.</div>
-                <div style="margin-top:10px;" class="row">
-                    <button class="btn btn-primary" onclick="sendDeposit()">Open payment</button>
-                </div>
-            `);
-        }
-
-        function openWithdraw() {
-            openModal('Withdraw TON', `
-                <div class="row">
-                    <input id="wAmount" class="inp" placeholder="Amount TON" type="number" step="0.01" min="0.01">
-                    <input id="wAddress" class="inp" placeholder="Address (UQ...)" style="min-width:260px;">
-                </div>
-                <div style="margin-top:10px;" class="row">
-                    <button class="btn btn-primary" onclick="confirmWithdraw()">Create request</button>
-                </div>
-                <div class="hint">Withdraw is queued and processed by admin.</div>
-            `);
-        }
-
-        async function confirmWithdraw() {
-            const amount = Number(document.getElementById('wAmount').value);
-            const address = (document.getElementById('wAddress').value || '').trim();
-            if (!amount || amount <= 0) return toast('Bad amount');
-            if (address.length < 10) return toast('Bad address');
-
-            const res = await apiFetch(`${API}/api/withdraw/ton`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount, address })
-            });
-
-            if (!res.ok) return toast(res.error || 'Withdraw failed');
-            toast('Withdraw requested');
-            closeModal();
-            await load();
-        }
-
-        async function sendDeposit() {
-            try {
-                await tonConnectUI.openModal();
-                const w = tonConnectUI.wallet;
-                if (!w) return toast('Wallet not connected');
-
-                const u = tg.initDataUnsafe.user;
-                if (!u || !u.id) return toast('No Telegram user');
-
-                const amount = prompt('Enter TON amount to deposit:', '1');
-                if (!amount) return;
-
-                const toNano = (x) => {
-                    const n = Number(x);
-                    if (!Number.isFinite(n) || n <= 0) throw new Error('bad amount');
-                    return (n * 1e9).toFixed(0);
-                };
-
-                const bodyCell = new TonWeb.boc.Cell();
-                bodyCell.bits.writeUint(0, 32);
-                bodyCell.bits.writeString(String(u.id));
-                const payload = TonWeb.utils.bytesToBase64(await bodyCell.toBoc(false));
-
-                await tonConnectUI.sendTransaction({
-                    validUntil: Math.floor(Date.now() / 1000) + 300,
-                    messages: [{
-                        address: 'UQDxFs685oBQjawclpOrO-kb2n3hugWWOf51h6goSQQQLnLg',
-                        amount: toNano(amount),
-                        payload
-                    }]
-                });
-
-                toast('Payment sent, waiting credit...');
-                closeModal();
-            } catch (e) {
-                console.error(e);
-                toast('Payment canceled');
-            }
-        }
-
-        function renderHistory(list) {
-            const box = document.getElementById('history');
-            if (!list || !list.length) {
-                box.innerHTML = `<div style="color:var(--muted);">No history</div>`;
-                return;
-            }
-            box.innerHTML = list.map(x => {
-                const t = new Date(x.created_at).toLocaleString();
-                return `
-                    <div class="panel" style="padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.03);">
-                        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;">
-                            <b style="font-size:13px;">${escapeHtml(x.type)}</b>
-                            <span style="color:var(--muted);font-size:12px;">${t}</span>
-                        </div>
-                        <div style="margin-top:6px;font-weight:900;">${Number(x.amount).toFixed(6)} TON</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function load() {
-            const user = tg.initDataUnsafe.user;
-
-            const resUser = await apiFetch(`${API}/api/user`, { headers: { 'x-user-id': user?.id || '' } });
-            if (!resUser.ok) return toast(resUser.error || 'User load failed');
-
-            document.getElementById('bal').textContent = Number(resUser.balance || 0).toFixed(3);
-
-            profileList = (resUser.nfts || []).map(item => {
-                item.parsedTraits = parseAttrs(item.attributes);
-                return item;
-            });
-            document.getElementById('profileCount').textContent = `${profileList.length} items`;
-            renderGrid(profileList, 'profileGrid', false);
-            renderHistory(resUser.history || []);
-
-            const res = await apiFetch(`${API}/api/auctions`);
-            if (!res.ok) return toast(res.error || 'Auctions load failed');
-
-            marketList = (res.list || []).map(item => {
-                item.parsedTraits = parseAttrs(item.attributes);
-                return item;
-            });
-
-            buildFiltersFromList(marketList);
-            document.getElementById('marketCount').textContent = `${marketList.length} items`;
-            renderGrid(marketList, 'marketGrid', true);
-
-            applyFilters();
-            applyProfileFilters();
-        }
-
-        load().catch(e => {
-            console.error(e);
-            toast('Init error');
-        });
-    </script>
+    // initial
+    setIndicator('auction');
+    loadAll().catch(e => { console.error(e); toast('Init error'); });
+  </script>
 </body>
 </html>
