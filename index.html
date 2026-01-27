@@ -3,340 +3,2062 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AucTon</title>
-
+  <title>AucTon - NFT Auction Platform</title>
+  
+  <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
+  
+  <!-- TonConnect SDK -->
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
-    * { box-sizing: border-box; }
-    body {
+    :root {
+      --primary: #7c5cff;
+      --primary-dark: #5d3fe8;
+      --secondary: #2a2d3e;
+      --bg-primary: #0b0d12;
+      --bg-secondary: #12141c;
+      --bg-card: #161824;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a3bd;
+      --text-muted: #6c7086;
+      --success: #00d4aa;
+      --warning: #ff9f43;
+      --danger: #ff5c8d;
+      --border: #272a3a;
+      --gradient-primary: linear-gradient(135deg, #7c5cff 0%, #5d3fe8 100%);
+      --gradient-secondary: linear-gradient(135deg, #2a2d3e 0%, #1a1c2e 100%);
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+    }
+
+    * {
       margin: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(1200px 600px at 50% -200px, #3b2d5c, #07080c);
-      color: #fff;
-      display: flex;
-      justify-content: center;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(124, 92, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(93, 63, 232, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(0, 212, 170, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
     }
 
     #app {
-      width: 100%;
-      max-width: 430px;
-      min-height: 100vh;
-      padding: 14px;
-      animation: fadeIn 0.4s ease;
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 0 16px 40px;
+      animation: fadeIn 0.5s ease-out;
     }
 
+    /* Animations */
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    header {
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Header */
+    .header {
+      padding: 20px 0 16px;
+      position: sticky;
+      top: 0;
+      background: rgba(11, 13, 18, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
     }
 
-    .title {
-      font-weight: 700;
-      font-size: 18px;
-    }
-
-    .balance {
-      background: #12131a;
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-weight: 600;
-    }
-
-    .tabs {
+    .logo {
       display: flex;
-      background: #0e0f15;
-      border-radius: 14px;
-      margin-bottom: 12px;
-    }
-
-    .tab {
-      flex: 1;
-      text-align: center;
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 14px;
-      transition: 0.2s;
-      font-weight: 600;
-    }
-
-    .tab.active {
-      background: linear-gradient(135deg, #6b4cff, #3a2c85);
-    }
-
-    .card {
-      background: linear-gradient(180deg, #151722, #0c0d14);
-      border-radius: 16px;
-      padding: 12px;
-      margin-bottom: 12px;
-    }
-
-    input, select {
-      width: 100%;
-      background: #0e1018;
-      border: none;
-      color: #fff;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 8px;
-    }
-
-    .nft-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      align-items: center;
       gap: 10px;
+      font-weight: 700;
+      font-size: 20px;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .nft {
-      background: #0f1119;
-      border-radius: 12px;
-      padding: 8px;
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--gradient-primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .balance-card {
+      background: var(--gradient-secondary);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
       cursor: pointer;
-      transition: transform .15s;
     }
 
-    .nft:hover {
+    .balance-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .balance-amount {
+      font-weight: 700;
+      font-size: 16px;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .balance-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Navigation */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      background: var(--bg-secondary);
+      padding: 6px;
+      border-radius: var(--radius-lg);
+      margin: 16px 0 24px;
+      border: 1px solid var(--border);
+    }
+
+    .nav-tab {
+      flex: 1;
+      padding: 12px 16px;
+      text-align: center;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .nav-tab.active {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(124, 92, 255, 0.3);
+    }
+
+    .nav-tab:hover:not(.active) {
+      background: var(--bg-card);
+      color: var(--text-primary);
+    }
+
+    /* Search & Filters */
+    .search-container {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 14px;
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.1);
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .filter-select {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .filter-select:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .search-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+      flex: 1;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(124, 92, 255, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      flex: 1;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-secondary);
       transform: translateY(-2px);
     }
 
-    .nft img {
-      width: 100%;
-      border-radius: 10px;
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 12px;
     }
 
-    .btn {
-      background: linear-gradient(135deg, #6b4cff, #3a2c85);
-      border: none;
-      color: #fff;
-      padding: 10px;
-      border-radius: 12px;
-      width: 100%;
-      font-weight: 600;
+    /* Auction Grid */
+    .auctions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .auction-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
       cursor: pointer;
-      margin-top: 6px;
+      position: relative;
     }
 
-    .btn.secondary {
-      background: #1a1c27;
+    .auction-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow);
+      border-color: var(--primary);
     }
 
-    /* MODAL */
+    .auction-image {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .auction-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .auction-content {
+      padding: 12px;
+    }
+
+    .auction-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .auction-collection {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .auction-price {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .price-amount {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--success);
+    }
+
+    .time-left {
+      font-size: 12px;
+      color: var(--warning);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .auction-bids {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Modal */
     .modal {
       position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.6);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 10;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+      padding: 16px;
     }
 
-    .modal.show {
+    .modal.active {
       display: flex;
     }
 
     .modal-content {
-      background: #0e1018;
-      border-radius: 16px;
-      padding: 14px;
-      width: 92%;
-      max-width: 400px;
-      animation: fadeIn .2s ease;
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 450px;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideUp 0.4s ease-out;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      position: relative;
     }
 
-    .row {
-      margin-bottom: 6px;
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      background: var(--bg-card);
+      z-index: 1;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      font-size: 24px;
+      line-height: 1;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
       font-size: 14px;
-      color: #cfcfe6;
+      font-weight: 600;
+      color: var(--text-primary);
     }
 
-    .row span {
-      color: #fff;
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.1);
+    }
+
+    .form-hint {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    /* Wallet Connect */
+    #ton-connect-button {
+      margin-top: 20px;
+    }
+
+    .wallet-connected {
+      background: rgba(0, 212, 170, 0.1);
+      border: 1px solid var(--success);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 20px;
+    }
+
+    .wallet-address {
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--success);
+      word-break: break-all;
+    }
+
+    /* Loading States */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-card) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: var(--radius-md);
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Toast Notifications */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1001;
+      opacity: 0;
+      transition: all 0.3s ease;
+      max-width: 90%;
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast-success {
+      border-left: 4px solid var(--success);
+    }
+
+    .toast-error {
+      border-left: 4px solid var(--danger);
+    }
+
+    .toast-warning {
+      border-left: 4px solid var(--warning);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    /* Bid History */
+    .bid-history {
+      margin-top: 20px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .bid-history-header {
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .bid-history-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .bid-history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .bid-history-item:last-child {
+      border-bottom: none;
+    }
+
+    .bid-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bid-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
       font-weight: 600;
     }
 
-    .history {
-      margin-top: 8px;
-      max-height: 140px;
-      overflow-y: auto;
+    .bid-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bid-username {
+      font-weight: 600;
       font-size: 13px;
     }
 
-    .history div {
-      padding: 4px 0;
-      border-bottom: 1px solid #1f2130;
+    .bid-time {
+      font-size: 11px;
+      color: var(--text-muted);
     }
 
+    .bid-amount {
+      font-weight: 700;
+      color: var(--success);
+      font-size: 14px;
+    }
+
+    /* NFT Status Badges */
+    .nft-badge {
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .badge-available {
+      background: rgba(0, 212, 170, 0.2);
+      color: var(--success);
+    }
+
+    .badge-listed {
+      background: rgba(255, 159, 67, 0.2);
+      color: var(--warning);
+    }
+
+    .badge-withdraw {
+      background: rgba(124, 92, 255, 0.2);
+      color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      #app {
+        padding: 0 12px 40px;
+      }
+      
+      .auctions-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+      }
+      
+      .filters-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .modal-content {
+        max-height: 90vh;
+      }
+    }
+
+    /* TonConnect Styles */
+    .ton-connect-modal {
+      max-width: 500px !important;
+    }
+
+    .ton-connect-modal .modal-content {
+      max-width: 500px;
+    }
   </style>
 </head>
 
 <body>
-<div id="app"></div>
+  <div id="app"></div>
+  
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <i id="toast-icon"></i>
+    <span id="toast-message"></span>
+  </div>
 
-<!-- MODAL NFT -->
-<div id="nftModal" class="modal">
-  <div class="modal-content" id="modalContent"></div>
-</div>
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.enableClosingConfirmation();
 
-<script>
-const tg = window.Telegram.WebApp;
-tg.expand();
+    // App State
+    const state = {
+      user: null,
+      balance: 0,
+      nfts: [],
+      auctions: [],
+      collections: [],
+      models: [],
+      backdrops: [],
+      activeTab: 'auctions',
+      loading: false,
+      tonConnected: false,
+      walletAddress: null,
+      selectedCollection: '',
+      selectedModel: '',
+      selectedBackdrop: '',
+      searchQuery: ''
+    };
 
-const app = document.getElementById('app');
-const modal = document.getElementById('nftModal');
-const modalContent = document.getElementById('modalContent');
+    // TonConnect
+    let tonConnectUI = null;
+    let wallet = null;
 
-/* ---------- LANGUAGE & AGREEMENT ---------- */
+    // Initialize App
+    async function initApp() {
+      showLoading();
+      
+      try {
+        // Initialize Telegram user
+        const initData = tg.initData || '';
+        const user = tg.initDataUnsafe?.user || {};
+        
+        if (!user.id) {
+          throw new Error('Telegram user not found');
+        }
+        
+        // Load user data from backend
+        const response = await fetch('/api/user', {
+          headers: {
+            'X-User-ID': user.id,
+            'X-Username': user.username || '',
+            'X-First-Name': user.first_name || '',
+            'X-Init-Data': initData
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          state.user = data.user;
+          state.balance = data.balance;
+          state.nfts = data.nfts || [];
+          
+          // Load initial data
+          await Promise.all([
+            loadAuctions(),
+            loadCollections(),
+            loadBackdrops()
+          ]);
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to load user data');
+        }
+      } catch (error) {
+        console.error('Failed to load user data:', error);
+        showToast(`Failed to load data: ${error.message}`, 'error');
+        
+        // Show error state
+        state.user = { id: 0, username: 'error', first_name: 'Error' };
+        state.balance = 0;
+        state.nfts = [];
+        state.auctions = [];
+        state.collections = [];
+        state.models = [];
+        state.backdrops = [];
+      }
+      
+      // Initialize TonConnect
+      initTonConnect();
+      
+      hideLoading();
+      renderApp();
+    }
 
-const lang = localStorage.getItem('lang');
-const agreed = localStorage.getItem('agreed');
+    // Initialize TonConnect
+    function initTonConnect() {
+      try {
+        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+          manifestUrl: window.location.origin + '/tonconnect-manifest.json',
+          buttonRootId: 'ton-connect-button',
+          uiPreferences: {
+            theme: 'DARK',
+            colorsSet: {
+              connectButton: {
+                background: '#7c5cff',
+                foreground: '#ffffff'
+              }
+            }
+          }
+        });
 
-if (!lang) {
-  renderLanguage();
-} else if (!agreed) {
-  renderAgreement(lang);
-} else {
-  renderMain();
-}
+        tonConnectUI.onStatusChange(walletInfo => {
+          if (walletInfo) {
+            state.tonConnected = true;
+            state.walletAddress = walletInfo.account.address;
+            wallet = walletInfo;
+            showToast('Wallet connected successfully!', 'success');
+            renderApp();
+          } else {
+            state.tonConnected = false;
+            state.walletAddress = null;
+            wallet = null;
+          }
+        });
 
-function renderLanguage() {
-  app.innerHTML = `
-    <div class="card">
-      <h3>Select language / Выберите язык</h3>
-      <button class="btn" onclick="setLang('en')">English</button>
-      <button class="btn secondary" onclick="setLang('ru')">Русский</button>
-    </div>
-  `;
-}
+        // Restore connection
+        tonConnectUI.connectionRestored.then(() => {
+          console.log('Connection restored');
+        });
+      } catch (error) {
+        console.error('Failed to init TonConnect:', error);
+      }
+    }
 
-function setLang(l) {
-  localStorage.setItem('lang', l);
-  renderAgreement(l);
-}
+    // API Functions
+    async function loadAuctions() {
+      try {
+        const params = new URLSearchParams();
+        if (state.selectedCollection) params.append('collection', state.selectedCollection);
+        if (state.selectedModel) params.append('model', state.selectedModel);
+        if (state.selectedBackdrop) params.append('backdrop', state.selectedBackdrop);
+        if (state.searchQuery) params.append('search', state.searchQuery);
+        
+        const url = `/api/auctions/search?${params.toString()}`;
+        const response = await fetch(url, {
+          headers: {
+            'X-User-ID': state.user.id,
+            'X-Init-Data': tg.initData || ''
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          state.auctions = data.list || [];
+        }
+      } catch (error) {
+        console.error('Failed to load auctions:', error);
+        state.auctions = [];
+      }
+    }
 
-function renderAgreement(l) {
-  const text = l === 'ru'
-    ? 'Используя AucTon, вы соглашаетесь с тем, что платформа не несёт ответственности за происхождение NFT/подарков, включая украденные активы.'
-    : 'By using AucTon, you agree that the platform is not responsible for the origin of NFTs/gifts, including stolen assets.';
-  app.innerHTML = `
-    <div class="card">
-      <h3>Terms of Service</h3>
-      <p>${text}</p>
-      <button class="btn" onclick="accept()">Accept</button>
-    </div>
-  `;
-}
+    async function loadCollections() {
+      try {
+        const response = await fetch('/api/collections', {
+          headers: {
+            'X-User-ID': state.user.id,
+            'X-Init-Data': tg.initData || ''
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          state.collections = data.collections || [];
+        }
+      } catch (error) {
+        console.error('Failed to load collections:', error);
+        state.collections = [];
+      }
+    }
 
-function accept() {
-  localStorage.setItem('agreed', '1');
-  renderMain();
-}
+    async function loadModels(collection) {
+      if (!collection) {
+        state.models = [];
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/models?collection=${encodeURIComponent(collection)}`, {
+          headers: {
+            'X-User-ID': state.user.id,
+            'X-Init-Data': tg.initData || ''
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          state.models = data.models || [];
+        }
+      } catch (error) {
+        console.error('Failed to load models:', error);
+        state.models = [];
+      }
+    }
 
-/* ---------- MAIN UI ---------- */
+    async function loadBackdrops() {
+      try {
+        const response = await fetch('/api/backdrops', {
+          headers: {
+            'X-User-ID': state.user.id,
+            'X-Init-Data': tg.initData || ''
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          state.backdrops = data.backdrops || [];
+        }
+      } catch (error) {
+        console.error('Failed to load backdrops:', error);
+        state.backdrops = [];
+      }
+    }
 
-function renderMain() {
-  app.innerHTML = `
-    <header>
-      <div class="title">AucTon</div>
-      <div class="balance">0.000 TON</div>
-    </header>
+    // Load bid history for auction
+    async function loadBidHistory(auctionId) {
+      try {
+        const response = await fetch(`/api/auction/${auctionId}/bids`, {
+          headers: {
+            'X-User-ID': state.user.id,
+            'X-Init-Data': tg.initData || ''
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          return data.bids || [];
+        }
+        return [];
+      } catch (error) {
+        console.error('Failed to load bid history:', error);
+        return [];
+      }
+    }
 
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab('auction')">Auction</div>
-      <div class="tab" onclick="switchTab('profile')">Profile</div>
-    </div>
+    // UI Functions
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      const toastIcon = document.getElementById('toast-icon');
+      const toastMessage = document.getElementById('toast-message');
+      
+      toastMessage.textContent = message;
+      
+      // Set icon based on type
+      if (type === 'success') {
+        toastIcon.className = 'fas fa-check-circle';
+        toastIcon.style.color = 'var(--success)';
+      } else if (type === 'error') {
+        toastIcon.className = 'fas fa-times-circle';
+        toastIcon.style.color = 'var(--danger)';
+      } else if (type === 'warning') {
+        toastIcon.className = 'fas fa-exclamation-triangle';
+        toastIcon.style.color = 'var(--warning)';
+      } else {
+        toastIcon.className = 'fas fa-info-circle';
+        toastIcon.style.color = 'var(--text-secondary)';
+      }
+      
+      toast.className = `toast toast-${type}`;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
 
-    <div id="content"></div>
-  `;
-  renderAuction();
-}
+    function showLoading() {
+      state.loading = true;
+    }
 
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  tab === 'auction' ? renderAuction() : renderProfile();
-}
+    function hideLoading() {
+      state.loading = false;
+    }
 
-/* ---------- AUCTION ---------- */
+    function formatTON(amount) {
+      if (!amount && amount !== 0) return '0.000 TON';
+      return parseFloat(amount).toFixed(3) + ' TON';
+    }
 
-function renderAuction() {
-  document.getElementById('content').innerHTML = `
-    <div class="card">
-      <input placeholder="Search by ID or name">
-      <select><option>Collection</option></select>
-      <select disabled><option>Model</option></select>
-      <select><option>Backdrop</option></select>
-    </div>
+    function formatTimeLeft(timestamp) {
+      const diff = timestamp - Date.now();
+      if (diff <= 0) return 'Ended';
+      
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      if (days > 0) {
+        return `${days}d ${hours}h`;
+      } else if (hours > 0) {
+        return `${hours}h ${minutes}m`;
+      } else {
+        return `${minutes}m`;
+      }
+    }
 
-    <div class="nft-grid">
-      <div class="nft" onclick="openAuctionNFT()">
-        <img src="https://via.placeholder.com/300">
-      </div>
-    </div>
-  `;
-}
+    function formatTime(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
 
-/* ---------- PROFILE ---------- */
+    // Render Functions
+    function renderApp() {
+      const app = document.getElementById('app');
+      
+      // Check if user is loaded
+      if (!state.user || !state.user.id) {
+        app.innerHTML = `
+          <div class="empty-state" style="padding-top: 100px;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Connection Error</h3>
+            <p>Please open this app through Telegram bot</p>
+            <button class="btn btn-primary" onclick="initApp()" style="margin-top: 20px;">
+              <i class="fas fa-redo"></i>
+              Retry
+            </button>
+          </div>
+        `;
+        return;
+      }
+      
+      app.innerHTML = `
+        <!-- Header -->
+        <div class="header">
+          <div class="header-content">
+            <div class="logo">
+              <div class="logo-icon">
+                <i class="fas fa-gem"></i>
+              </div>
+              AucTon
+            </div>
+            
+            <div class="balance-card" onclick="showDepositModal()">
+              <div>
+                <div class="balance-label">BALANCE</div>
+                <div class="balance-amount">${formatTON(state.balance)}</div>
+              </div>
+              <i class="fas fa-wallet"></i>
+            </div>
+          </div>
+        </div>
 
-function renderProfile() {
-  document.getElementById('content').innerHTML = `
-    <div class="card">
-      <button class="btn">Deposit TON</button>
-      <button class="btn secondary">Withdraw TON</button>
-    </div>
+        <!-- Navigation -->
+        <div class="nav-tabs">
+          <div class="nav-tab ${state.activeTab === 'auctions' ? 'active' : ''}" 
+               onclick="switchTab('auctions')">
+            <i class="fas fa-gavel"></i>
+            Auctions
+          </div>
+          
+          <div class="nav-tab ${state.activeTab === 'nfts' ? 'active' : ''}" 
+               onclick="switchTab('nfts')">
+            <i class="fas fa-box"></i>
+            My NFTs
+          </div>
+          
+          <div class="nav-tab ${state.activeTab === 'wallet' ? 'active' : ''}" 
+               onclick="switchTab('wallet')">
+            <i class="fas fa-wallet"></i>
+            Wallet
+          </div>
+          
+          ${state.user?.isAdmin ? `
+            <div class="nav-tab ${state.activeTab === 'admin' ? 'active' : ''}" 
+                 onclick="switchTab('admin')">
+              <i class="fas fa-shield-alt"></i>
+              Admin
+            </div>
+          ` : ''}
+        </div>
 
-    <div class="nft-grid">
-      <div class="nft" onclick="openProfileNFT()">
-        <img src="https://via.placeholder.com/300">
-      </div>
-    </div>
-  `;
-}
+        <!-- Content -->
+        ${renderContent()}
+      `;
+    }
 
-/* ---------- MODALS ---------- */
+    function renderContent() {
+      switch(state.activeTab) {
+        case 'auctions':
+          return renderAuctions();
+        case 'nfts':
+          return renderNFTs();
+        case 'wallet':
+          return renderWallet();
+        case 'admin':
+          return renderAdmin();
+        default:
+          return renderAuctions();
+      }
+    }
 
-function openAuctionNFT() {
-  modalContent.innerHTML = `
-    <h3>NFT Auction</h3>
-    <div class="row">Collection: <span>Plush Pepe</span></div>
-    <div class="row">Model: <span>#2133</span></div>
-    <div class="row">Backdrop: <span>Onyx Black</span></div>
-    <div class="row">Owner: <span>@user (123456)</span></div>
+    function renderAuctions() {
+      return `
+        <div class="content-section active">
+          <!-- Search & Filters -->
+          <div class="search-container">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Search by name or collection..."
+              value="${state.searchQuery}"
+              oninput="state.searchQuery = this.value;"
+              onkeypress="if(event.key === 'Enter') loadAuctions().then(() => renderApp());"
+            >
+            
+            <div class="filters-grid">
+              <select class="filter-select" 
+                      onchange="state.selectedCollection = this.value; loadModels(this.value).then(() => renderApp());">
+                <option value="">All Collections</option>
+                ${state.collections.map(c => `
+                  <option value="${c}" ${c === state.selectedCollection ? 'selected' : ''}>${c}</option>
+                `).join('')}
+              </select>
+              
+              <select class="filter-select" ${!state.selectedCollection ? 'disabled' : ''}
+                      onchange="state.selectedModel = this.value; loadAuctions().then(() => renderApp());">
+                <option value="">All Models</option>
+                ${state.models.map(m => `
+                  <option value="${m}" ${m === state.selectedModel ? 'selected' : ''}>${m}</option>
+                `).join('')}
+              </select>
+              
+              <select class="filter-select" 
+                      onchange="state.selectedBackdrop = this.value; loadAuctions().then(() => renderApp());">
+                <option value="">All Backdrops</option>
+                ${state.backdrops.map(b => `
+                  <option value="${b}" ${b === state.selectedBackdrop ? 'selected' : ''}>${b}</option>
+                `).join('')}
+              </select>
+            </div>
+            
+            <div class="search-actions">
+              <button class="btn btn-primary" onclick="loadAuctions().then(() => renderApp());">
+                <i class="fas fa-search"></i>
+                Search
+              </button>
+              <button class="btn btn-secondary" onclick="clearFilters()">
+                <i class="fas fa-times"></i>
+                Clear
+              </button>
+            </div>
+          </div>
+          
+          <!-- Auctions Grid -->
+          ${renderAuctionsGrid()}
+        </div>
+      `;
+    }
 
-    <input placeholder="Amount TON">
-    <button class="btn">Place Bid</button>
+    function renderAuctionsGrid() {
+      if (state.loading) {
+        return `
+          <div style="display: grid; gap: 16px;">
+            <div class="skeleton" style="height: 200px;"></div>
+            <div class="skeleton" style="height: 200px;"></div>
+          </div>
+        `;
+      }
+      
+      if (state.auctions.length === 0) {
+        return `
+          <div class="empty-state">
+            <i class="fas fa-search"></i>
+            <h3>No Auctions Found</h3>
+            <p>Try changing your search filters or check back later</p>
+          </div>
+        `;
+      }
+      
+      return `
+        <div class="auctions-grid">
+          ${state.auctions.map(auction => `
+            <div class="auction-card" onclick="showAuctionModal(${auction.id})">
+              <div class="auction-badge">Auction #${auction.id}</div>
+              <img src="${auction.image_url || 'https://picsum.photos/seed/' + auction.id + '/300/300'}" 
+                   alt="${auction.name}" 
+                   class="auction-image"
+                   onerror="this.src='https://picsum.photos/seed/${auction.id}/300/300'">
+              <div class="auction-content">
+                <div class="auction-title">${auction.name || 'Unnamed NFT'}</div>
+                <div class="auction-collection">${auction.collection || 'No Collection'}</div>
+                <div class="auction-price">
+                  <div class="price-amount">${formatTON(auction.current_bid || auction.min_bid)}</div>
+                  <div class="time-left">
+                    <i class="fas fa-clock"></i>
+                    ${formatTimeLeft(auction.ends_at)}
+                  </div>
+                </div>
+                <div class="auction-bids">
+                  <i class="fas fa-users"></i>
+                  ${auction.bids_count || 0} bids
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
 
-    <div class="history">
-      <div>@alice — 5 TON</div>
-      <div>@bob — 6 TON</div>
-    </div>
-  `;
-  modal.classList.add('show');
-}
+    function renderNFTs() {
+      return `
+        <div class="content-section active">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 18px;">My NFT Collection</h3>
+            <button class="btn btn-primary" onclick="importNFTModal()" style="padding: 8px 16px; font-size: 13px;">
+              <i class="fas fa-plus"></i>
+              Import NFT
+            </button>
+          </div>
+          
+          ${renderNFTsGrid()}
+        </div>
+      `;
+    }
 
-function openProfileNFT() {
-  modalContent.innerHTML = `
-    <h3>Your NFT</h3>
-    <div class="row">Collection: <span>Plush Pepe</span></div>
-    <div class="row">Model: <span>#2133</span></div>
-    <div class="row">Backdrop: <span>Onyx Black</span></div>
+    function renderNFTsGrid() {
+      if (state.loading) {
+        return `
+          <div style="display: grid; gap: 16px;">
+            <div class="skeleton" style="height: 160px;"></div>
+            <div class="skeleton" style="height: 160px;"></div>
+          </div>
+        `;
+      }
+      
+      if (state.nfts.length === 0) {
+        return `
+          <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h3>No NFTs Yet</h3>
+            <p>Import your Telegram NFTs or win auctions to build your collection</p>
+            <button class="btn btn-primary" onclick="importNFTModal()" style="margin-top: 20px;">
+              <i class="fas fa-download"></i>
+              Import First NFT
+            </button>
+          </div>
+        `;
+      }
+      
+      const availableNFTs = state.nfts.filter(nft => nft.status === 'in_app');
+      const listedNFTs = state.nfts.filter(nft => nft.status === 'listed');
+      const withdrawnNFTs = state.nfts.filter(nft => nft.status === 'withdraw_requested');
+      
+      return `
+        ${listedNFTs.length > 0 ? `
+          <h4 style="margin: 0 0 12px 0; color: var(--text-secondary); font-size: 14px;">Listed for Auction (${listedNFTs.length})</h4>
+          <div class="auctions-grid" style="margin-bottom: 24px;">
+            ${listedNFTs.map(nft => `
+              <div class="auction-card" onclick="showNFTModal(${nft.id})">
+                <img src="${nft.image_url || 'https://picsum.photos/seed/' + nft.id + '/300/300'}" 
+                     alt="${nft.name}" 
+                     class="auction-image"
+                     onerror="this.src='https://picsum.photos/seed/${nft.id}/300/300'">
+                <div class="auction-content">
+                  <div class="auction-title">${nft.name || 'Unnamed NFT'}</div>
+                  <div class="auction-collection">${nft.collection || 'No Collection'}</div>
+                  <span class="nft-badge badge-listed">Listed</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+        
+        ${availableNFTs.length > 0 ? `
+          <h4 style="margin: 0 0 12px 0; color: var(--text-secondary); font-size: 14px;">Available (${availableNFTs.length})</h4>
+          <div class="auctions-grid" style="margin-bottom: ${withdrawnNFTs.length > 0 ? '24px' : '0'};">
+            ${availableNFTs.map(nft => `
+              <div class="auction-card" onclick="showNFTModal(${nft.id})">
+                <img src="${nft.image_url || 'https://picsum.photos/seed/' + nft.id + '/300/300'}" 
+                     alt="${nft.name}" 
+                     class="auction-image"
+                     onerror="this.src='https://picsum.photos/seed/${nft.id}/300/300'">
+                <div class="auction-content">
+                  <div class="auction-title">${nft.name || 'Unnamed NFT'}</div>
+                  <div class="auction-collection">${nft.collection || 'No Collection'}</div>
+                  <span class="nft-badge badge-available">Available</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+        
+        ${withdrawnNFTs.length > 0 ? `
+          <h4 style="margin: 0 0 12px 0; color: var(--text-secondary); font-size: 14px;">Withdrawal Pending (${withdrawnNFTs.length})</h4>
+          <div class="auctions-grid">
+            ${withdrawnNFTs.map(nft => `
+              <div class="auction-card" onclick="showNFTModal(${nft.id})">
+                <img src="${nft.image_url || 'https://picsum.photos/seed/' + nft.id + '/300/300'}" 
+                     alt="${nft.name}" 
+                     class="auction-image"
+                     onerror="this.src='https://picsum.photos/seed/${nft.id}/300/300'">
+                <div class="auction-content">
+                  <div class="auction-title">${nft.name || 'Unnamed NFT'}</div>
+                  <div class="auction-collection">${nft.collection || 'No Collection'}</div>
+                  <span class="nft-badge badge-withdraw">Withdraw Pending</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      `;
+    }
 
-    <button class="btn">Auction</button>
-    <button class="btn secondary">Withdraw</button>
-  `;
-  modal.classList.add('show');
-}
+    function renderWallet() {
+      return `
+        <div class="content-section active">
+          <!-- Wallet Connection -->
+          <div class="search-container">
+            <h3 style="margin-bottom: 16px;">Wallet Connection</h3>
+            
+            ${state.tonConnected ? `
+              <div class="wallet-connected">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="color: var(--success); font-weight: 600;">
+                    <i class="fas fa-check-circle"></i> Wallet Connected
+                  </span>
+                  <button class="btn btn-small btn-secondary" onclick="disconnectWallet()" style="padding: 4px 12px;">
+                    Disconnect
+                  </button>
+                </div>
+                <div class="wallet-address">${state.walletAddress}</div>
+              </div>
+            ` : `
+              <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                Connect your TON wallet to deposit and withdraw funds
+              </p>
+              <div id="ton-connect-button"></div>
+            `}
+          </div>
+          
+          <!-- Balance Actions -->
+          <div class="search-container">
+            <h3 style="margin-bottom: 16px;">Balance: ${formatTON(state.balance)}</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <button class="btn btn-primary" onclick="showDepositModal()">
+                <i class="fas fa-arrow-down"></i>
+                Deposit
+              </button>
+              <button class="btn btn-secondary" onclick="showWithdrawModal()" ${state.balance < 0.1 ? 'disabled' : ''}>
+                <i class="fas fa-arrow-up"></i>
+                Withdraw
+              </button>
+            </div>
+            
+            ${state.balance < 0.1 ? `
+              <p style="color: var(--warning); font-size: 12px; margin-top: 12px;">
+                <i class="fas fa-exclamation-triangle"></i>
+                Minimum withdrawal: 0.1 TON
+              </p>
+            ` : ''}
+          </div>
+          
+          <!-- Recent Transactions -->
+          <div class="search-container">
+            <h3 style="margin-bottom: 16px;">Recent Transactions</h3>
+            
+            ${renderTransactionHistory()}
+          </div>
+        </div>
+      `;
+    }
 
-modal.onclick = e => {
-  if (e.target === modal) modal.classList.remove('show');
-};
-</script>
+    function renderTransactionHistory() {
+      // This would be populated from server data
+      return `
+        <div style="min-height: 100px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
+          <div style="text-align: center;">
+            <i class="fas fa-history" style="font-size: 32px; margin-bottom: 8px;"></i>
+            <p>No transactions yet</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAdmin() {
+      if (!state.user?.isAdmin) {
+        return `
+          <div class="content-section active">
+            <div class="empty-state">
+              <i class="fas fa-lock"></i>
+              <h3>Access Denied</h3>
+              <p>Admin panel is only available to administrators</p>
+            </div>
+          </div>
+        `;
+      }
+      
+      return `
+        <div class="content-section active">
+          <h3 style="margin-bottom: 24px; font-size: 18px;">Admin Panel</h3>
+          
+          <div class="search-container">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+              <button class="btn btn-secondary" onclick="adminManageUsers()">
+                <i class="fas fa-users"></i>
+                Users
+              </button>
+              <button class="btn btn-secondary" onclick="adminWithdrawRequests()">
+                <i class="fas fa-clock"></i>
+                Withdrawals
+              </button>
+              <button class="btn btn-secondary" onclick="adminIssueNFT()">
+                <i class="fas fa-gift"></i>
+                Issue NFT
+              </button>
+              <button class="btn btn-secondary" onclick="adminIssueTON()">
+                <i class="fas fa-coins"></i>
+                Issue TON
+              </button>
+            </div>
+            
+            <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 16px;">
+              <h4 style="margin-bottom: 12px; font-size: 16px;">Platform Statistics</h4>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">Total Users</div>
+                  <div style="font-size: 20px; font-weight: 700;">--</div>
+                </div>
+                <div>
+                  <div style="font-size: 12px; color: var(--text-secondary);">Active Auctions</div>
+                  <div style="font-size: 20px; font-weight: 700;">${state.auctions.length}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Modal Functions
+    function createModal(title, content, className = '') {
+      const modalId = 'modal-' + Date.now();
+      const modalHTML = `
+        <div class="modal active ${className}" id="${modalId}">
+          <div class="modal-content">
+            <div class="modal-header">
+              <div class="modal-title">${title}</div>
+              <button class="modal-close" onclick="closeModal('${modalId}')">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="modal-body">
+              ${content}
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+      return modalId;
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+      }
+    }
+
+    async function showAuctionModal(auctionId) {
+      const auction = state.auctions.find(a => a.id === auctionId);
+      if (!auction) {
+        showToast('Auction not found', 'error');
+        return;
+      }
+
+      // Load bid history
+      const bids = await loadBidHistory(auctionId);
+      
+      const modalId = createModal('Place Bid', `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="${auction.image_url || 'https://picsum.photos/seed/' + auction.id + '/300/300'}" 
+               alt="${auction.name}" 
+               style="width: 100%; max-height: 200px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 16px;"
+               onerror="this.src='https://picsum.photos/seed/${auction.id}/300/300'">
+          <h4 style="margin-bottom: 8px;">${auction.name || 'Unnamed NFT'}</h4>
+          <div style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">
+            ${auction.collection || ''} ${auction.model ? '• ' + auction.model : ''}
+          </div>
+          <div style="color: var(--text-muted); font-size: 12px;">Auction #${auction.id}</div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+          <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px;">
+            <div style="font-size: 12px; color: var(--text-secondary);">Current Bid</div>
+            <div style="font-size: 18px; font-weight: 700; color: var(--success);">
+              ${formatTON(auction.current_bid || auction.min_bid)}
+            </div>
+          </div>
+          <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px;">
+            <div style="font-size: 12px; color: var(--text-secondary);">Time Left</div>
+            <div style="font-size: 18px; font-weight: 700; color: var(--warning);">
+              ${formatTimeLeft(auction.ends_at)}
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <div class="form-label">Your Bid (TON)</div>
+          <input type="number" 
+                 class="form-input" 
+                 id="bidAmount-${auctionId}" 
+                 placeholder="${(auction.current_bid || auction.min_bid) + 1}" 
+                 step="0.1" 
+                 min="${(auction.current_bid || auction.min_bid) + 1}">
+          <p class="form-hint">Minimum bid: ${(auction.current_bid || auction.min_bid) + 1} TON</p>
+        </div>
+        
+        <!-- Bid History -->
+        <div class="bid-history">
+          <div class="bid-history-header">
+            <i class="fas fa-history"></i> Bid History (${bids.length})
+          </div>
+          <div class="bid-history-list">
+            ${bids.length > 0 ? bids.map(bid => `
+              <div class="bid-history-item">
+                <div class="bid-user">
+                  <div class="bid-avatar">
+                    ${(bid.first_name || bid.username || 'U').charAt(0).toUpperCase()}
+                  </div>
+                  <div class="bid-details">
+                    <div class="bid-username">${bid.first_name || bid.username || `User ${bid.bidder_id}`}</div>
+                    <div class="bid-time">${formatTime(bid.created_at)}</div>
+                  </div>
+                </div>
+                <div class="bid-amount">${formatTON(bid.amount)}</div>
+              </div>
+            `).join('') : `
+              <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                No bids yet
+              </div>
+            `}
+          </div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="placeBid(${auctionId})" style="width: 100%; margin-top: 20px;">
+          <i class="fas fa-gavel"></i>
+          Place Bid
+        </button>
+      `);
+    }
+
+    function showDepositModal() {
+      if (!state.tonConnected) {
+        showToast('Please connect your wallet first', 'warning');
+        return;
+      }
+
+      const modalId = createModal('Deposit TON', `
+        <div class="form-group">
+          <div class="form-label">Deposit Amount (TON)</div>
+          <input type="number" class="form-input" id="depositAmount" placeholder="0.0" step="0.001" min="0.1">
+          <p class="form-hint">Minimum deposit: 0.1 TON</p>
+        </div>
+        
+        <div class="form-group">
+          <div class="form-label">Connected Wallet</div>
+          <div style="background: var(--bg-secondary); padding: 12px; border-radius: var(--radius-md); font-family: monospace; font-size: 12px; word-break: break-all;">
+            ${state.walletAddress}
+          </div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="initiateDeposit()" style="width: 100%;">
+          <i class="fas fa-arrow-down"></i>
+          Deposit with TonConnect
+        </button>
+        
+        <p style="color: var(--text-secondary); font-size: 12px; margin-top: 16px; text-align: center;">
+          Transaction will be signed using TonConnect
+        </p>
+      `);
+    }
+
+    function showWithdrawModal() {
+      const modalId = createModal('Withdraw TON', `
+        <div class="form-group">
+          <div class="form-label">Amount to Withdraw</div>
+          <input type="number" 
+                 class="form-input" 
+                 id="withdrawAmount" 
+                 placeholder="0.0" 
+                 step="0.001" 
+                 min="0.1" 
+                 max="${state.balance}">
+          <p class="form-hint">Available: ${formatTON(state.balance)} | Min: 0.1 TON</p>
+        </div>
+        
+        <div class="form-group">
+          <div class="form-label">TON Wallet Address</div>
+          <input type="text" class="form-input" id="withdrawAddress" placeholder="EQ...">
+        </div>
+        
+        <div style="background: rgba(255, 92, 141, 0.1); border-left: 4px solid var(--danger); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 20px;">
+          <div style="font-size: 12px; color: var(--danger);">
+            <i class="fas fa-exclamation-circle"></i>
+            Withdrawal requires manual approval by admin. Processing time: 1-24 hours.
+          </div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="submitWithdraw()" style="width: 100%;" ${state.balance < 0.1 ? 'disabled' : ''}>
+          <i class="fas fa-arrow-up"></i>
+          Submit Withdrawal Request
+        </button>
+      `);
+    }
+
+    function showNFTModal(nftId) {
+      const nft = state.nfts.find(n => n.id === nftId);
+      if (!nft) {
+        showToast('NFT not found', 'error');
+        return;
+      }
+
+      const modalId = createModal('NFT Details', `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="${nft.image_url || 'https://picsum.photos/seed/' + nft.id + '/300/300'}" 
+               alt="${nft.name}" 
+               style="width: 100%; max-height: 200px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 16px;"
+               onerror="this.src='https://picsum.photos/seed/${nft.id}/300/300'">
+          <h4 style="margin-bottom: 8px;">${nft.name || 'Unnamed NFT'}</h4>
+          <div style="color: var(--text-secondary); font-size: 14px;">
+            ${nft.collection || ''} ${nft.model ? '• ' + nft.model : ''}
+          </div>
+        </div>
+        
+        <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
+          <h5 style="margin-bottom: 12px; font-size: 14px;">NFT Details</h5>
+          ${nft.collection ? `
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
+              <span style="color: var(--text-secondary);">Collection</span>
+              <span style="font-weight: 600;">${nft.collection}</span>
+            </div>
+          ` : ''}
+          ${nft.model ? `
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
+              <span style="color: var(--text-secondary);">Model</span>
+              <span style="font-weight: 600;">${nft.model}</span>
+            </div>
+          ` : ''}
+          ${nft.backdrop ? `
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
+              <span style="color: var(--text-secondary);">Backdrop</span>
+              <span style="font-weight: 600;">${nft.backdrop}</span>
+            </div>
+          ` : ''}
+          <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+            <span style="color: var(--text-secondary);">Status</span>
+            <span class="nft-badge ${nft.status === 'in_app' ? 'badge-available' : nft.status === 'listed' ? 'badge-listed' : 'badge-withdraw'}">
+              ${nft.status === 'in_app' ? 'Available' : nft.status === 'listed' ? 'Listed' : 'Withdraw Pending'}
+            </span>
+          </div>
+        </div>
+        
+        ${nft.status === 'in_app' ? `
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <button class="btn btn-primary" onclick="listNFTForAuction(${nft.id})">
+              <i class="fas fa-gavel"></i>
+              Sell on Auction
+            </button>
+            <button class="btn btn-secondary" onclick="withdrawNFT(${nft.id})">
+              <i class="fas fa-external-link-alt"></i>
+              Withdraw
+            </button>
+          </div>
+        ` : nft.status === 'listed' ? `
+          <div style="background: rgba(255, 159, 67, 0.1); border-left: 4px solid var(--warning); padding: 12px; border-radius: var(--radius-sm);">
+            <div style="color: var(--warning); font-size: 14px;">
+              <i class="fas fa-info-circle"></i>
+              This NFT is currently listed on auction
+            </div>
+          </div>
+        ` : `
+          <div style="background: rgba(124, 92, 255, 0.1); border-left: 4px solid var(--primary); padding: 12px; border-radius: var(--radius-sm);">
+            <div style="color: var(--primary); font-size: 14px;">
+              <i class="fas fa-info-circle"></i>
+              Withdrawal request submitted. Waiting for admin approval.
+            </div>
+          </div>
+        `}
+      `);
+    }
+
+    function importNFTModal() {
+      const modalId = createModal('Import Telegram NFT', `
+        <div class="form-group">
+          <div class="form-label">Telegram NFT URL</div>
+          <input type="text" class="form-input" id="nftUrl" placeholder="https://t.me/nft/...">
+          <p class="form-hint">Paste the link to your Telegram NFT from fragment.com</p>
+        </div>
+        
+        <div style="background: rgba(255, 159, 67, 0.1); border-left: 4px solid var(--warning); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 20px;">
+          <div style="font-size: 12px; color: var(--warning);">
+            <i class="fas fa-shield-alt"></i>
+            Only import NFTs that you legally own
+          </div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="importNFT()" style="width: 100%;">
+          <i class="fas fa-download"></i>
+          Import NFT
+        </button>
+      `);
+    }
+
+    // Action Handlers
+    function switchTab(tab) {
+      state.activeTab = tab;
+      renderApp();
+    }
+
+    function clearFilters() {
+      state.selectedCollection = '';
+      state.selectedModel = '';
+      state.selectedBackdrop = '';
+      state.searchQuery = '';
+      state.models = [];
+      loadAuctions().then(() => renderApp());
+    }
+
+    async function disconnectWallet() {
+      if (tonConnectUI) {
+        await tonConnectUI.disconnect();
+        state.tonConnected = false;
+        state.walletAddress = null;
+        showToast('Wallet disconnected', 'info');
+        renderApp();
+      }
+    }
+
+    async function initiateDeposit() {
+      if (!state.tonConnected) {
+        showToast('Please connect your wallet first', 'warning');
+        return;
+      }
+
+      const amount = parseFloat(document.getElementById('depositAmount')?.value);
+      if (!amount || amount < 0.1) {
+        showToast('Minimum deposit: 0.1 TON', 'error');
+        return;
+      }
+
+      try {
+        // In a real implementation, you would:
+        // 1. Generate a deposit address for the user
+        // 2. Create a TonConnect transaction
+        // 3. Send the transaction
+        // 4. Wait for confirmation
+        
+        showToast('Deposit feature coming soon! Use /deposit command in bot', 'info');
+        closeModal(document.querySelector('.modal.active')?.id);
+      } catch (error) {
+        showToast('Deposit failed: ' + error.message, 'error');
+      }
+    }
+
+    async function submitWithdraw() {
+      const amount = parseFloat(document.getElementById('withdrawAmount')?.value);
+      const address = document.getElementById('withdrawAddress')?.value;
+      
+      if (!amount || amount < 0.1) {
+        showToast('Minimum withdrawal: 0.1 TON', 'error');
+        return;
+      }
+      
+      if (amount > state.balance) {
+        showToast('Insufficient balance', 'error');
+        return;
+      }
+      
+      if (!address || address.length < 10) {
+        showToast('Invalid TON address', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/withdraw/ton', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-ID': state.user.id,
+            'X-Init-Data': tg.initData || ''
+          },
+          body: JSON.stringify({ amount, address })
+        });
+        
+        const data = await response.json();
+        
+        if (data.ok) {
+          showToast('Withdrawal request submitted! Admin will process it soon.', 'success');
+          closeModal(document.querySelector('.modal.active')?.id);
+          state.balance -= amount;
+          renderApp();
+        } else {
+          showToast('Withdrawal failed: ' + (data.error || 'Unknown error'), 'error');
+        }
+      } catch (error) {
+        showToast('Network error: ' + error.message, 'error');
+      }
+    }
+
+    async function importNFT() {
+      const url = document.getElementById('nftUrl')?.value;
+      
+      if (!url || !url.includes('t.me/nft/')) {
+        showToast('Invalid Telegram NFT URL. Format: https://t.me/nft/...', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/nft/import', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-ID': state.user.id,
+            'X-Init-Data': tg.initData || ''
+          },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await response.json();
+        
+        if (data.ok) {
+          showToast('NFT imported successfully!', 'success');
+          state.nfts.push(data.nft);
+          closeModal(document.querySelector('.modal.active')?.id);
+          renderApp();
+        } else {
+          showToast('Import failed: ' + (data.error || 'Unknown error'), 'error');
+        }
+      } catch (error) {
+        showToast('Network error: ' + error.message, 'error');
+      }
+    }
+
+    async function placeBid(auctionId) {
+      const amount = parseFloat(document.getElementById(`bidAmount-${auctionId}`)?.value);
+      const auction = state.auctions.find(a => a.id === auctionId);
+      
+      if (!amount) {
+        showToast('Please enter bid amount', 'error');
+        return;
+      }
+      
+      if (!auction) {
+        showToast('Auction not found', 'error');
+        return;
+      }
+      
+      const minBid = Math.max(auction.min_bid, (auction.current_bid || 0) + 1);
+      if (amount < minBid) {
+        showToast(`Minimum bid: ${minBid} TON`, 'error');
+        return;
+      }
+      
+      if (amount > state.balance) {
+        showToast('Insufficient balance', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/auction/bid', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-ID': state.user.id,
+            'X-Init-Data': tg.initData || ''
+          },
+          body: JSON.stringify({ auctionId, amount })
+        });
+        
+        const data = await response.json();
+        
+        if (data.ok) {
+          showToast('Bid placed successfully!', 'success');
+          closeModal(document.querySelector('.modal.active')?.id);
+          state.balance -= amount;
+          await loadAuctions();
+          renderApp();
+        } else {
+          showToast('Bid failed: ' + (data.error || 'Unknown error'), 'error');
+        }
+      } catch (error) {
+        showToast('Network error: ' + error.message, 'error');
+      }
+    }
+
+    function listNFTForAuction(nftId) {
+      const modalId = createModal('Create Auction', `
+        <div class="form-group">
+          <div class="form-label">Starting Price (TON)</div>
+          <input type="number" class="form-input" id="auctionPrice" placeholder="1.0" step="0.1" min="1">
+          <p class="form-hint">Minimum starting price: 1 TON</p>
+        </div>
+        
+        <div class="form-group">
+          <div class="form-label">Auction Duration</div>
+          <select class="form-input" id="auctionDuration">
+            <option value="86400">24 hours</option>
+            <option value="172800" selected>48 hours</option>
+            <option value="259200">72 hours</option>
+            <option value="604800">7 days</option>
+          </select>
+        </div>
+        
+        <div style="background: rgba(0, 212, 170, 0.1); border-left: 4px solid var(--success); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 20px;">
+          <div style="font-size: 12px; color: var(--success);">
+            <i class="fas fa-info-circle"></i>
+            Platform fee: 2% of final sale price
+          </div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="createAuction(${nftId})" style="width: 100%;">
+          <i class="fas fa-gavel"></i>
+          Create Auction
+        </button>
+      `);
+    }
+
+    async function createAuction(nftId) {
+      const price = parseFloat(document.getElementById('auctionPrice')?.value);
+      
+      if (!price || price < 1) {
+        showToast('Minimum price: 1 TON', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/auction/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-ID': state.user.id,
+            'X-Init-Data': tg.initData || ''
+          },
+          body: JSON.stringify({ nftId, price })
+        });
+        
+        const data = await response.json();
+        
+        if (data.ok) {
+          showToast('Auction created successfully!', 'success');
+          closeModal(document.querySelector('.modal.active')?.id);
+          // Refresh NFTs and auctions
+          const userResponse = await fetch('/api/user', {
+            headers: {
+              'X-User-ID': state.user.id,
+              'X-Init-Data': tg.initData || ''
+            }
+          });
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            state.nfts = userData.nfts || [];
+          }
+          await loadAuctions();
+          renderApp();
+        } else {
+          showToast('Failed to create auction: ' + (data.error || 'Unknown error'), 'error');
+        }
+      } catch (error) {
+        showToast('Network error: ' + error.message, 'error');
+      }
+    }
+
+    async function withdrawNFT(nftId) {
+      try {
+        const response = await fetch('/api/withdraw/nft', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-ID': state.user.id,
+            'X-Init-Data': tg.initData || ''
+          },
+          body: JSON.stringify({ nftId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.ok) {
+          showToast('NFT withdrawal requested! Fee of 0.2 TON charged.', 'success');
+          // Update balance
+          state.balance -= 0.2;
+          // Update NFTs
+          const nftIndex = state.nfts.findIndex(n => n.id === nftId);
+          if (nftIndex !== -1) {
+            state.nfts[nftIndex].status = 'withdraw_requested';
+          }
+          renderApp();
+        } else {
+          showToast('Withdrawal failed: ' + (data.error || 'Unknown error'), 'error');
+        }
+      } catch (error) {
+        showToast('Network error: ' + error.message, 'error');
+      }
+    }
+
+    // Admin functions
+    function adminManageUsers() {
+      showToast('Use /admin command in Telegram bot to manage users', 'info');
+    }
+
+    function adminWithdrawRequests() {
+      showToast('Use /admin command in Telegram bot to view withdrawal requests', 'info');
+    }
+
+    function adminIssueNFT() {
+      showToast('Use /nft command in Telegram bot to issue NFTs', 'info');
+    }
+
+    function adminIssueTON() {
+      showToast('Use /admin command in Telegram bot to issue TON', 'info');
+    }
+
+    // Initialize the app
+    initApp();
+  </script>
 </body>
 </html>
