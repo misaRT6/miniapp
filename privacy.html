@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AucTon — Политика конфиденциальности</title>
+  <meta name="color-scheme" content="dark" />
+  <style>
+    :root {
+      --bg: #0b0f1e;
+      --card: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.10);
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.70);
+      --muted2: rgba(255,255,255,0.55);
+      --accent: #7c5cff;
+      --radius: 16px;
+      --shadow: 0 20px 60px rgba(0,0,0,0.45);
+      --max: 980px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(900px 540px at 15% -10%, rgba(124,92,255,0.30), transparent 60%),
+        linear-gradient(180deg, var(--bg), #060816 70%);
+      min-height: 100vh;
+    }
+    .wrap {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 24px 16px 56px;
+    }
+    .topbar {
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      margin-bottom: 18px;
+    }
+    .brand {
+      display:flex; align-items:center; gap:10px;
+      font-weight: 800;
+    }
+    .dot {
+      width:34px; height:34px; border-radius: 10px;
+      background: linear-gradient(135deg, rgba(124,92,255,1), rgba(124,92,255,0.45));
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.10) inset;
+      display:grid; place-items:center;
+      font-size: 18px;
+    }
+    .btn {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 16px;
+    }
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+    h2 { margin: 18px 0 10px; font-size: 16px; }
+    p, li { color: var(--muted); font-size: 14px; line-height: 1.55; }
+    ul { margin: 8px 0 8px 18px; }
+    code {
+      background: rgba(0,0,0,0.25);
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.10);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+    }
+    .note {
+      border-left: 4px solid var(--accent);
+      padding: 12px 12px;
+      border-radius: 12px;
+      background: rgba(124,92,255,0.10);
+      color: var(--muted);
+      margin: 14px 0 18px;
+      font-size: 13px;
+    }
+    .footer { margin-top: 16px; color: var(--muted2); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand"><div class="dot">🛡️</div> AucTon</div>
+      <a class="btn" href="./index.html" onclick="try{ if(window.Telegram?.WebApp){ Telegram.WebApp.openLink(new URL('./index.html', location.href).toString()); return false; } }catch(e){}">← Вернуться в приложение</a>
+    </div>
+
+    <div class="card">
+      <h1>Политика конфиденциальности</h1>
+      <div class="meta">Дата последнего обновления: <b>16.02.2026</b></div>
+
+      <div class="note">
+        Коротко: мы храним минимум данных, чтобы приложение работало (Telegram ID, username, балансы, NFT, операции).
+        Мы не просим пароли от кошелька и не получаем доступ к вашим seed-фразам.
+      </div>
+
+      <h2>1. Какие данные мы можем хранить</h2>
+      <ul>
+        <li><b>Идентификаторы Telegram</b>: <code>telegram_user_id</code>, username, имя (если передаётся клиентом).</li>
+        <li><b>Данные баланса и операций</b>: история пополнений/выводов/продаж, комиссии.</li>
+        <li><b>Данные NFT</b>: ссылка на подарок (t.me/nft…), название, модель, backdrop (цвет), символ, изображение/фолбэк.</li>
+        <li><b>Технические логи</b>: события сервера (создание аукциона, ошибки, админ-действия).</li>
+      </ul>
+
+      <h2>2. Зачем мы используем данные</h2>
+      <ul>
+        <li>для отображения профиля, баланса и списка NFT;</li>
+        <li>для проведения аукционов и фиксации ставок;</li>
+        <li>для обработки запросов на вывод TON/NFT;</li>
+        <li>для предотвращения злоупотреблений и обеспечения безопасности.</li>
+      </ul>
+
+      <h2>3. Передача данных третьим лицам</h2>
+      <p>
+        Мы не продаём ваши данные. Данные могут быть переданы только если это необходимо:
+        (а) для работы сетевых провайдеров (кошельки/TON инфраструктура), (б) по требованию закона/компетентных органов.
+      </p>
+
+      <h2>4. Хранение и безопасность</h2>
+      <p>
+        Данные хранятся на сервере (обычно SQLite). Мы применяем разумные меры защиты, но не можем гарантировать абсолютную безопасность.
+        Не передавайте третьим лицам доступ к вашему Telegram и кошельку.
+      </p>
+
+      <h2>5. Ваши права</h2>
+      <ul>
+        <li>Вы можете запросить информацию о данных, которые хранятся о вашем аккаунте.</li>
+        <li>Вы можете запросить удаление данных, если это возможно без нарушения обязательств и требований закона.</li>
+      </ul>
+
+      <h2>6. Контакты</h2>
+      <p>Поддержка/контакт: <code>tg:@Immortal_redo</code></p>
+
+      <div class="footer">
+        Это общий шаблон политики. При необходимости под страну/юрисдикцию — лучше сверить с юристом.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
