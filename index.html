@@ -898,7 +898,8 @@
         if (state.selectedModel) params.append('model', state.selectedModel);
         if (state.selectedBackdrop) params.append('backdrop', state.selectedBackdrop);
         if (state.searchQuery) params.append('search', state.searchQuery);
-        
+
+        const API = 'https://api.growagardentrade.online'
         const url = `/api/auctions/search?${params.toString()}`;
         const response = await fetch(url, {
           headers: {
