@@ -747,6 +747,68 @@
     .ton-connect-modal .modal-content {
       max-width: 500px;
     }
+
+/* ================= CONSENT MODAL ================= */
+
+.consent-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.80);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+  padding: 20px;
+}
+
+.consent-overlay.active {
+  display: flex;
+}
+
+.consent-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  max-width: 420px;
+  width: 100%;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  animation: slideUp 0.4s ease-out;
+}
+
+.consent-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.consent-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.consent-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.consent-link {
+  font-size: 12px;
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.consent-actions {
+  display: flex;
+  gap: 10px;
+}
+
   </style>
 </head>
 
@@ -760,9 +822,24 @@
   </div>
 
   <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    tg.enableClosingConfirmation();
+    const tg = window.Telegram?.WebApp || null;
+    try { tg?.expand?.(); } catch (e) {}
+    try { tg?.enableClosingConfirmation?.(); } catch (e) {}
+
+// Backend API base (separate domain)
+const API_BASE = (() => {
+  const h = window.location.hostname;
+  if (h === 'localhost' || h === '127.0.0.1') return 'http://localhost:3000';
+  return 'https://api.growagardentrade.online';
+})();
+
+function apiFetch(path, options) {
+  const url = (typeof path === 'string' && /^https?:\/\//i.test(path))
+    ? path
+    : (API_BASE + path);
+  return fetch(url, options);
+}
+
 
     // App State
     const state = {
@@ -802,7 +879,7 @@
         }
         
         // Load user data from backend
-        const response = await fetch('/api/user', {
+        const response = await apiFetch('/api/user', {
           headers: {
             'X-User-ID': user.id,
             'X-Username': user.username || '',
@@ -898,10 +975,9 @@
         if (state.selectedModel) params.append('model', state.selectedModel);
         if (state.selectedBackdrop) params.append('backdrop', state.selectedBackdrop);
         if (state.searchQuery) params.append('search', state.searchQuery);
-
-        const API = 'https://api.growagardentrade.online'
+        
         const url = `/api/auctions/search?${params.toString()}`;
-        const response = await fetch(url, {
+        const response = await apiFetch(url, {
           headers: {
             'X-User-ID': state.user.id,
             'X-Init-Data': tg.initData || ''
@@ -920,7 +996,7 @@
 
     async function loadCollections() {
       try {
-        const response = await fetch('/api/collections', {
+        const response = await apiFetch('/api/collections', {
           headers: {
             'X-User-ID': state.user.id,
             'X-Init-Data': tg.initData || ''
@@ -944,7 +1020,7 @@
       }
       
       try {
-        const response = await fetch(`/api/models?collection=${encodeURIComponent(collection)}`, {
+        const response = await apiFetch(`/api/models?collection=${encodeURIComponent(collection)}`, {
           headers: {
             'X-User-ID': state.user.id,
             'X-Init-Data': tg.initData || ''
@@ -963,7 +1039,7 @@
 
     async function loadBackdrops() {
       try {
-        const response = await fetch('/api/backdrops', {
+        const response = await apiFetch('/api/backdrops', {
           headers: {
             'X-User-ID': state.user.id,
             'X-Init-Data': tg.initData || ''
@@ -983,7 +1059,7 @@
     // Load bid history for auction
     async function loadBidHistory(auctionId) {
       try {
-        const response = await fetch(`/api/auction/${auctionId}/bids`, {
+        const response = await apiFetch(`/api/auction/${auctionId}/bids`, {
           headers: {
             'X-User-ID': state.user.id,
             'X-Init-Data': tg.initData || ''
@@ -1051,6 +1127,50 @@
       }
       return false;
     }
+
+
+// ====== Access control: allow only Telegram Mini App ======
+function isTelegramMiniApp() {
+  try {
+    if (!tg) return false;
+    const initData = tg.initData || '';
+    const userId = tg.initDataUnsafe?.user?.id;
+    return Boolean(initData && userId);
+  } catch (e) {
+    return false;
+  }
+}
+
+function showBrowserBlock() {
+  document.getElementById('browserBlock')?.classList.add('active');
+}
+
+function openInTelegram() {
+  // TODO: replace with your bot link, e.g. https://t.me/YourBot?startapp=1
+  const botUrl = 'https://t.me/';
+  try {
+    // If somehow called inside Telegram
+    if (tg?.openTelegramLink) return tg.openTelegramLink(botUrl);
+  } catch (e) {}
+  window.location.href = botUrl;
+}
+
+// ====== Consent logic (one-time) ======
+function checkConsent() {
+  try {
+    const accepted = localStorage.getItem('aucTonConsentAccepted');
+    if (!accepted) {
+      document.getElementById('consentModal')?.classList.add('active');
+    }
+  } catch (e) {}
+}
+
+function acceptConsent() {
+  try {
+    localStorage.setItem('aucTonConsentAccepted', 'true');
+  } catch (e) {}
+  document.getElementById('consentModal')?.classList.remove('active');
+}
 
     function formatDate(ts) {
       if (!ts) return '';
@@ -1923,7 +2043,7 @@
       }
       
       try {
-        const response = await fetch('/api/withdraw/ton', {
+        const response = await apiFetch('/api/withdraw/ton', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1970,7 +2090,7 @@
       }
       
       try {
-        const response = await fetch('/api/nft/import', {
+        const response = await apiFetch('/api/nft/import', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -2021,7 +2141,7 @@
       }
       
       try {
-        const response = await fetch('/api/auction/bid', {
+        const response = await apiFetch('/api/auction/bid', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -2088,7 +2208,7 @@
       }
       
       try {
-        const response = await fetch('/api/auction/create', {
+        const response = await apiFetch('/api/auction/create', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -2104,7 +2224,7 @@
           showToast('Auction created successfully!', 'success');
           closeModal(document.querySelector('.modal.active')?.id);
           // Refresh NFTs and auctions
-          const userResponse = await fetch('/api/user', {
+          const userResponse = await apiFetch('/api/user', {
             headers: {
               'X-User-ID': state.user.id,
               'X-Init-Data': tg.initData || ''
@@ -2128,7 +2248,7 @@
 
     async function withdrawNFT(nftId) {
       try {
-        const response = await fetch('/api/withdraw/nft', {
+        const response = await apiFetch('/api/withdraw/nft', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -2175,8 +2295,63 @@
       showToast('Use /admin command in Telegram bot to issue TON', 'info');
     }
 
-    // Initialize the app
-    initApp();
+    // Initialize the app (after DOM is ready, so modals exist)
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!isTelegramMiniApp()) {
+        showBrowserBlock();
+      } else {
+        checkConsent();
+        initApp();
+      }
+    });
   </script>
+
+<!-- ================= BROWSER BLOCK (NOT TELEGRAM) ================= -->
+<div id="browserBlock" class="consent-overlay">
+  <div class="consent-box">
+    <div class="consent-title">Open in Telegram</div>
+
+    <div class="consent-text">
+      This app works only inside Telegram Mini App.
+      Please open it via the Telegram bot.
+    </div>
+
+    <div class="consent-actions">
+      <button class="btn btn-primary" style="flex:1;" onclick="openInTelegram()">
+        Open Telegram
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================= CONSENT MODAL ================= -->
+<div id="consentModal" class="consent-overlay">
+  <div class="consent-box">
+    <div class="consent-title">Terms & Privacy</div>
+
+    <div class="consent-text">
+      By using this application you confirm that you agree with our
+      Terms of Use and Privacy Policy.
+    </div>
+
+    <div class="consent-links">
+      <a class="consent-link" href="terms.html" onclick="return openLegal(event,'terms.html')">
+        Terms of Use
+      </a>
+      <a class="consent-link" href="privacy.html" onclick="return openLegal(event,'privacy.html')">
+        Privacy Policy
+      </a>
+    </div>
+
+    <div class="consent-actions">
+      <button class="btn btn-primary" style="flex:1;" onclick="acceptConsent()">
+        I Agree
+      </button>
+    </div>
+  </div>
+</div>
+
+
 </body>
 </html>
