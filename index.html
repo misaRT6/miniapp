@@ -881,10 +881,7 @@ function apiFetch(path, options) {
         // Load user data from backend
         const response = await apiFetch('/api/user', {
           headers: {
-            'X-User-ID': user.id,
-            'X-Username': user.username || '',
-            'X-First-Name': user.first_name || '',
-            'X-Init-Data': initData
+            'X-User-ID': user.id,            'X-Init-Data': initData
           }
         });
         
