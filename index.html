@@ -1267,13 +1267,7 @@ function acceptConsent() {
             Wallet
           </div>
           
-          ${state.user?.isAdmin ? `
-            <div class="nav-tab ${state.activeTab === 'admin' ? 'active' : ''}" 
-                 onclick="switchTab('admin')">
-              <i class="fas fa-shield-alt"></i>
-              Admin
-            </div>
-          ` : ''}
+          
         </div>
 
         <!-- Content -->
@@ -1289,9 +1283,7 @@ function acceptConsent() {
           return renderNFTs();
         case 'wallet':
           return renderWallet();
-        case 'admin':
-          return renderAdmin();
-        default:
+default:
           return renderAuctions();
       }
     }
@@ -1410,11 +1402,7 @@ function acceptConsent() {
         <div class="content-section active">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <h3 style="font-size: 18px;">My NFT Collection</h3>
-            <button class="btn btn-primary" onclick="importNFTModal()" style="padding: 8px 16px; font-size: 13px;">
-              <i class="fas fa-plus"></i>
-              Import NFT
-            </button>
-          </div>
+            </div>
           
           ${renderNFTsGrid()}
         </div>
@@ -1436,11 +1424,7 @@ function acceptConsent() {
           <div class="empty-state">
             <i class="fas fa-box-open"></i>
             <h3>No NFTs Yet</h3>
-            <p>Import your Telegram NFTs or win auctions to build your collection</p>
-            <button class="btn btn-primary" onclick="importNFTModal()" style="margin-top: 20px;">
-              <i class="fas fa-download"></i>
-              Import First NFT
-            </button>
+            <p>Win auctions to build your collection</p>
           </div>
         `;
       }
