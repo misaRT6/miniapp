@@ -4,17 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AucTon - NFT Auction Platform</title>
-  
+
   <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  
+
   <!-- TonConnect SDK -->
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-  
+
   <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+
   <style>
     :root {
       --primary: #7c5cff;
@@ -39,11 +39,7 @@
       --radius-xl: 20px;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Inter', sans-serif;
@@ -57,11 +53,9 @@
     body::before {
       content: '';
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background:
         radial-gradient(circle at 20% 80%, rgba(124, 92, 255, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(93, 63, 232, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 40% 40%, rgba(0, 212, 170, 0.05) 0%, transparent 50%);
@@ -77,18 +71,18 @@
     }
 
     /* Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px);} to { opacity: 1; transform: translateY(0);} }
+    @keyframes spin { to { transform: rotate(360deg);} }
+    @keyframes float { 0%, 100% { transform: translateY(0);} 50% { transform: translateY(-5px);} }
+    @keyframes pulseSoft { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+    @keyframes glow {
+      0%,100% { box-shadow: 0 0 0 rgba(124,92,255,0.0); }
+      50% { box-shadow: 0 0 24px rgba(124,92,255,0.25); }
     }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
 
     /* Header */
@@ -102,11 +96,7 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .header-content { display: flex; justify-content: space-between; align-items: center; }
 
     .logo {
       display: flex;
@@ -129,11 +119,7 @@
       align-items: center;
       justify-content: center;
       animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
+      box-shadow: 0 8px 20px rgba(124,92,255,0.15);
     }
 
     .balance-card {
@@ -144,13 +130,15 @@
       align-items: center;
       gap: 8px;
       border: 1px solid var(--border);
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
       cursor: pointer;
     }
 
     .balance-card:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow);
+      border-color: rgba(124,92,255,0.35);
+      animation: glow 1.4s ease-in-out infinite;
     }
 
     .balance-amount {
@@ -162,10 +150,7 @@
       background-clip: text;
     }
 
-    .balance-label {
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
+    .balance-label { font-size: 12px; color: var(--text-secondary); }
 
     /* Navigation */
     .nav-tabs {
@@ -187,7 +172,7 @@
       font-size: 14px;
       color: var(--text-secondary);
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -198,12 +183,10 @@
       background: var(--gradient-primary);
       color: white;
       box-shadow: 0 4px 12px rgba(124, 92, 255, 0.3);
+      animation: pulseSoft 1.6s ease-in-out infinite;
     }
 
-    .nav-tab:hover:not(.active) {
-      background: var(--bg-card);
-      color: var(--text-primary);
-    }
+    .nav-tab:hover:not(.active) { background: var(--bg-card); color: var(--text-primary); }
 
     /* Search & Filters */
     .search-container {
@@ -223,7 +206,7 @@
       color: var(--text-primary);
       font-size: 14px;
       margin-bottom: 12px;
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
     }
 
     .search-input:focus {
@@ -250,16 +233,9 @@
       cursor: pointer;
     }
 
-    .filter-select:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .filter-select:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .search-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
+    .search-actions { display: flex; gap: 10px; margin-top: 10px; }
 
     /* Buttons */
     .btn {
@@ -269,12 +245,15 @@
       font-size: 14px;
       border: none;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      user-select: none;
     }
+
+    .btn:active { transform: translateY(0) scale(0.99); }
 
     .btn-primary {
       background: var(--gradient-primary);
@@ -284,7 +263,7 @@
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(124, 92, 255, 0.4);
+      box-shadow: 0 8px 20px rgba(124, 92, 255, 0.35);
     }
 
     .btn-secondary {
@@ -294,14 +273,15 @@
       flex: 1;
     }
 
-    .btn-secondary:hover {
-      background: var(--bg-secondary);
-      transform: translateY(-2px);
-    }
+    .btn-secondary:hover { background: var(--bg-secondary); transform: translateY(-2px); }
 
-    .btn-small {
-      padding: 8px 16px;
-      font-size: 12px;
+    .btn-small { padding: 8px 16px; font-size: 12px; }
+
+    .btn-disabled, button:disabled {
+      opacity: 0.6 !important;
+      cursor: not-allowed !important;
+      transform: none !important;
+      box-shadow: none !important;
     }
 
     /* Auction Grid */
@@ -317,7 +297,7 @@
       border-radius: var(--radius-lg);
       overflow: hidden;
       border: 1px solid var(--border);
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
       cursor: pointer;
       position: relative;
     }
@@ -347,9 +327,7 @@
       font-weight: 600;
     }
 
-    .auction-content {
-      padding: 12px;
-    }
+    .auction-content { padding: 12px; }
 
     .auction-title {
       font-size: 14px;
@@ -369,42 +347,19 @@
       text-overflow: ellipsis;
     }
 
-    .auction-price {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
+    .auction-price { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 
-    .price-amount {
-      font-weight: 700;
-      font-size: 16px;
-      color: var(--success);
-    }
+    .price-amount { font-weight: 700; font-size: 16px; color: var(--success); }
 
-    .time-left {
-      font-size: 12px;
-      color: var(--warning);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+    .time-left { font-size: 12px; color: var(--warning); display: flex; align-items: center; gap: 4px; }
 
-    .auction-bids {
-      font-size: 12px;
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+    .auction-bids { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
 
     /* Modal */
     .modal {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(5px);
       display: none;
@@ -415,9 +370,7 @@
       padding: 16px;
     }
 
-    .modal.active {
-      display: flex;
-    }
+    .modal.active { display: flex; }
 
     .modal-content {
       background: var(--bg-card);
@@ -445,10 +398,7 @@
       border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     }
 
-    .modal-title {
-      font-size: 18px;
-      font-weight: 700;
-    }
+    .modal-title { font-size: 18px; font-weight: 700; }
 
     .modal-close {
       background: none;
@@ -459,35 +409,19 @@
       border-radius: 6px;
       font-size: 24px;
       line-height: 1;
-      width: 32px;
-      height: 32px;
+      width: 32px; height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .modal-close:hover {
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-    }
+    .modal-close:hover { background: var(--bg-secondary); color: var(--text-primary); }
 
-    .modal-body {
-      padding: 24px;
-    }
+    .modal-body { padding: 24px; }
 
     /* Form Elements */
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
     .form-input {
       width: 100%;
       padding: 12px 16px;
@@ -496,61 +430,90 @@
       border-radius: var(--radius-md);
       color: var(--text-primary);
       font-size: 14px;
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
     }
+    .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.1); }
+    .form-hint { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
 
-    .form-input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.1);
-    }
-
-    .form-hint {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 6px;
-    }
-
-    /* Wallet Connect */
-    #ton-connect-button {
-      margin-top: 20px;
-    }
-
+    /* Wallet */
     .wallet-connected {
       background: rgba(0, 212, 170, 0.1);
-      border: 1px solid var(--success);
+      border: 1px solid rgba(0, 212, 170, 0.45);
       border-radius: var(--radius-md);
       padding: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      animation: fadeIn 0.4s ease-out;
     }
-
     .wallet-address {
-      font-family: monospace;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 12px;
       color: var(--success);
       word-break: break-all;
+      margin-top: 6px;
     }
-
-    .legal-links {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+    .wallet-row {
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
     }
-    .legal-link {
-      display: inline-flex;
-      align-items: center;
+    .wallet-actions {
+      display:flex;
       gap: 8px;
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 12px;
-      padding: 8px 10px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      background: rgba(255,255,255,0.03);
+      align-items:center;
     }
-    .legal-link:active { transform: scale(0.98); }
+    .chip-row {
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .chip {
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      user-select: none;
+    }
+    .chip:hover { color: var(--text-primary); border-color: rgba(124,92,255,0.35); transform: translateY(-1px); }
 
-    /* Loading States */
+    .deposit-hero {
+      background: linear-gradient(90deg, rgba(124,92,255,0.18), rgba(93,63,232,0.06), rgba(0,212,170,0.08));
+      background-size: 200% 100%;
+      animation: shimmer 2.2s ease-in-out infinite;
+      border: 1px solid rgba(124,92,255,0.25);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+    .deposit-hero-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+    .deposit-hero-sub { font-size: 12px; color: var(--text-secondary); line-height: 1.45; }
+
+    .stepper {
+      display:flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .step {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .step > div {
+      height: 100%;
+      width: 0%;
+      background: var(--gradient-primary);
+      transition: width 0.35s ease;
+    }
+
+    /* Loading */
     .loading {
       display: inline-block;
       width: 20px;
@@ -561,19 +524,7 @@
       animation: spin 1s linear infinite;
     }
 
-    .skeleton {
-      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-card) 50%, var(--bg-secondary) 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s infinite;
-      border-radius: var(--radius-md);
-    }
-
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
-    /* Toast Notifications */
+    /* Toast */
     .toast {
       position: fixed;
       bottom: 20px;
@@ -588,114 +539,42 @@
       gap: 10px;
       z-index: 1001;
       opacity: 0;
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
       max-width: 90%;
       box-shadow: var(--shadow);
     }
-
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
-
-    .toast-success {
-      border-left: 4px solid var(--success);
-    }
-
-    .toast-error {
-      border-left: 4px solid var(--danger);
-    }
-
-    .toast-warning {
-      border-left: 4px solid var(--warning);
-    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast-success { border-left: 4px solid var(--success); }
+    .toast-error { border-left: 4px solid var(--danger); }
+    .toast-warning { border-left: 4px solid var(--warning); }
 
     /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-secondary);
-    }
-
-    .empty-state i {
-      font-size: 48px;
-      margin-bottom: 16px;
-      opacity: 0.5;
-    }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+    .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
 
     /* Bid History */
-    .bid-history {
-      margin-top: 20px;
-      background: var(--bg-secondary);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-    }
-
-    .bid-history-header {
-      padding: 12px 16px;
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border);
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .bid-history-list {
-      max-height: 200px;
-      overflow-y: auto;
-    }
-
+    .bid-history { margin-top: 20px; background: var(--bg-secondary); border-radius: var(--radius-md); overflow: hidden; }
+    .bid-history-header { padding: 12px 16px; background: var(--bg-card); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 14px; }
+    .bid-history-list { max-height: 200px; overflow-y: auto; }
     .bid-history-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: flex; justify-content: space-between; align-items: center;
       padding: 10px 16px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
-
-    .bid-history-item:last-child {
-      border-bottom: none;
-    }
-
-    .bid-user {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
+    .bid-history-item:last-child { border-bottom: none; }
+    .bid-user { display: flex; align-items: center; gap: 8px; }
     .bid-avatar {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
+      width: 24px; height: 24px; border-radius: 50%;
       background: var(--gradient-primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 600;
     }
+    .bid-details { display: flex; flex-direction: column; }
+    .bid-username { font-weight: 600; font-size: 13px; }
+    .bid-time { font-size: 11px; color: var(--text-muted); }
+    .bid-amount { font-weight: 700; color: var(--success); font-size: 14px; }
 
-    .bid-details {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .bid-username {
-      font-weight: 600;
-      font-size: 13px;
-    }
-
-    .bid-time {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .bid-amount {
-      font-weight: 700;
-      color: var(--success);
-      font-size: 14px;
-    }
-
-    /* NFT Status Badges */
+    /* NFT Status */
     .nft-badge {
       padding: 3px 8px;
       border-radius: 12px;
@@ -703,118 +582,80 @@
       font-weight: 600;
       display: inline-block;
     }
-
-    .badge-available {
-      background: rgba(0, 212, 170, 0.2);
-      color: var(--success);
-    }
-
-    .badge-listed {
-      background: rgba(255, 159, 67, 0.2);
-      color: var(--warning);
-    }
-
-    .badge-withdraw {
-      background: rgba(124, 92, 255, 0.2);
-      color: var(--primary);
-    }
+    .badge-available { background: rgba(0, 212, 170, 0.2); color: var(--success); }
+    .badge-listed { background: rgba(255, 159, 67, 0.2); color: var(--warning); }
+    .badge-withdraw { background: rgba(124, 92, 255, 0.2); color: var(--primary); }
 
     /* Responsive */
     @media (max-width: 480px) {
-      #app {
-        padding: 0 12px 40px;
-      }
-      
-      .auctions-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 12px;
-      }
-      
-      .filters-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .modal-content {
-        max-height: 90vh;
-      }
+      #app { padding: 0 12px 40px; }
+      .auctions-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+      .filters-grid { grid-template-columns: 1fr; }
+      .modal-content { max-height: 90vh; }
     }
 
-    /* TonConnect Styles */
-    .ton-connect-modal {
-      max-width: 500px !important;
+    /* Legal */
+    .legal-links { display: flex; gap: 12px; flex-wrap: wrap; }
+    .legal-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 12px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.03);
     }
+    .legal-link:active { transform: scale(0.98); }
 
-    .ton-connect-modal .modal-content {
-      max-width: 500px;
+    /* Consent / Block */
+    .consent-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.80);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 5000;
+      padding: 20px;
     }
+    .consent-overlay.active { display: flex; }
+    .consent-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      max-width: 420px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      animation: slideUp 0.4s ease-out;
+    }
+    .consent-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+    .consent-text { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; }
+    .consent-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .consent-link { font-size: 12px; color: var(--primary); text-decoration: underline; cursor: pointer; }
+    .consent-actions { display: flex; gap: 10px; }
 
-/* ================= CONSENT MODAL ================= */
-
-.consent-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.80);
-  backdrop-filter: blur(6px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 5000;
-  padding: 20px;
-}
-
-.consent-overlay.active {
-  display: flex;
-}
-
-.consent-box {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  max-width: 420px;
-  width: 100%;
-  padding: 24px;
-  box-shadow: var(--shadow);
-  animation: slideUp 0.4s ease-out;
-}
-
-.consent-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-.consent-text {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-bottom: 16px;
-  line-height: 1.5;
-}
-
-.consent-links {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-
-.consent-link {
-  font-size: 12px;
-  color: var(--primary);
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.consent-actions {
-  display: flex;
-  gap: 10px;
-}
-
+    /* TonConnect portal: stays in DOM always */
+    #ton-connect-portal {
+      position: fixed;
+      left: -9999px;
+      top: -9999px;
+      width: 10px; height: 10px;
+      overflow: hidden;
+    }
   </style>
 </head>
 
 <body>
+  <!-- TonConnect portal (not destroyed by re-render) -->
+  <div id="ton-connect-portal">
+    <div id="ton-connect-button"></div>
+  </div>
+
   <div id="app"></div>
-  
+
   <!-- Toast Notification -->
   <div id="toast" class="toast">
     <i id="toast-icon"></i>
@@ -826,36 +667,33 @@
     try { tg?.expand?.(); } catch (e) {}
     try { tg?.enableClosingConfirmation?.(); } catch (e) {}
 
-// Backend API base (separate domain)
-const API_BASE = (() => {
-  const h = window.location.hostname;
-  if (h === 'localhost' || h === '127.0.0.1') return 'http://localhost:3000';
-  return 'https://api.growagardentrade.online';
-})();
+    // Backend API base (separate domain)
+    const API_BASE = (() => {
+      const h = window.location.hostname;
+      if (h === 'localhost' || h === '127.0.0.1') return 'http://localhost:3000';
+      return 'https://api.growagardentrade.online';
+    })();
 
-function apiFetch(path, options) {
-  const url = (typeof path === 'string' && /^https?:\/\//i.test(path))
-    ? path
-    : (API_BASE + path);
-  return fetch(url, options);
-}
+    function apiFetch(path, options) {
+      const url = (typeof path === 'string' && /^https?:\/\//i.test(path))
+        ? path
+        : (API_BASE + path);
+      return fetch(url, options);
+    }
 
+    function safeHeaderValue(v) {
+      try { return encodeURIComponent(String(v || '')); } catch (e) { return ''; }
+    }
 
-function safeHeaderValue(v) {
-  // Fetch headers must be ISO-8859-1 (ByteString). Encode non-latin safely.
-  try { return encodeURIComponent(String(v || '')); } catch (e) { return ''; }
-}
-
-async function expectJson(res, label = 'API') {
-  const ct = (res.headers && res.headers.get && res.headers.get('content-type')) ? (res.headers.get('content-type') || '') : '';
-  if (!ct.includes('application/json')) {
-    const txt = await res.text().catch(() => '');
-    const head = (txt || '').slice(0, 160).replace(/\s+/g, ' ').trim();
-    throw new Error(`${label}: ответ не JSON (status ${res.status}). ${head ? 'Тело: ' + head : ''}`);
-  }
-  return res.json();
-}
-
+    async function expectJson(res, label = 'API') {
+      const ct = (res.headers && res.headers.get && res.headers.get('content-type')) ? (res.headers.get('content-type') || '') : '';
+      if (!ct.includes('application/json')) {
+        const txt = await res.text().catch(() => '');
+        const head = (txt || '').slice(0, 160).replace(/\s+/g, ' ').trim();
+        throw new Error(`${label}: ответ не JSON (status ${res.status}). ${head ? 'Тело: ' + head : ''}`);
+      }
+      return res.json();
+    }
 
     // App State
     const state = {
@@ -884,17 +722,13 @@ async function expectJson(res, label = 'API') {
     // Initialize App
     async function initApp() {
       showLoading();
-      
+
       try {
-        // Initialize Telegram user
-        const initData = tg.initData || '';
-        const user = tg.initDataUnsafe?.user || {};
-        
-        if (!user.id) {
-          throw new Error('Telegram user not found');
-        }
-        
-        // Load user data from backend
+        const initData = tg?.initData || '';
+        const user = tg?.initDataUnsafe?.user || {};
+
+        if (!user.id) throw new Error('Telegram user not found');
+
         const response = await apiFetch('/api/user', {
           headers: {
             'X-User-ID': String(user.id),
@@ -903,29 +737,23 @@ async function expectJson(res, label = 'API') {
             'X-Init-Data': initData
           }
         });
-        
+
         if (response.ok) {
-          const data = await expectJson(response);
+          const data = await expectJson(response, '/api/user');
           state.user = data.user;
           state.balance = data.balance;
           state.nfts = data.nfts || [];
           state.history = data.history || [];
-          
-          // Load initial data
-          await Promise.all([
-            loadAuctions(),
-            loadCollections(),
-            loadBackdrops()
-          ]);
+
+          await Promise.all([ loadAuctions(), loadCollections(), loadBackdrops() ]);
         } else {
-          const errorData = await expectJson(response);
+          const errorData = await expectJson(response, '/api/user');
           throw new Error(errorData.error || 'Failed to load user data');
         }
       } catch (error) {
         console.error('Failed to load user data:', error);
         showToast(`Failed to load data: ${error.message}`, 'error');
-        
-        // Show error state
+
         state.user = { id: 0, username: 'error', first_name: 'Error' };
         state.balance = 0;
         state.nfts = [];
@@ -935,29 +763,23 @@ async function expectJson(res, label = 'API') {
         state.models = [];
         state.backdrops = [];
       }
-      
-      // Initialize TonConnect
+
+      // Initialize TonConnect (once)
       initTonConnect();
-      
+
       hideLoading();
       renderApp();
     }
 
-    // Initialize TonConnect
+    // Initialize TonConnect (button lives in portal, we move it into view)
     function initTonConnect() {
+      if (tonConnectUI) return;
+
       try {
         tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
           manifestUrl: window.location.origin + '/tonconnect-manifest.json',
           buttonRootId: 'ton-connect-button',
-          uiPreferences: {
-            theme: 'DARK',
-            colorsSet: {
-              connectButton: {
-                background: '#7c5cff',
-                foreground: '#ffffff'
-              }
-            }
-          }
+          uiPreferences: { theme: 'DARK' }
         });
 
         tonConnectUI.onStatusChange(walletInfo => {
@@ -971,16 +793,34 @@ async function expectJson(res, label = 'API') {
             state.tonConnected = false;
             state.walletAddress = null;
             wallet = null;
+            renderApp();
           }
         });
 
-        // Restore connection
         tonConnectUI.connectionRestored.then(() => {
-          console.log('Connection restored');
+          // after restore, ensure UI button is in the right slot
+          setTimeout(syncTonConnectButtonSlot, 50);
         });
       } catch (error) {
         console.error('Failed to init TonConnect:', error);
       }
+    }
+
+    // Move TonConnect button into visible slot (because #app re-renders)
+    function syncTonConnectButtonSlot() {
+      const btn = document.getElementById('ton-connect-button');
+      const slot = document.getElementById('walletConnectSlot');
+      if (!btn || !slot) return;
+
+      // If connected, we hide the button (but keep it mounted)
+      if (state.tonConnected) {
+        document.getElementById('ton-connect-portal')?.appendChild(btn);
+        return;
+      }
+
+      // Put into slot
+      slot.innerHTML = '';
+      slot.appendChild(btn);
     }
 
     // API Functions
@@ -991,17 +831,17 @@ async function expectJson(res, label = 'API') {
         if (state.selectedModel) params.append('model', state.selectedModel);
         if (state.selectedBackdrop) params.append('backdrop', state.selectedBackdrop);
         if (state.searchQuery) params.append('search', state.searchQuery);
-        
+
         const url = `/api/auctions/search?${params.toString()}`;
         const response = await apiFetch(url, {
           headers: {
             'X-User-ID': state.user.id,
-            'X-Init-Data': tg.initData || ''
+            'X-Init-Data': tg?.initData || ''
           }
         });
-        
+
         if (response.ok) {
-          const data = await expectJson(response);
+          const data = await expectJson(response, '/api/auctions/search');
           state.auctions = data.list || [];
         }
       } catch (error) {
@@ -1013,14 +853,10 @@ async function expectJson(res, label = 'API') {
     async function loadCollections() {
       try {
         const response = await apiFetch('/api/collections', {
-          headers: {
-            'X-User-ID': state.user.id,
-            'X-Init-Data': tg.initData || ''
-          }
+          headers: { 'X-User-ID': state.user.id, 'X-Init-Data': tg?.initData || '' }
         });
-        
         if (response.ok) {
-          const data = await expectJson(response);
+          const data = await expectJson(response, '/api/collections');
           state.collections = data.collections || [];
         }
       } catch (error) {
@@ -1030,21 +866,13 @@ async function expectJson(res, label = 'API') {
     }
 
     async function loadModels(collection) {
-      if (!collection) {
-        state.models = [];
-        return;
-      }
-      
+      if (!collection) { state.models = []; return; }
       try {
         const response = await apiFetch(`/api/models?collection=${encodeURIComponent(collection)}`, {
-          headers: {
-            'X-User-ID': state.user.id,
-            'X-Init-Data': tg.initData || ''
-          }
+          headers: { 'X-User-ID': state.user.id, 'X-Init-Data': tg?.initData || '' }
         });
-        
         if (response.ok) {
-          const data = await expectJson(response);
+          const data = await expectJson(response, '/api/models');
           state.models = data.models || [];
         }
       } catch (error) {
@@ -1056,14 +884,10 @@ async function expectJson(res, label = 'API') {
     async function loadBackdrops() {
       try {
         const response = await apiFetch('/api/backdrops', {
-          headers: {
-            'X-User-ID': state.user.id,
-            'X-Init-Data': tg.initData || ''
-          }
+          headers: { 'X-User-ID': state.user.id, 'X-Init-Data': tg?.initData || '' }
         });
-        
         if (response.ok) {
-          const data = await expectJson(response);
+          const data = await expectJson(response, '/api/backdrops');
           state.backdrops = data.backdrops || [];
         }
       } catch (error) {
@@ -1072,18 +896,13 @@ async function expectJson(res, label = 'API') {
       }
     }
 
-    // Load bid history for auction
     async function loadBidHistory(auctionId) {
       try {
         const response = await apiFetch(`/api/auction/${auctionId}/bids`, {
-          headers: {
-            'X-User-ID': state.user.id,
-            'X-Init-Data': tg.initData || ''
-          }
+          headers: { 'X-User-ID': state.user.id, 'X-Init-Data': tg?.initData || '' }
         });
-        
         if (response.ok) {
-          const data = await expectJson(response);
+          const data = await expectJson(response, '/api/auction/:id/bids');
           return data.bids || [];
         }
         return [];
@@ -1093,15 +912,14 @@ async function expectJson(res, label = 'API') {
       }
     }
 
-    // UI Functions
+    // UI Helpers
     function showToast(message, type = 'info') {
       const toast = document.getElementById('toast');
       const toastIcon = document.getElementById('toast-icon');
       const toastMessage = document.getElementById('toast-message');
-      
+
       toastMessage.textContent = message;
-      
-      // Set icon based on type
+
       if (type === 'success') {
         toastIcon.className = 'fas fa-check-circle';
         toastIcon.style.color = 'var(--success)';
@@ -1115,78 +933,59 @@ async function expectJson(res, label = 'API') {
         toastIcon.className = 'fas fa-info-circle';
         toastIcon.style.color = 'var(--text-secondary)';
       }
-      
+
       toast.className = `toast toast-${type}`;
       toast.classList.add('show');
-      
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
+
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    function showLoading() {
-      state.loading = true;
-    }
-
-
-    function hideLoading() {
-      state.loading = false;
-    }
+    function showLoading() { state.loading = true; }
+    function hideLoading() { state.loading = false; }
 
     function openLegal(ev, path) {
       try { if (ev) ev.preventDefault(); } catch {}
       const url = new URL(path, window.location.href).toString();
-      if (window.Telegram?.WebApp?.openLink) {
-        window.Telegram.WebApp.openLink(url);
-      } else {
-        window.open(url, '_blank');
-      }
+      if (window.Telegram?.WebApp?.openLink) window.Telegram.WebApp.openLink(url);
+      else window.open(url, '_blank');
       return false;
     }
 
-
-// ====== Access control: allow only Telegram Mini App ======
-function isTelegramMiniApp() {
-  try {
-    if (!tg) return false;
-    const initData = tg.initData || '';
-    const userId = tg.initDataUnsafe?.user?.id;
-    return Boolean(initData && userId);
-  } catch (e) {
-    return false;
-  }
-}
-
-function showBrowserBlock() {
-  document.getElementById('browserBlock')?.classList.add('active');
-}
-
-function openInTelegram() {
-  // TODO: replace with your bot link, e.g. https://t.me/YourBot?startapp=1
-  const botUrl = 'https://t.me/';
-  try {
-    // If somehow called inside Telegram
-    if (tg?.openTelegramLink) return tg.openTelegramLink(botUrl);
-  } catch (e) {}
-  window.location.href = botUrl;
-}
-
-// ====== Consent logic (one-time) ======
-function checkConsent() {
-  try {
-    const accepted = localStorage.getItem('aucTonConsentAccepted');
-    if (!accepted) {
-      document.getElementById('consentModal')?.classList.add('active');
+    // Access control: allow only Telegram Mini App
+    function isTelegramMiniApp() {
+      try {
+        if (!tg) return false;
+        const initData = tg.initData || '';
+        const userId = tg.initDataUnsafe?.user?.id;
+        return Boolean(initData && userId);
+      } catch (e) {
+        return false;
+      }
     }
-  } catch (e) {}
-}
 
-function acceptConsent() {
-  try {
-    localStorage.setItem('aucTonConsentAccepted', 'true');
-  } catch (e) {}
-  document.getElementById('consentModal')?.classList.remove('active');
-}
+    function showBrowserBlock() {
+      document.getElementById('browserBlock')?.classList.add('active');
+    }
+
+    function openInTelegram() {
+      // TODO: replace with your bot link, e.g. https://t.me/YourBot?startapp=1
+      const botUrl = 'https://t.me/';
+      try { if (tg?.openTelegramLink) return tg.openTelegramLink(botUrl); } catch (e) {}
+      window.location.href = botUrl;
+    }
+
+    // Consent logic (one-time)
+    function checkConsent() {
+      try {
+        const accepted = localStorage.getItem('aucTonConsentAccepted');
+        if (!accepted) document.getElementById('consentModal')?.classList.add('active');
+      } catch (e) {}
+    }
+
+    function acceptConsent() {
+      try { localStorage.setItem('aucTonConsentAccepted', 'true'); } catch (e) {}
+      document.getElementById('consentModal')?.classList.remove('active');
+    }
 
     function formatDate(ts) {
       if (!ts) return '';
@@ -1195,7 +994,6 @@ function acceptConsent() {
     }
 
     function formatTON(amount) {
-
       if (!amount && amount !== 0) return '0.000 TON';
       return parseFloat(amount).toFixed(3) + ' TON';
     }
@@ -1203,18 +1001,12 @@ function acceptConsent() {
     function formatTimeLeft(timestamp) {
       const diff = timestamp - Date.now();
       if (diff <= 0) return 'Ended';
-      
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      
-      if (days > 0) {
-        return `${days}d ${hours}h`;
-      } else if (hours > 0) {
-        return `${hours}h ${minutes}m`;
-      } else {
-        return `${minutes}m`;
-      }
+      if (days > 0) return `${days}d ${hours}h`;
+      if (hours > 0) return `${hours}h ${minutes}m`;
+      return `${minutes}m`;
     }
 
     function formatTime(timestamp) {
@@ -1222,11 +1014,10 @@ function acceptConsent() {
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
-    // Render Functions
+    // Render
     function renderApp() {
       const app = document.getElementById('app');
-      
-      // Check if user is loaded
+
       if (!state.user || !state.user.id) {
         app.innerHTML = `
           <div class="empty-state" style="padding-top: 100px;">
@@ -1241,18 +1032,15 @@ function acceptConsent() {
         `;
         return;
       }
-      
+
       app.innerHTML = `
-        <!-- Header -->
         <div class="header">
           <div class="header-content">
             <div class="logo">
-              <div class="logo-icon">
-                <i class="fas fa-gem"></i>
-              </div>
+              <div class="logo-icon"><i class="fas fa-gem"></i></div>
               AucTon
             </div>
-            
+
             <div class="balance-card" onclick="showDepositModal()">
               <div>
                 <div class="balance-label">BALANCE</div>
@@ -1263,100 +1051,79 @@ function acceptConsent() {
           </div>
         </div>
 
-        <!-- Navigation -->
         <div class="nav-tabs">
-          <div class="nav-tab ${state.activeTab === 'auctions' ? 'active' : ''}" 
-               onclick="switchTab('auctions')">
-            <i class="fas fa-gavel"></i>
-            Auctions
+          <div class="nav-tab ${state.activeTab === 'auctions' ? 'active' : ''}" onclick="switchTab('auctions')">
+            <i class="fas fa-gavel"></i> Auctions
           </div>
-          
-          <div class="nav-tab ${state.activeTab === 'nfts' ? 'active' : ''}" 
-               onclick="switchTab('nfts')">
-            <i class="fas fa-box"></i>
-            My NFTs
+
+          <div class="nav-tab ${state.activeTab === 'nfts' ? 'active' : ''}" onclick="switchTab('nfts')">
+            <i class="fas fa-box"></i> My NFTs
           </div>
-          
-          <div class="nav-tab ${state.activeTab === 'wallet' ? 'active' : ''}" 
-               onclick="switchTab('wallet')">
-            <i class="fas fa-wallet"></i>
-            Wallet
+
+          <div class="nav-tab ${state.activeTab === 'wallet' ? 'active' : ''}" onclick="switchTab('wallet')">
+            <i class="fas fa-wallet"></i> Wallet
           </div>
-          
-          
         </div>
 
-        <!-- Content -->
         ${renderContent()}
       `;
+
+      // Re-attach TonConnect button into wallet tab slot when needed
+      setTimeout(syncTonConnectButtonSlot, 0);
     }
 
     function renderContent() {
-      switch(state.activeTab) {
-        case 'auctions':
-          return renderAuctions();
-        case 'nfts':
-          return renderNFTs();
-        case 'wallet':
-          return renderWallet();
-default:
-          return renderAuctions();
+      switch (state.activeTab) {
+        case 'auctions': return renderAuctions();
+        case 'nfts': return renderNFTs();
+        case 'wallet': return renderWallet();
+        default: return renderAuctions();
       }
     }
 
     function renderAuctions() {
       return `
         <div class="content-section active">
-          <!-- Search & Filters -->
           <div class="search-container">
-            <input 
-              type="text" 
-              class="search-input" 
+            <input
+              type="text"
+              class="search-input"
               placeholder="Search by name, collection, model or color..."
               value="${state.searchQuery}"
               oninput="state.searchQuery = this.value;"
               onkeypress="if(event.key === 'Enter') loadAuctions().then(() => renderApp());"
             >
-            
+
             <div class="filters-grid">
-              <select class="filter-select" 
+              <select class="filter-select"
                       onchange="state.selectedCollection = this.value; loadModels(this.value).then(() => renderApp());">
                 <option value="">All Collections</option>
-                ${state.collections.map(c => `
-                  <option value="${c}" ${c === state.selectedCollection ? 'selected' : ''}>${c}</option>
-                `).join('')}
+                ${state.collections.map(c => `<option value="${c}" ${c === state.selectedCollection ? 'selected' : ''}>${c}</option>`).join('')}
               </select>
-              
+
               <select class="filter-select" ${!state.selectedCollection ? 'disabled' : ''}
                       onchange="state.selectedModel = this.value; loadAuctions().then(() => renderApp());">
                 <option value="">All Models</option>
-                ${state.models.map(m => `
-                  <option value="${m}" ${m === state.selectedModel ? 'selected' : ''}>${m}</option>
-                `).join('')}
+                ${state.models.map(m => `<option value="${m}" ${m === state.selectedModel ? 'selected' : ''}>${m}</option>`).join('')}
               </select>
-              
-              <select class="filter-select" 
+
+              <select class="filter-select"
                       onchange="state.selectedBackdrop = this.value; loadAuctions().then(() => renderApp());">
                 <option value="">All Colors</option>
-                ${state.backdrops.map(b => `
-                  <option value="${b}" ${b === state.selectedBackdrop ? 'selected' : ''}>${b}</option>
-                `).join('')}
+                ${state.backdrops.map(b => `<option value="${b}" ${b === state.selectedBackdrop ? 'selected' : ''}>${b}</option>`).join('')}
               </select>
             </div>
-            
+
             <div class="search-actions">
               <button class="btn btn-primary" onclick="loadAuctions().then(() => renderApp());">
-                <i class="fas fa-search"></i>
-                Search
+                <i class="fas fa-search"></i> Search
               </button>
               <button class="btn btn-secondary" onclick="clearFilters()">
-                <i class="fas fa-times"></i>
-                Clear
+                <i class="fas fa-times"></i> Clear
               </button>
             </div>
           </div>
-          
-          <!-- Auctions Grid -->
+
           ${renderAuctionsGrid()}
         </div>
       `;
@@ -1371,7 +1138,7 @@ default:
           </div>
         `;
       }
-      
+
       if (state.auctions.length === 0) {
         return `
           <div class="empty-state">
@@ -1381,7 +1148,7 @@ default:
           </div>
         `;
       }
-      
+
       return `
         <div class="auctions-grid">
           ${state.auctions.map(auction => `
@@ -1389,7 +1156,7 @@ default:
               <div class="auction-badge">Auction #${auction.id}</div>
               <img src="${auction.image_url || 'https://picsum.photos/seed/' + auction.id + '/300/300'}"
                    data-fallback="${auction.image_url_fallback || ''}"
-                   alt="${auction.name}" 
+                   alt="${auction.name}"
                    class="auction-image"
                    onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}else{this.src='https://picsum.photos/seed/${auction.id}/300/300';}">
               <div class="auction-content">
@@ -1397,15 +1164,9 @@ default:
                 <div class="auction-collection">${auction.collection || 'No Collection'}${auction.model ? ' • ' + auction.model : ''}${auction.backdrop ? ' • ' + auction.backdrop : ''}${auction.symbol ? ' • ' + auction.symbol : ''}</div>
                 <div class="auction-price">
                   <div class="price-amount">${formatTON(auction.current_bid || auction.min_bid)}</div>
-                  <div class="time-left">
-                    <i class="fas fa-clock"></i>
-                    ${formatTimeLeft(auction.ends_at)}
-                  </div>
+                  <div class="time-left"><i class="fas fa-clock"></i>${formatTimeLeft(auction.ends_at)}</div>
                 </div>
-                <div class="auction-bids">
-                  <i class="fas fa-users"></i>
-                  ${auction.bids_count || 0} bids
-                </div>
+                <div class="auction-bids"><i class="fas fa-users"></i>${auction.bids_count || 0} bids</div>
               </div>
             </div>
           `).join('')}
@@ -1416,10 +1177,9 @@ default:
     function renderNFTs() {
       return `
         <div class="content-section active">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 16px;">
             <h3 style="font-size: 18px;">My NFT Collection</h3>
-            </div>
-          
+          </div>
           ${renderNFTsGrid()}
         </div>
       `;
@@ -1434,7 +1194,7 @@ default:
           </div>
         `;
       }
-      
+
       if (state.nfts.length === 0) {
         return `
           <div class="empty-state">
@@ -1444,116 +1204,94 @@ default:
           </div>
         `;
       }
-      
+
       const availableNFTs = state.nfts.filter(nft => nft.status === 'in_app');
       const listedNFTs = state.nfts.filter(nft => nft.status === 'listed');
       const withdrawnNFTs = state.nfts.filter(nft => nft.status === 'withdraw_requested');
-      
+
+      const card = (nft, badgeHtml) => `
+        <div class="auction-card" onclick="showNFTModal(${nft.id})">
+          <img src="${nft.image_url || 'https://picsum.photos/seed/' + nft.id + '/300/300'}"
+               data-fallback="${nft.image_url_fallback || ''}"
+               alt="${nft.name}"
+               class="auction-image"
+               onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}else{this.src='https://picsum.photos/seed/${nft.id}/300/300';}">
+          <div class="auction-content">
+            <div class="auction-title">${nft.name || 'Unnamed NFT'}</div>
+            <div class="auction-collection">${nft.collection || 'No Collection'}${nft.model ? ' • ' + nft.model : ''}${nft.backdrop ? ' • ' + nft.backdrop : ''}${nft.symbol ? ' • ' + nft.symbol : ''}</div>
+            ${badgeHtml}
+          </div>
+        </div>
+      `;
+
       return `
         ${listedNFTs.length > 0 ? `
           <h4 style="margin: 0 0 12px 0; color: var(--text-secondary); font-size: 14px;">Listed for Auction (${listedNFTs.length})</h4>
           <div class="auctions-grid" style="margin-bottom: 24px;">
-            ${listedNFTs.map(nft => `
-              <div class="auction-card" onclick="showNFTModal(${nft.id})">
-                <img src="${nft.image_url || 'https://picsum.photos/seed/' + nft.id + '/300/300'}"
-                     data-fallback="${nft.image_url_fallback || ''}"
-                     alt="${nft.name}" 
-                     class="auction-image"
-                     onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}else{this.src='https://picsum.photos/seed/${nft.id}/300/300';}">
-                <div class="auction-content">
-                  <div class="auction-title">${nft.name || 'Unnamed NFT'}</div>
-                  <div class="auction-collection">${nft.collection || 'No Collection'}${nft.model ? ' • ' + nft.model : ''}${nft.backdrop ? ' • ' + nft.backdrop : ''}${nft.symbol ? ' • ' + nft.symbol : ''}</div>
-                  <span class="nft-badge badge-listed">Listed</span>
-                </div>
-              </div>
-            `).join('')}
+            ${listedNFTs.map(nft => card(nft, `<span class="nft-badge badge-listed">Listed</span>`)).join('')}
           </div>
         ` : ''}
-        
+
         ${availableNFTs.length > 0 ? `
           <h4 style="margin: 0 0 12px 0; color: var(--text-secondary); font-size: 14px;">Available (${availableNFTs.length})</h4>
           <div class="auctions-grid" style="margin-bottom: ${withdrawnNFTs.length > 0 ? '24px' : '0'};">
-            ${availableNFTs.map(nft => `
-              <div class="auction-card" onclick="showNFTModal(${nft.id})">
-                <img src="${nft.image_url || 'https://picsum.photos/seed/' + nft.id + '/300/300'}"
-                     data-fallback="${nft.image_url_fallback || ''}"
-                     alt="${nft.name}" 
-                     class="auction-image"
-                     onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}else{this.src='https://picsum.photos/seed/${nft.id}/300/300';}">
-                <div class="auction-content">
-                  <div class="auction-title">${nft.name || 'Unnamed NFT'}</div>
-                  <div class="auction-collection">${nft.collection || 'No Collection'}${nft.model ? ' • ' + nft.model : ''}${nft.backdrop ? ' • ' + nft.backdrop : ''}${nft.symbol ? ' • ' + nft.symbol : ''}</div>
-                  <span class="nft-badge badge-available">Available</span>
-                </div>
-              </div>
-            `).join('')}
+            ${availableNFTs.map(nft => card(nft, `<span class="nft-badge badge-available">Available</span>`)).join('')}
           </div>
         ` : ''}
-        
+
         ${withdrawnNFTs.length > 0 ? `
           <h4 style="margin: 0 0 12px 0; color: var(--text-secondary); font-size: 14px;">Withdrawal Pending (${withdrawnNFTs.length})</h4>
           <div class="auctions-grid">
-            ${withdrawnNFTs.map(nft => `
-              <div class="auction-card" onclick="showNFTModal(${nft.id})">
-                <img src="${nft.image_url || 'https://picsum.photos/seed/' + nft.id + '/300/300'}"
-                     data-fallback="${nft.image_url_fallback || ''}"
-                     alt="${nft.name}" 
-                     class="auction-image"
-                     onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}else{this.src='https://picsum.photos/seed/${nft.id}/300/300';}">
-                <div class="auction-content">
-                  <div class="auction-title">${nft.name || 'Unnamed NFT'}</div>
-                  <div class="auction-collection">${nft.collection || 'No Collection'}${nft.model ? ' • ' + nft.model : ''}${nft.backdrop ? ' • ' + nft.backdrop : ''}${nft.symbol ? ' • ' + nft.symbol : ''}</div>
-                  <span class="nft-badge badge-withdraw">Withdraw Pending</span>
-                </div>
-              </div>
-            `).join('')}
+            ${withdrawnNFTs.map(nft => card(nft, `<span class="nft-badge badge-withdraw">Withdraw Pending</span>`)).join('')}
           </div>
         ` : ''}
       `;
     }
 
     function renderWallet() {
-      return `
-        <div class="content-section active">
-          <!-- Wallet Connection -->
-          <div class="search-container">
-            <h3 style="margin-bottom: 16px;">Wallet Connection</h3>
-            
-            ${state.tonConnected ? `
-              <div class="wallet-connected">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <span style="color: var(--success); font-weight: 600;">
-                    <i class="fas fa-check-circle"></i> Wallet Connected
-                  </span>
-                  <button class="btn btn-small btn-secondary" onclick="disconnectWallet()" style="padding: 4px 12px;">
-                    Disconnect
-                  </button>
-                </div>
-                <div class="wallet-address">${state.walletAddress}</div>
-              </div>
-            ` : `
-              <p style="color: var(--text-secondary); margin-bottom: 16px;">
-                Connect your TON wallet to deposit and withdraw funds
-              </p>
-              <div id="ton-connect-button"></div>
-            `}
-          </div>
-          
-          <!-- Balance Actions -->
-          <div class="search-container">
-            <h3 style="margin-bottom: 16px;">Balance: ${formatTON(state.balance)}</h3>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-              <button class="btn btn-primary" onclick="showDepositModal()">
-                <i class="fas fa-arrow-down"></i>
-                Deposit
+      const connectedBlock = state.tonConnected ? `
+        <div class="wallet-connected">
+          <div class="wallet-row">
+            <span style="color: var(--success); font-weight: 700;">
+              <i class="fas fa-check-circle"></i> Wallet Connected
+            </span>
+            <div class="wallet-actions">
+              <button class="btn btn-small btn-secondary" onclick="copyWalletAddress()" style="padding: 6px 10px;">
+                <i class="fas fa-copy"></i> Copy
               </button>
-              <button class="btn btn-secondary" onclick="showWithdrawModal()" ${state.balance < 0.1 ? 'disabled' : ''}>
-                <i class="fas fa-arrow-up"></i>
-                Withdraw
+              <button class="btn btn-small btn-secondary" onclick="disconnectWallet()" style="padding: 6px 10px;">
+                Disconnect
               </button>
             </div>
-            
+          </div>
+          <div class="wallet-address">${state.walletAddress || ''}</div>
+        </div>
+      ` : `
+        <p style="color: var(--text-secondary); margin-bottom: 12px;">
+          Connect your TON wallet to deposit and withdraw funds
+        </p>
+        <div id="walletConnectSlot" style="display:flex; justify-content:center;"></div>
+      `;
+
+      return `
+        <div class="content-section active">
+          <div class="search-container">
+            <h3 style="margin-bottom: 16px;">Wallet Connection</h3>
+            ${connectedBlock}
+          </div>
+
+          <div class="search-container">
+            <h3 style="margin-bottom: 16px;">Balance: ${formatTON(state.balance)}</h3>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <button class="btn btn-primary" onclick="showDepositModal()">
+                <i class="fas fa-arrow-down"></i> Deposit
+              </button>
+              <button class="btn btn-secondary" onclick="showWithdrawModal()" ${state.balance < 0.1 ? 'disabled' : ''}>
+                <i class="fas fa-arrow-up"></i> Withdraw
+              </button>
+            </div>
+
             ${state.balance < 0.1 ? `
               <p style="color: var(--warning); font-size: 12px; margin-top: 12px;">
                 <i class="fas fa-exclamation-triangle"></i>
@@ -1561,16 +1299,12 @@ default:
               </p>
             ` : ''}
           </div>
-          
-          <!-- Recent Transactions -->
+
           <div class="search-container">
             <h3 style="margin-bottom: 16px;">Recent Transactions</h3>
-            
-
             ${renderTransactionHistory()}
           </div>
 
-          <!-- Legal -->
           <div class="search-container">
             <h3 style="margin-bottom: 12px;">Legal</h3>
             <div class="legal-links">
@@ -1585,116 +1319,60 @@ default:
               By using this app you agree to the Terms.
             </div>
           </div>
-
         </div>
       `;
     }
 
     function renderTransactionHistory() {
-  const items = state.history || [];
-  if (!items.length) {
-    return `
-      <div style="min-height: 100px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
-        <div style="text-align: center;">
-          <i class="fas fa-history" style="font-size: 32px; margin-bottom: 8px;"></i>
-          <p>No transactions yet</p>
-        </div>
-      </div>
-    `;
-  }
-
-  const typeLabel = (t) => {
-    switch (t) {
-      case 'deposit': return 'Deposit';
-      case 'withdraw_request': return 'Withdraw TON';
-      case 'withdraw_nft_fee': return 'Withdraw NFT (fee)';
-      case 'sale': return 'Auction sale';
-      case 'admin_give_ton': return 'Admin credit';
-      case 'admin_take_ton': return 'Admin debit';
-      default: return String(t || 'Transaction');
-    }
-  };
-
-  return `
-    <div style="display: flex; flex-direction: column; gap: 10px;">
-      ${items.map(tx => {
-        const amt = Number(tx.amount || 0);
-        const fee = Number(tx.fee || 0);
-        const isPlus = amt > 0;
-        const color = isPlus ? 'var(--success)' : (amt < 0 ? 'var(--danger)' : 'var(--text-secondary)');
-        const sign = isPlus ? '+' : '';
-        const feeText = fee > 0 ? `<div style="font-size: 11px; color: var(--text-muted);">Fee: ${fee.toFixed(4)} TON</div>` : '';
+      const items = state.history || [];
+      if (!items.length) {
         return `
-          <div style="display:flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-md);">
-            <div>
-              <div style="font-weight: 600; font-size: 13px;">${typeLabel(tx.type)}</div>
-              <div style="font-size: 11px; color: var(--text-muted);">${formatDate(tx.created_at)}</div>
-              ${feeText}
-            </div>
-            <div style="font-weight: 700; color: ${color}; font-size: 13px;">${sign}${amt.toFixed(4)} TON</div>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
-}
-
-    function renderAdmin() {
-      if (!state.user?.isAdmin) {
-        return `
-          <div class="content-section active">
-            <div class="empty-state">
-              <i class="fas fa-lock"></i>
-              <h3>Access Denied</h3>
-              <p>Admin panel is only available to administrators</p>
+          <div style="min-height: 100px; display:flex; align-items:center; justify-content:center; color: var(--text-secondary);">
+            <div style="text-align:center;">
+              <i class="fas fa-history" style="font-size: 32px; margin-bottom: 8px;"></i>
+              <p>No transactions yet</p>
             </div>
           </div>
         `;
       }
-      
+
+      const typeLabel = (t) => {
+        switch (t) {
+          case 'deposit': return 'Deposit';
+          case 'withdraw_request': return 'Withdraw TON';
+          case 'withdraw_nft_fee': return 'Withdraw NFT (fee)';
+          case 'sale': return 'Auction sale';
+          case 'admin_give_ton': return 'Admin credit';
+          case 'admin_take_ton': return 'Admin debit';
+          default: return String(t || 'Transaction');
+        }
+      };
+
       return `
-        <div class="content-section active">
-          <h3 style="margin-bottom: 24px; font-size: 18px;">Admin Panel</h3>
-          
-          <div class="search-container">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-              <button class="btn btn-secondary" onclick="adminManageUsers()">
-                <i class="fas fa-users"></i>
-                Users
-              </button>
-              <button class="btn btn-secondary" onclick="adminWithdrawRequests()">
-                <i class="fas fa-clock"></i>
-                Withdrawals
-              </button>
-              <button class="btn btn-secondary" onclick="adminIssueNFT()">
-                <i class="fas fa-gift"></i>
-                Issue NFT
-              </button>
-              <button class="btn btn-secondary" onclick="adminIssueTON()">
-                <i class="fas fa-coins"></i>
-                Issue TON
-              </button>
-            </div>
-            
-            <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 16px;">
-              <h4 style="margin-bottom: 12px; font-size: 16px;">Platform Statistics</h4>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div style="display:flex; flex-direction:column; gap: 10px;">
+          ${items.map(tx => {
+            const amt = Number(tx.amount || 0);
+            const fee = Number(tx.fee || 0);
+            const isPlus = amt > 0;
+            const color = isPlus ? 'var(--success)' : (amt < 0 ? 'var(--danger)' : 'var(--text-secondary)');
+            const sign = isPlus ? '+' : '';
+            const feeText = fee > 0 ? `<div style="font-size: 11px; color: var(--text-muted);">Fee: ${fee.toFixed(4)} TON</div>` : '';
+            return `
+              <div style="display:flex; justify-content: space-between; align-items:center; padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-md);">
                 <div>
-                  <div style="font-size: 12px; color: var(--text-secondary);">Total Users</div>
-                  <div style="font-size: 20px; font-weight: 700;">--</div>
+                  <div style="font-weight: 600; font-size: 13px;">${typeLabel(tx.type)}</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">${formatDate(tx.created_at)}</div>
+                  ${feeText}
                 </div>
-                <div>
-                  <div style="font-size: 12px; color: var(--text-secondary);">Active Auctions</div>
-                  <div style="font-size: 20px; font-weight: 700;">${state.auctions.length}</div>
-                </div>
+                <div style="font-weight: 700; color: ${color}; font-size: 13px;">${sign}${amt.toFixed(4)} TON</div>
               </div>
-            </div>
-          </div>
+            `;
+          }).join('')}
         </div>
       `;
     }
 
-    // Modal Functions
+    // Modals
     function createModal(title, content, className = '') {
       const modalId = 'modal-' + Date.now();
       const modalHTML = `
@@ -1706,13 +1384,10 @@ default:
                 <i class="fas fa-times"></i>
               </button>
             </div>
-            <div class="modal-body">
-              ${content}
-            </div>
+            <div class="modal-body">${content}</div>
           </div>
         </div>
       `;
-      
       document.body.insertAdjacentHTML('beforeend', modalHTML);
       return modalId;
     }
@@ -1721,26 +1396,23 @@ default:
       const modal = document.getElementById(modalId);
       if (modal) {
         modal.classList.remove('active');
-        setTimeout(() => modal.remove(), 300);
+        setTimeout(() => modal.remove(), 250);
       }
     }
 
+    // Auction modal etc (unchanged core)
     async function showAuctionModal(auctionId) {
       const auction = state.auctions.find(a => a.id === auctionId);
-      if (!auction) {
-        showToast('Auction not found', 'error');
-        return;
-      }
+      if (!auction) { showToast('Auction not found', 'error'); return; }
 
-      // Load bid history
       const bids = await loadBidHistory(auctionId);
-      
-      const modalId = createModal('Place Bid', `
-        <div style="text-align: center; margin-bottom: 20px;">
+
+      createModal('Place Bid', `
+        <div style="text-align:center; margin-bottom: 20px;">
           <img src="${auction.image_url || 'https://picsum.photos/seed/' + auction.id + '/300/300'}"
                data-fallback="${auction.image_url_fallback || ''}"
-               alt="${auction.name}" 
-               style="width: 100%; max-height: 200px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 16px;"
+               alt="${auction.name}"
+               style="width:100%; max-height:200px; object-fit:cover; border-radius: var(--radius-md); margin-bottom: 16px;"
                onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}else{this.src='https://picsum.photos/seed/${auction.id}/300/300';}">
           <h4 style="margin-bottom: 8px;">${auction.name || 'Unnamed NFT'}</h4>
           <div style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">
@@ -1748,45 +1420,36 @@ default:
           </div>
           <div style="color: var(--text-muted); font-size: 12px;">Auction #${auction.id}</div>
         </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
           <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px;">
             <div style="font-size: 12px; color: var(--text-secondary);">Current Bid</div>
-            <div style="font-size: 18px; font-weight: 700; color: var(--success);">
-              ${formatTON(auction.current_bid || auction.min_bid)}
-            </div>
+            <div style="font-size: 18px; font-weight: 700; color: var(--success);">${formatTON(auction.current_bid || auction.min_bid)}</div>
           </div>
           <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px;">
             <div style="font-size: 12px; color: var(--text-secondary);">Time Left</div>
-            <div style="font-size: 18px; font-weight: 700; color: var(--warning);">
-              ${formatTimeLeft(auction.ends_at)}
-            </div>
+            <div style="font-size: 18px; font-weight: 700; color: var(--warning);">${formatTimeLeft(auction.ends_at)}</div>
           </div>
         </div>
-        
+
         <div class="form-group">
           <div class="form-label">Your Bid (TON)</div>
-          <input type="number" 
-                 class="form-input" 
-                 id="bidAmount-${auctionId}" 
-                 placeholder="${(auction.current_bid || auction.min_bid) + 1}" 
-                 step="0.1" 
+          <input type="number"
+                 class="form-input"
+                 id="bidAmount-${auctionId}"
+                 placeholder="${(auction.current_bid || auction.min_bid) + 1}"
+                 step="0.1"
                  min="${(auction.current_bid || auction.min_bid) + 1}">
           <p class="form-hint">Minimum bid: ${(auction.current_bid || auction.min_bid) + 1} TON</p>
         </div>
-        
-        <!-- Bid History -->
+
         <div class="bid-history">
-          <div class="bid-history-header">
-            <i class="fas fa-history"></i> Bid History (${bids.length})
-          </div>
+          <div class="bid-history-header"><i class="fas fa-history"></i> Bid History (${bids.length})</div>
           <div class="bid-history-list">
             ${bids.length > 0 ? bids.map(bid => `
               <div class="bid-history-item">
                 <div class="bid-user">
-                  <div class="bid-avatar">
-                    ${(bid.first_name || bid.username || 'U').charAt(0).toUpperCase()}
-                  </div>
+                  <div class="bid-avatar">${(bid.first_name || bid.username || 'U').charAt(0).toUpperCase()}</div>
                   <div class="bid-details">
                     <div class="bid-username">${bid.first_name || bid.username || `User ${bid.bidder_id}`}</div>
                     <div class="bid-time">${formatTime(bid.created_at)}</div>
@@ -1795,77 +1458,256 @@ default:
                 <div class="bid-amount">${formatTON(bid.amount)}</div>
               </div>
             `).join('') : `
-              <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
-                No bids yet
-              </div>
+              <div style="text-align:center; padding: 20px; color: var(--text-secondary);">No bids yet</div>
             `}
           </div>
         </div>
-        
-        <button class="btn btn-primary" onclick="placeBid(${auctionId})" style="width: 100%; margin-top: 20px;">
-          <i class="fas fa-gavel"></i>
-          Place Bid
+
+        <button class="btn btn-primary" onclick="placeBid(${auctionId})" style="width:100%; margin-top: 20px;">
+          <i class="fas fa-gavel"></i> Place Bid
         </button>
       `);
     }
 
+    // Deposit (new UX + real TonConnect)
     function showDepositModal() {
       if (!state.tonConnected) {
-        showToast('Please connect your wallet first', 'warning');
+        // Nice connect prompt
+        const id = createModal('Connect Wallet', `
+          <div class="deposit-hero">
+            <div class="deposit-hero-title">Connect your TON wallet</div>
+            <div class="deposit-hero-sub">
+              To deposit funds, connect a wallet with TonConnect.
+              This takes a few seconds.
+            </div>
+          </div>
+
+          <div id="walletConnectSlot" style="display:flex; justify-content:center; margin-bottom: 12px;"></div>
+
+          <button class="btn btn-secondary" style="width:100%;" onclick="closeModal('${id}')">
+            Not now
+          </button>
+        `);
+        setTimeout(syncTonConnectButtonSlot, 0);
         return;
       }
 
       const modalId = createModal('Deposit TON', `
+        <div class="deposit-hero">
+          <div class="deposit-hero-title">Top up your balance</div>
+          <div class="deposit-hero-sub">
+            Choose amount → confirm in wallet → balance updates automatically.
+          </div>
+          <div class="stepper" aria-label="deposit steps">
+            <div class="step"><div id="depStep1"></div></div>
+            <div class="step"><div id="depStep2"></div></div>
+            <div class="step"><div id="depStep3"></div></div>
+          </div>
+        </div>
+
         <div class="form-group">
-          <div class="form-label">Deposit Amount (TON)</div>
-          <input type="number" class="form-input" id="depositAmount" placeholder="0.0" step="0.001" min="0.1">
+          <div class="form-label">Amount (TON)</div>
+          <input type="number" class="form-input" id="depositAmount" placeholder="0.0" step="0.001" min="0.1" value="1">
+          <div class="chip-row">
+            <div class="chip" onclick="setDepositAmount(0.5)">0.5</div>
+            <div class="chip" onclick="setDepositAmount(1)">1</div>
+            <div class="chip" onclick="setDepositAmount(2)">2</div>
+            <div class="chip" onclick="setDepositAmount(5)">5</div>
+            <div class="chip" onclick="setDepositAmount(10)">10</div>
+          </div>
           <p class="form-hint">Minimum deposit: 0.1 TON</p>
         </div>
-        
+
         <div class="form-group">
           <div class="form-label">Connected Wallet</div>
           <div style="background: var(--bg-secondary); padding: 12px; border-radius: var(--radius-md); font-family: monospace; font-size: 12px; word-break: break-all;">
             ${state.walletAddress}
           </div>
         </div>
-        
-        <button class="btn btn-primary" onclick="initiateDeposit()" style="width: 100%;">
+
+        <button id="depositBtn" class="btn btn-primary" onclick="initiateDeposit('${modalId}')" style="width:100%;">
           <i class="fas fa-arrow-down"></i>
           Deposit with TonConnect
         </button>
-        
-        <p style="color: var(--text-secondary); font-size: 12px; margin-top: 16px; text-align: center;">
-          Transaction will be signed using TonConnect
-        </p>
+
+        <div id="depositStatus" style="margin-top: 14px; font-size: 12px; color: var(--text-secondary); text-align:center;"></div>
       `);
+
+      // reset steps
+      setTimeout(() => {
+        setDepositStep(1);
+      }, 0);
+    }
+
+    function setDepositAmount(v) {
+      const el = document.getElementById('depositAmount');
+      if (el) el.value = String(v);
+    }
+
+    function setDepositStep(step) {
+      const s1 = document.getElementById('depStep1');
+      const s2 = document.getElementById('depStep2');
+      const s3 = document.getElementById('depStep3');
+      if (!s1 || !s2 || !s3) return;
+      s1.style.width = step >= 1 ? '100%' : '0%';
+      s2.style.width = step >= 2 ? '100%' : '0%';
+      s3.style.width = step >= 3 ? '100%' : '0%';
+    }
+
+    function setDepositStatus(text, type='info') {
+      const el = document.getElementById('depositStatus');
+      if (!el) return;
+      const color = type === 'success' ? 'var(--success)' : (type === 'error' ? 'var(--danger)' : 'var(--text-secondary)');
+      el.style.color = color;
+      el.textContent = text;
+    }
+
+    async function initiateDeposit(modalId) {
+      if (!state.tonConnected || !tonConnectUI) {
+        showToast('Connect wallet first', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('depositBtn');
+      const amount = parseFloat(document.getElementById('depositAmount')?.value);
+
+      if (!amount || amount < 0.1) {
+        showToast('Minimum deposit: 0.1 TON', 'error');
+        return;
+      }
+
+      try {
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = `<span class="loading"></span> Preparing...`;
+        }
+        setDepositStep(1);
+        setDepositStatus('Preparing deposit...', 'info');
+
+        // Ask server for deposit info (address + payload + min)
+        const res = await apiFetch('/api/deposit/info', {
+          headers: {
+            'X-User-ID': String(state.user.id),
+            'X-Init-Data': tg?.initData || ''
+          }
+        });
+
+        if (!res.ok) {
+          const data = await expectJson(res, '/api/deposit/info');
+          throw new Error(data.error || 'Failed to get deposit info');
+        }
+
+        const info = await expectJson(res, '/api/deposit/info');
+        const address = info.address;
+        const payload = info.payload || null; // base64 BOC comment (optional)
+        const min = Number(info.min_deposit_ton || 0.1);
+
+        if (!address) throw new Error('Deposit address missing');
+        if (amount < min) throw new Error(`Minimum deposit: ${min} TON`);
+
+        // build tx
+        const nano = BigInt(Math.floor(amount * 1e9)).toString();
+        const message = {
+          address,
+          amount: nano
+        };
+        if (payload && typeof payload === 'string') {
+          message.payload = payload;
+        }
+
+        const tx = {
+          validUntil: Math.floor(Date.now() / 1000) + 600,
+          messages: [message]
+        };
+
+        setDepositStep(2);
+        setDepositStatus('Confirm transaction in your wallet...', 'info');
+        if (btn) btn.innerHTML = `<span class="loading"></span> Waiting for wallet...`;
+
+        const result = await tonConnectUI.sendTransaction(tx);
+
+        setDepositStep(3);
+        setDepositStatus('Transaction sent. Waiting for credit...', 'info');
+        if (btn) btn.innerHTML = `<span class="loading"></span> Checking balance...`;
+
+        // Best-effort: refresh user state after a short delay (watcher credits async)
+        await sleep(1800);
+        await refreshUser();
+
+        showToast('Deposit sent! Balance will update after confirmation.', 'success');
+
+        // Keep modal for a moment, then close
+        await sleep(900);
+        if (modalId) closeModal(modalId);
+
+      } catch (e) {
+        console.error('Deposit failed:', e);
+        setDepositStatus(`Deposit failed: ${e?.message || e}`, 'error');
+        showToast(`Deposit failed: ${e?.message || e}`, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fas fa-arrow-down"></i> Deposit with TonConnect`;
+        }
+      }
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    async function refreshUser() {
+      try {
+        const response = await apiFetch('/api/user', {
+          headers: {
+            'X-User-ID': String(state.user.id),
+            'X-Init-Data': tg?.initData || ''
+          }
+        });
+        if (response.ok) {
+          const data = await expectJson(response, '/api/user');
+          state.balance = data.balance ?? state.balance;
+          state.nfts = data.nfts || state.nfts;
+          state.history = data.history || state.history;
+          renderApp();
+        }
+      } catch (e) {
+        console.warn('refreshUser failed:', e);
+      }
+    }
+
+    function copyWalletAddress() {
+      const addr = state.walletAddress || '';
+      if (!addr) return;
+      navigator.clipboard?.writeText(addr).then(() => showToast('Address copied', 'success')).catch(() => {
+        showToast('Copy failed', 'error');
+      });
     }
 
     function showWithdrawModal() {
-      const modalId = createModal('Withdraw TON', `
+      createModal('Withdraw TON', `
         <div class="form-group">
           <div class="form-label">Amount to Withdraw</div>
-          <input type="number" 
-                 class="form-input" 
-                 id="withdrawAmount" 
-                 placeholder="0.0" 
-                 step="0.001" 
-                 min="0.1" 
+          <input type="number"
+                 class="form-input"
+                 id="withdrawAmount"
+                 placeholder="0.0"
+                 step="0.001"
+                 min="0.1"
                  max="${state.balance}">
           <p class="form-hint">Available: ${formatTON(state.balance)} | Min: 0.1 TON</p>
         </div>
-        
+
         <div class="form-group">
           <div class="form-label">TON Wallet Address</div>
           <input type="text" class="form-input" id="withdrawAddress" placeholder="EQ...">
         </div>
-        
+
         <div style="background: rgba(255, 92, 141, 0.1); border-left: 4px solid var(--danger); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 20px;">
           <div style="font-size: 12px; color: var(--danger);">
             <i class="fas fa-exclamation-circle"></i>
             Withdrawal requires manual approval by admin. Processing time: 1-24 hours.
           </div>
         </div>
-        
+
         <button class="btn btn-primary" onclick="submitWithdraw()" style="width: 100%;" ${state.balance < 0.1 ? 'disabled' : ''}>
           <i class="fas fa-arrow-up"></i>
           Submit Withdrawal Request
@@ -1873,110 +1715,8 @@ default:
       `);
     }
 
-    function showNFTModal(nftId) {
-      const nft = state.nfts.find(n => n.id === nftId);
-      if (!nft) {
-        showToast('NFT not found', 'error');
-        return;
-      }
-
-      const modalId = createModal('NFT Details', `
-        <div style="text-align: center; margin-bottom: 20px;">
-          <img src="${nft.image_url || 'https://picsum.photos/seed/' + nft.id + '/300/300'}"
-               data-fallback="${nft.image_url_fallback || ''}"
-               alt="${nft.name}" 
-               style="width: 100%; max-height: 200px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 16px;"
-               onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}else{this.src='https://picsum.photos/seed/${nft.id}/300/300';}">
-          <h4 style="margin-bottom: 8px;">${nft.name || 'Unnamed NFT'}</h4>
-          <div style="color: var(--text-secondary); font-size: 14px;">
-            ${nft.collection || ''} ${nft.model ? '• ' + nft.model : ''}
-          </div>
-        </div>
-        
-        <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
-          <h5 style="margin-bottom: 12px; font-size: 14px;">NFT Details</h5>
-          ${nft.collection ? `
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
-              <span style="color: var(--text-secondary);">Collection</span>
-              <span style="font-weight: 600;">${nft.collection}</span>
-            </div>
-          ` : ''}
-          ${nft.model ? `
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
-              <span style="color: var(--text-secondary);">Model</span>
-              <span style="font-weight: 600;">${nft.model}</span>
-            </div>
-          ` : ''}
-          ${nft.backdrop ? `
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
-              <span style="color: var(--text-secondary);">Backdrop</span>
-              <span style="font-weight: 600;">${nft.backdrop}</span>
-            </div>
-          ` : ''}
-          <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-            <span style="color: var(--text-secondary);">Status</span>
-            <span class="nft-badge ${nft.status === 'in_app' ? 'badge-available' : nft.status === 'listed' ? 'badge-listed' : 'badge-withdraw'}">
-              ${nft.status === 'in_app' ? 'Available' : nft.status === 'listed' ? 'Listed' : 'Withdraw Pending'}
-            </span>
-          </div>
-        </div>
-        
-        ${nft.status === 'in_app' ? `
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <button class="btn btn-primary" onclick="listNFTForAuction(${nft.id})">
-              <i class="fas fa-gavel"></i>
-              Sell on Auction
-            </button>
-            <button class="btn btn-secondary" onclick="withdrawNFT(${nft.id})">
-              <i class="fas fa-external-link-alt"></i>
-              Withdraw
-            </button>
-          </div>
-        ` : nft.status === 'listed' ? `
-          <div style="background: rgba(255, 159, 67, 0.1); border-left: 4px solid var(--warning); padding: 12px; border-radius: var(--radius-sm);">
-            <div style="color: var(--warning); font-size: 14px;">
-              <i class="fas fa-info-circle"></i>
-              This NFT is currently listed on auction
-            </div>
-          </div>
-        ` : `
-          <div style="background: rgba(124, 92, 255, 0.1); border-left: 4px solid var(--primary); padding: 12px; border-radius: var(--radius-sm);">
-            <div style="color: var(--primary); font-size: 14px;">
-              <i class="fas fa-info-circle"></i>
-              Withdrawal request submitted. Waiting for admin approval.
-            </div>
-          </div>
-        `}
-      `);
-    }
-
-    function importNFTModal() {
-      const modalId = createModal('Import NFT', `
-        <div class="form-group">
-          <div class="form-label">NFT URL or slug</div>
-          <input type="text" class="form-input" id="nftUrl" placeholder="https://t.me/nft/... or https://fragment.com/gift/... or PlushPepe-1">
-          <p class="form-hint">Paste a link from t.me/nft or fragment.com, or just a slug like PlushPepe-1</p>
-        </div>
-        
-        <div style="background: rgba(255, 159, 67, 0.1); border-left: 4px solid var(--warning); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 20px;">
-          <div style="font-size: 12px; color: var(--warning);">
-            <i class="fas fa-shield-alt"></i>
-            Only import NFTs that you legally own
-          </div>
-        </div>
-        
-        <button class="btn btn-primary" onclick="importNFT()" style="width: 100%;">
-          <i class="fas fa-download"></i>
-          Import NFT
-        </button>
-      `);
-    }
-
-    // Action Handlers
-    function switchTab(tab) {
-      state.activeTab = tab;
-      renderApp();
-    }
+    // Actions
+    function switchTab(tab) { state.activeTab = tab; renderApp(); }
 
     function clearFilters() {
       state.selectedCollection = '';
@@ -1988,73 +1728,36 @@ default:
     }
 
     async function disconnectWallet() {
-      if (tonConnectUI) {
-        await tonConnectUI.disconnect();
-        state.tonConnected = false;
-        state.walletAddress = null;
-        showToast('Wallet disconnected', 'info');
-        renderApp();
-      }
-    }
-
-    async function initiateDeposit() {
-      if (!state.tonConnected) {
-        showToast('Please connect your wallet first', 'warning');
-        return;
-      }
-
-      const amount = parseFloat(document.getElementById('depositAmount')?.value);
-      if (!amount || amount < 0.1) {
-        showToast('Minimum deposit: 0.1 TON', 'error');
-        return;
-      }
-
       try {
-        // In a real implementation, you would:
-        // 1. Generate a deposit address for the user
-        // 2. Create a TonConnect transaction
-        // 3. Send the transaction
-        // 4. Wait for confirmation
-        
-        showToast('Deposit feature coming soon! Use /deposit command in bot', 'info');
-        closeModal(document.querySelector('.modal.active')?.id);
-      } catch (error) {
-        showToast('Deposit failed: ' + error.message, 'error');
-      }
+        if (tonConnectUI) await tonConnectUI.disconnect();
+      } catch (e) {}
+      state.tonConnected = false;
+      state.walletAddress = null;
+      wallet = null;
+      showToast('Wallet disconnected', 'info');
+      renderApp();
     }
 
     async function submitWithdraw() {
       const amount = parseFloat(document.getElementById('withdrawAmount')?.value);
       const address = document.getElementById('withdrawAddress')?.value;
-      
-      if (!amount || amount < 0.1) {
-        showToast('Minimum withdrawal: 0.1 TON', 'error');
-        return;
-      }
-      
-      if (amount > state.balance) {
-        showToast('Insufficient balance', 'error');
-        return;
-      }
-      
-      if (!address || address.length < 10) {
-        showToast('Invalid TON address', 'error');
-        return;
-      }
-      
+
+      if (!amount || amount < 0.1) { showToast('Minimum withdrawal: 0.1 TON', 'error'); return; }
+      if (amount > state.balance) { showToast('Insufficient balance', 'error'); return; }
+      if (!address || address.length < 10) { showToast('Invalid TON address', 'error'); return; }
+
       try {
         const response = await apiFetch('/api/withdraw/ton', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-User-ID': state.user.id,
-            'X-Init-Data': tg.initData || ''
+            'X-User-ID': String(state.user.id),
+            'X-Init-Data': tg?.initData || ''
           },
           body: JSON.stringify({ amount, address })
         });
-        
-        const data = await expectJson(response);
-        
+
+        const data = await expectJson(response, '/api/withdraw/ton');
         if (data.ok) {
           showToast('Withdrawal request submitted! Admin will process it soon.', 'success');
           closeModal(document.querySelector('.modal.active')?.id);
@@ -2068,91 +1771,29 @@ default:
       }
     }
 
-    async function importNFT() {
-      const url = document.getElementById('nftUrl')?.value;
-      
-      const raw = (url || '').trim();
-      if (!raw) {
-        showToast('Please paste a link or slug', 'error');
-        return;
-      }
-
-      const looksLikeSlug = /^[A-Za-z0-9_-]{2,128}-\d+$/.test(raw) && !raw.includes('/');
-      const isSupportedUrl =
-        raw.includes('t.me/nft/') ||
-        raw.includes('telegram.me/nft/') ||
-        raw.includes('fragment.com/gift/') ||
-        raw.includes('nft.fragment.com/gift/');
-
-      if (!looksLikeSlug && !isSupportedUrl) {
-        showToast('Invalid link. Use t.me/nft/..., fragment.com/gift/..., or slug like PlushPepe-1', 'error');
-        return;
-      }
-      
-      try {
-        const response = await apiFetch('/api/nft/import', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-User-ID': state.user.id,
-            'X-Init-Data': tg.initData || ''
-          },
-          body: JSON.stringify({ url: raw })
-        });
-        
-        const data = await expectJson(response);
-        
-        if (data.ok) {
-          showToast('NFT imported successfully!', 'success');
-          state.nfts.push(data.nft);
-          closeModal(document.querySelector('.modal.active')?.id);
-          renderApp();
-        } else {
-          showToast('Import failed: ' + (data.error || 'Unknown error'), 'error');
-        }
-      } catch (error) {
-        showToast('Network error: ' + error.message, 'error');
-      }
-    }
-
     async function placeBid(auctionId) {
       const amount = parseFloat(document.getElementById(`bidAmount-${auctionId}`)?.value);
       const auction = state.auctions.find(a => a.id === auctionId);
-      
-      if (!amount) {
-        showToast('Please enter bid amount', 'error');
-        return;
-      }
-      
-      if (!auction) {
-        showToast('Auction not found', 'error');
-        return;
-      }
-      
+
+      if (!amount) { showToast('Please enter bid amount', 'error'); return; }
+      if (!auction) { showToast('Auction not found', 'error'); return; }
+
       const minBid = Math.max(auction.min_bid, (auction.current_bid || 0) + 1);
-      if (amount < minBid) {
-        showToast(`Minimum bid: ${minBid} TON`, 'error');
-        return;
-      }
-      
-      if (amount > state.balance) {
-        showToast('Insufficient balance', 'error');
-        return;
-      }
-      
+      if (amount < minBid) { showToast(`Minimum bid: ${minBid} TON`, 'error'); return; }
+      if (amount > state.balance) { showToast('Insufficient balance', 'error'); return; }
+
       try {
         const response = await apiFetch('/api/auction/bid', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-User-ID': state.user.id,
-            'X-Init-Data': tg.initData || ''
+            'X-User-ID': String(state.user.id),
+            'X-Init-Data': tg?.initData || ''
           },
           body: JSON.stringify({ auctionId, amount })
         });
-        
-        const data = await expectJson(response);
-        
+
+        const data = await expectJson(response, '/api/auction/bid');
         if (data.ok) {
           showToast('Bid placed successfully!', 'success');
           closeModal(document.querySelector('.modal.active')?.id);
@@ -2167,14 +1808,84 @@ default:
       }
     }
 
+    function showNFTModal(nftId) {
+      const nft = state.nfts.find(n => n.id === nftId);
+      if (!nft) { showToast('NFT not found', 'error'); return; }
+
+      createModal('NFT Details', `
+        <div style="text-align:center; margin-bottom: 20px;">
+          <img src="${nft.image_url || 'https://picsum.photos/seed/' + nft.id + '/300/300'}"
+               data-fallback="${nft.image_url_fallback || ''}"
+               alt="${nft.name}"
+               style="width:100%; max-height:200px; object-fit:cover; border-radius: var(--radius-md); margin-bottom: 16px;"
+               onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.fallback='';}else{this.src='https://picsum.photos/seed/${nft.id}/300/300';}">
+          <h4 style="margin-bottom: 8px;">${nft.name || 'Unnamed NFT'}</h4>
+          <div style="color: var(--text-secondary); font-size: 14px;">
+            ${nft.collection || ''} ${nft.model ? '• ' + nft.model : ''}
+          </div>
+        </div>
+
+        <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
+          <h5 style="margin-bottom: 12px; font-size: 14px;">NFT Details</h5>
+          ${nft.collection ? `
+            <div style="display:flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
+              <span style="color: var(--text-secondary);">Collection</span>
+              <span style="font-weight: 600;">${nft.collection}</span>
+            </div>
+          ` : ''}
+          ${nft.model ? `
+            <div style="display:flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
+              <span style="color: var(--text-secondary);">Model</span>
+              <span style="font-weight: 600;">${nft.model}</span>
+            </div>
+          ` : ''}
+          ${nft.backdrop ? `
+            <div style="display:flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
+              <span style="color: var(--text-secondary);">Backdrop</span>
+              <span style="font-weight: 600;">${nft.backdrop}</span>
+            </div>
+          ` : ''}
+          <div style="display:flex; justify-content: space-between; padding: 8px 0;">
+            <span style="color: var(--text-secondary);">Status</span>
+            <span class="nft-badge ${nft.status === 'in_app' ? 'badge-available' : nft.status === 'listed' ? 'badge-listed' : 'badge-withdraw'}">
+              ${nft.status === 'in_app' ? 'Available' : nft.status === 'listed' ? 'Listed' : 'Withdraw Pending'}
+            </span>
+          </div>
+        </div>
+
+        ${nft.status === 'in_app' ? `
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <button class="btn btn-primary" onclick="listNFTForAuction(${nft.id})">
+              <i class="fas fa-gavel"></i> Sell on Auction
+            </button>
+            <button class="btn btn-secondary" onclick="withdrawNFT(${nft.id})">
+              <i class="fas fa-external-link-alt"></i> Withdraw
+            </button>
+          </div>
+        ` : nft.status === 'listed' ? `
+          <div style="background: rgba(255, 159, 67, 0.1); border-left: 4px solid var(--warning); padding: 12px; border-radius: var(--radius-sm);">
+            <div style="color: var(--warning); font-size: 14px;">
+              <i class="fas fa-info-circle"></i> This NFT is currently listed on auction
+            </div>
+          </div>
+        ` : `
+          <div style="background: rgba(124, 92, 255, 0.1); border-left: 4px solid var(--primary); padding: 12px; border-radius: var(--radius-sm);">
+            <div style="color: var(--primary); font-size: 14px;">
+              <i class="fas fa-info-circle"></i> Withdrawal request submitted. Waiting for admin approval.
+            </div>
+          </div>
+        `}
+      `);
+    }
+
     function listNFTForAuction(nftId) {
-      const modalId = createModal('Create Auction', `
+      createModal('Create Auction', `
         <div class="form-group">
           <div class="form-label">Starting Price (TON)</div>
           <input type="number" class="form-input" id="auctionPrice" placeholder="1.0" step="0.1" min="1">
           <p class="form-hint">Minimum starting price: 1 TON</p>
         </div>
-        
+
         <div class="form-group">
           <div class="form-label">Auction Duration</div>
           <select class="form-input" id="auctionDuration">
@@ -2184,58 +1895,42 @@ default:
             <option value="604800">7 days</option>
           </select>
         </div>
-        
+
         <div style="background: rgba(0, 212, 170, 0.1); border-left: 4px solid var(--success); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 20px;">
           <div style="font-size: 12px; color: var(--success);">
-            <i class="fas fa-info-circle"></i>
-            Platform fee: 2% of final sale price
+            <i class="fas fa-info-circle"></i> Platform fee: 2% of final sale price
           </div>
         </div>
-        
+
         <button class="btn btn-primary" onclick="createAuction(${nftId})" style="width: 100%;">
-          <i class="fas fa-gavel"></i>
-          Create Auction
+          <i class="fas fa-gavel"></i> Create Auction
         </button>
       `);
     }
 
     async function createAuction(nftId) {
       const price = parseFloat(document.getElementById('auctionPrice')?.value);
-      
-      if (!price || price < 1) {
-        showToast('Minimum price: 1 TON', 'error');
-        return;
-      }
-      
+      const duration = parseInt(document.getElementById('auctionDuration')?.value || '172800', 10);
+
+      if (!price || price < 1) { showToast('Minimum price: 1 TON', 'error'); return; }
+
       try {
         const response = await apiFetch('/api/auction/create', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-User-ID': state.user.id,
-            'X-Init-Data': tg.initData || ''
+            'X-User-ID': String(state.user.id),
+            'X-Init-Data': tg?.initData || ''
           },
-          body: JSON.stringify({ nftId, price })
+          body: JSON.stringify({ nftId, price, duration })
         });
-        
-        const data = await expectJson(response);
-        
+
+        const data = await expectJson(response, '/api/auction/create');
         if (data.ok) {
           showToast('Auction created successfully!', 'success');
           closeModal(document.querySelector('.modal.active')?.id);
-          // Refresh NFTs and auctions
-          const userResponse = await apiFetch('/api/user', {
-            headers: {
-              'X-User-ID': state.user.id,
-              'X-Init-Data': tg.initData || ''
-            }
-          });
-          if (userResponse.ok) {
-            const userData = await expectJson(userResponse);
-            state.nfts = userData.nfts || [];
-            state.balance = userData.balance ?? state.balance;
-            state.history = userData.history || state.history;
-          }
+
+          await refreshUser();
           await loadAuctions();
           renderApp();
         } else {
@@ -2252,24 +1947,16 @@ default:
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-User-ID': state.user.id,
-            'X-Init-Data': tg.initData || ''
+            'X-User-ID': String(state.user.id),
+            'X-Init-Data': tg?.initData || ''
           },
           body: JSON.stringify({ nftId })
         });
-        
-        const data = await expectJson(response);
-        
+
+        const data = await expectJson(response, '/api/withdraw/nft');
         if (data.ok) {
-          showToast('NFT withdrawal requested! Fee of 0.2 TON charged.', 'success');
-          // Update balance
-          state.balance -= 0.2;
-          // Update NFTs
-          const nftIndex = state.nfts.findIndex(n => n.id === nftId);
-          if (nftIndex !== -1) {
-            state.nfts[nftIndex].status = 'withdraw_requested';
-          }
-          renderApp();
+          showToast(`NFT withdrawal requested! Fee charged. Request ID: ${data.requestId || '-'}`, 'success');
+          await refreshUser();
         } else {
           showToast('Withdrawal failed: ' + (data.error || 'Unknown error'), 'error');
         }
@@ -2278,24 +1965,7 @@ default:
       }
     }
 
-    // Admin functions
-    function adminManageUsers() {
-      showToast('Use /admin command in Telegram bot to manage users', 'info');
-    }
-
-    function adminWithdrawRequests() {
-      showToast('Use /admin command in Telegram bot to view withdrawal requests', 'info');
-    }
-
-    function adminIssueNFT() {
-      showToast('Use /nft command in Telegram bot to issue NFTs', 'info');
-    }
-
-    function adminIssueTON() {
-      showToast('Use /admin command in Telegram bot to issue TON', 'info');
-    }
-
-    // Initialize the app (after DOM is ready, so modals exist)
+    // Initialize the app (after DOM is ready)
     window.addEventListener('DOMContentLoaded', () => {
       if (!isTelegramMiniApp()) {
         showBrowserBlock();
@@ -2306,52 +1976,34 @@ default:
     });
   </script>
 
-<!-- ================= BROWSER BLOCK (NOT TELEGRAM) ================= -->
-<div id="browserBlock" class="consent-overlay">
-  <div class="consent-box">
-    <div class="consent-title">Open in Telegram</div>
-
-    <div class="consent-text">
-      This app works only inside Telegram Mini App.
-      Please open it via the Telegram bot.
-    </div>
-
-    <div class="consent-actions">
-      <button class="btn btn-primary" style="flex:1;" onclick="openInTelegram()">
-        Open Telegram
-      </button>
+  <!-- Browser Block -->
+  <div id="browserBlock" class="consent-overlay">
+    <div class="consent-box">
+      <div class="consent-title">Open in Telegram</div>
+      <div class="consent-text">
+        This app works only inside Telegram Mini App. Please open it via the Telegram bot.
+      </div>
+      <div class="consent-actions">
+        <button class="btn btn-primary" style="flex:1;" onclick="openInTelegram()">Open Telegram</button>
+      </div>
     </div>
   </div>
-</div>
 
-
-<!-- ================= CONSENT MODAL ================= -->
-<div id="consentModal" class="consent-overlay">
-  <div class="consent-box">
-    <div class="consent-title">Terms & Privacy</div>
-
-    <div class="consent-text">
-      By using this application you confirm that you agree with our
-      Terms of Use and Privacy Policy.
-    </div>
-
-    <div class="consent-links">
-      <a class="consent-link" href="terms.html" onclick="return openLegal(event,'terms.html')">
-        Terms of Use
-      </a>
-      <a class="consent-link" href="privacy.html" onclick="return openLegal(event,'privacy.html')">
-        Privacy Policy
-      </a>
-    </div>
-
-    <div class="consent-actions">
-      <button class="btn btn-primary" style="flex:1;" onclick="acceptConsent()">
-        I Agree
-      </button>
+  <!-- Consent Modal -->
+  <div id="consentModal" class="consent-overlay">
+    <div class="consent-box">
+      <div class="consent-title">Terms & Privacy</div>
+      <div class="consent-text">
+        By using this application you confirm that you agree with our Terms of Use and Privacy Policy.
+      </div>
+      <div class="consent-links">
+        <a class="consent-link" href="terms.html" onclick="return openLegal(event,'terms.html')">Terms of Use</a>
+        <a class="consent-link" href="privacy.html" onclick="return openLegal(event,'privacy.html')">Privacy Policy</a>
+      </div>
+      <div class="consent-actions">
+        <button class="btn btn-primary" style="flex:1;" onclick="acceptConsent()">I Agree</button>
+      </div>
     </div>
   </div>
-</div>
-
-
 </body>
 </html>
