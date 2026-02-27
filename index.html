@@ -767,16 +767,15 @@
       renderApp();
     }
 
-// Спасаем кнопку от удаления при перерисовке DOM
-function rescueTonConnectButton() {
-  const btn = document.getElementById('ton-connect-button');
-  const portal = document.getElementById('ton-connect-portal');
-  if (btn && portal && btn.parentNode !== portal) {
-    portal.appendChild(btn);
-  }
-}
+    // Спасаем кнопку от удаления при перерисовке DOM
+    function rescueTonConnectButton() {
+      const btn = document.getElementById('ton-connect-button');
+      const portal = document.getElementById('ton-connect-portal');
+      if (btn && portal && btn.parentNode !== portal) {
+        portal.appendChild(btn);
+      }
+    }
 
-    
     // Initialize TonConnect (button lives in portal, we move it into view)
     function initTonConnect() {
       if (tonConnectUI) return;
@@ -813,31 +812,20 @@ function rescueTonConnectButton() {
     }
 
     // Move TonConnect button into visible slot (because #app re-renders)
-function syncTonConnectButtonSlot() {
-  const btn = document.getElementById('ton-connect-button');
-  const slot = document.getElementById('walletConnectSlot');
-  const portal = document.getElementById('ton-connect-portal');
+    function syncTonConnectButtonSlot() {
+      const btn = document.getElementById('ton-connect-button');
+      const slot = document.getElementById('walletConnectSlot');
+      const portal = document.getElementById('ton-connect-portal');
 
-  if (!btn) return;
+      if (!btn) return;
 
-  // Если кошелек подключен ИЛИ на экране сейчас нет слота — прячем в портал
-  if (state.tonConnected || !slot) {
-    if (portal) portal.appendChild(btn);
-    return;
-  }
-
-  // Если слот есть — вставляем кнопку туда
-  slot.innerHTML = '';
-  slot.appendChild(btn);
-}
-
-      // If connected, we hide the button (but keep it mounted)
-      if (state.tonConnected) {
-        document.getElementById('ton-connect-portal')?.appendChild(btn);
+      // Если кошелек подключен ИЛИ на экране сейчас нет слота — прячем в портал
+      if (state.tonConnected || !slot) {
+        if (portal) portal.appendChild(btn);
         return;
       }
 
-      // Put into slot
+      // Если слот есть — вставляем кнопку туда
       slot.innerHTML = '';
       slot.appendChild(btn);
     }
@@ -1034,23 +1022,23 @@ function syncTonConnectButtonSlot() {
     }
 
     // Render
-  function renderApp() {
-    rescueTonConnectButton(); // <--- ДОБАВЛЕНО
-    const app = document.getElementById('app');
+    function renderApp() {
+      rescueTonConnectButton(); // <--- ДОБАВЛЕНО
+      const app = document.getElementById('app');
 
-    if (!state.user || !state.user.id) {
-        app.innerHTML = `
-          <div class="empty-state" style="padding-top: 100px;">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>Connection Error</h3>
-            <p style="margin-bottom:20px;">Please open this app through Telegram bot</p>
-            <button class="btn btn-primary" onclick="initApp()" style="margin: 0 auto; min-width: 150px;">
-              <i class="fas fa-redo"></i> Retry
-            </button>
-          </div>
-        `;
-        return;
-      }
+      if (!state.user || !state.user.id) {
+          app.innerHTML = `
+            <div class="empty-state" style="padding-top: 100px;">
+              <i class="fas fa-exclamation-triangle"></i>
+              <h3>Connection Error</h3>
+              <p style="margin-bottom:20px;">Please open this app through Telegram bot</p>
+              <button class="btn btn-primary" onclick="initApp()" style="margin: 0 auto; min-width: 150px;">
+                <i class="fas fa-redo"></i> Retry
+              </button>
+            </div>
+          `;
+          return;
+        }
 
       app.innerHTML = `
         <div class="header">
@@ -1435,17 +1423,17 @@ function syncTonConnectButtonSlot() {
       return modalId;
     }
     
-function closeModal(modalId) {
-  rescueTonConnectButton(); // <--- ДОБАВЛЕНО
-  const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.classList.remove('active');
-    setTimeout(() => {
-      modal.remove();
-      syncTonConnectButtonSlot(); // <--- ДОБАВЛЕНО (возвращаем кнопку на место после анимации)
-    }, 300);
-  }
-}
+    function closeModal(modalId) {
+      rescueTonConnectButton(); // <--- ДОБАВЛЕНО
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => {
+          modal.remove();
+          syncTonConnectButtonSlot(); // <--- ДОБАВЛЕНО (возвращаем кнопку на место после анимации)
+        }, 300);
+      }
+    }
 
     // Auction modal
     async function showAuctionModal(auctionId) {
@@ -1521,10 +1509,10 @@ function closeModal(modalId) {
     }
 
     // Deposit
-   function showDepositModal() {
-   rescueTonConnectButton(); // <--- ДОБАВЛЕНО
+    function showDepositModal() {
+      rescueTonConnectButton(); // <--- ДОБАВЛЕНО
 
-   if (!state.tonConnected) {
+      if (!state.tonConnected) {
         const id = createModal('Connect Wallet', `
           <div class="deposit-hero" style="text-align:center;">
             <div class="deposit-hero-title" style="font-size: 20px; margin-bottom: 12px;">Welcome to AucTon</div>
