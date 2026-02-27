@@ -1434,14 +1434,18 @@ function syncTonConnectButtonSlot() {
       document.body.insertAdjacentHTML('beforeend', modalHTML);
       return modalId;
     }
-
-    function closeModal(modalId) {
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.classList.remove('active');
-        setTimeout(() => modal.remove(), 300); // match transition duration
-      }
-    }
+    
+function closeModal(modalId) {
+  rescueTonConnectButton(); // <--- ДОБАВЛЕНО
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove('active');
+    setTimeout(() => {
+      modal.remove();
+      syncTonConnectButtonSlot(); // <--- ДОБАВЛЕНО (возвращаем кнопку на место после анимации)
+    }, 300);
+  }
+}
 
     // Auction modal
     async function showAuctionModal(auctionId) {
