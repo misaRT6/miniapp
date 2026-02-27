@@ -767,6 +767,16 @@
       renderApp();
     }
 
+// Спасаем кнопку от удаления при перерисовке DOM
+function rescueTonConnectButton() {
+  const btn = document.getElementById('ton-connect-button');
+  const portal = document.getElementById('ton-connect-portal');
+  if (btn && portal && btn.parentNode !== portal) {
+    portal.appendChild(btn);
+  }
+}
+
+    
     // Initialize TonConnect (button lives in portal, we move it into view)
     function initTonConnect() {
       if (tonConnectUI) return;
@@ -803,10 +813,23 @@
     }
 
     // Move TonConnect button into visible slot (because #app re-renders)
-    function syncTonConnectButtonSlot() {
-      const btn = document.getElementById('ton-connect-button');
-      const slot = document.getElementById('walletConnectSlot');
-      if (!btn || !slot) return;
+function syncTonConnectButtonSlot() {
+  const btn = document.getElementById('ton-connect-button');
+  const slot = document.getElementById('walletConnectSlot');
+  const portal = document.getElementById('ton-connect-portal');
+
+  if (!btn) return;
+
+  // Если кошелек подключен ИЛИ на экране сейчас нет слота — прячем в портал
+  if (state.tonConnected || !slot) {
+    if (portal) portal.appendChild(btn);
+    return;
+  }
+
+  // Если слот есть — вставляем кнопку туда
+  slot.innerHTML = '';
+  slot.appendChild(btn);
+}
 
       // If connected, we hide the button (but keep it mounted)
       if (state.tonConnected) {
@@ -1011,10 +1034,11 @@
     }
 
     // Render
-    function renderApp() {
-      const app = document.getElementById('app');
+  function renderApp() {
+    rescueTonConnectButton(); // <--- ДОБАВЛЕНО
+    const app = document.getElementById('app');
 
-      if (!state.user || !state.user.id) {
+    if (!state.user || !state.user.id) {
         app.innerHTML = `
           <div class="empty-state" style="padding-top: 100px;">
             <i class="fas fa-exclamation-triangle"></i>
@@ -1493,8 +1517,10 @@
     }
 
     // Deposit
-    function showDepositModal() {
-      if (!state.tonConnected) {
+   function showDepositModal() {
+   rescueTonConnectButton(); // <--- ДОБАВЛЕНО
+
+   if (!state.tonConnected) {
         const id = createModal('Connect Wallet', `
           <div class="deposit-hero" style="text-align:center;">
             <div class="deposit-hero-title" style="font-size: 20px; margin-bottom: 12px;">Welcome to AucTon</div>
