@@ -3,5 +3,7 @@
   "name": "AucTon",
   "iconUrl": "https://app.growagardentrade.online/icon.png",
   "termsOfUseUrl": "https://app.growagardentrade.online/terms.html",
-  "privacyPolicyUrl": "https://app.growagardentrade.online/privacy.html"
+  "privacyPolicyUrl": "https://app.growagardentrade.online/privacy.html",
+  "bridgeUrl": "https://bridge.tonapi.io/bridge",
+  "network": "testnet"
 }
