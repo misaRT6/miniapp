@@ -531,6 +531,222 @@
       word-break: break-all;
     }
 
+    .wallet-status-card {
+      background:
+        linear-gradient(135deg, rgba(124, 92, 255, 0.16), rgba(0, 212, 170, 0.08)),
+        var(--bg-secondary);
+      border: 1px solid rgba(124, 92, 255, 0.35);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .wallet-status-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .wallet-status-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .wallet-status-subtitle {
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .wallet-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(0, 212, 170, 0.12);
+      color: var(--success);
+      border: 1px solid rgba(0, 212, 170, 0.25);
+      white-space: nowrap;
+    }
+
+    .wallet-status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .wallet-status-metric {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: var(--radius-md);
+      padding: 12px;
+    }
+
+    .wallet-status-metric-label {
+      color: var(--text-secondary);
+      font-size: 11px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .wallet-status-metric-value {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .deposit-shell {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .deposit-hero {
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      border: 1px solid rgba(124, 92, 255, 0.25);
+      background:
+        radial-gradient(circle at top right, rgba(124, 92, 255, 0.22), transparent 35%),
+        radial-gradient(circle at bottom left, rgba(0, 212, 170, 0.15), transparent 45%),
+        var(--bg-secondary);
+    }
+
+    .deposit-hero-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .deposit-hero-text {
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .deposit-info-grid,
+    .deposit-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .deposit-info-card,
+    .deposit-summary-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+    }
+
+    .deposit-info-label,
+    .deposit-summary-label {
+      color: var(--text-secondary);
+      font-size: 11px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .deposit-info-value,
+    .deposit-summary-value {
+      font-weight: 700;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .deposit-amount-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .deposit-input-wrap {
+      position: relative;
+      flex: 1;
+    }
+
+    .deposit-amount-row .form-input {
+      font-size: 18px;
+      font-weight: 700;
+      padding-right: 72px;
+    }
+
+    .deposit-input-unit {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .deposit-presets {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .deposit-preset {
+      padding: 10px 8px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .deposit-preset:hover,
+    .deposit-preset.active {
+      border-color: rgba(124, 92, 255, 0.55);
+      background: rgba(124, 92, 255, 0.16);
+      transform: translateY(-1px);
+    }
+
+    .deposit-summary-card.primary {
+      border-color: rgba(0, 212, 170, 0.25);
+      background: rgba(0, 212, 170, 0.08);
+    }
+
+    .deposit-summary-card .muted {
+      color: var(--text-muted);
+      font-size: 11px;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .deposit-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 159, 67, 0.3);
+      background: rgba(255, 159, 67, 0.08);
+      color: var(--warning);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .mono-box {
+      background: var(--bg-secondary);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      font-family: monospace;
+      font-size: 12px;
+      word-break: break-all;
+      border: 1px solid var(--border);
+    }
+
     .legal-links {
       display: flex;
       gap: 12px;
@@ -737,6 +953,19 @@
       .modal-content {
         max-height: 90vh;
       }
+
+      .wallet-status-grid,
+      .deposit-info-grid,
+      .deposit-summary,
+      .deposit-presets {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .wallet-status-head,
+      .deposit-amount-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
     }
 
     /* TonConnect Styles */
@@ -871,6 +1100,7 @@ async function expectJson(res, label = 'API') {
       loading: false,
       tonConnected: false,
       walletAddress: null,
+      depositConfig: null,
       selectedCollection: '',
       selectedModel: '',
       selectedBackdrop: '',
@@ -1200,6 +1430,17 @@ function acceptConsent() {
       return parseFloat(amount).toFixed(3) + ' TON';
     }
 
+    function formatTONExact(amount, digits = 4) {
+      const n = Number(amount || 0);
+      return `${n.toFixed(digits)} TON`;
+    }
+
+    function shortenAddress(address, start = 6, end = 6) {
+      const value = String(address || '');
+      if (!value || value.length <= start + end + 3) return value;
+      return `${value.slice(0, start)}...${value.slice(-end)}`;
+    }
+
     function formatTimeLeft(timestamp) {
       const diff = timestamp - Date.now();
       if (diff <= 0) return 'Ended';
@@ -1513,6 +1754,10 @@ default:
     }
 
     function renderWallet() {
+      const minDeposit = Number(state.depositConfig?.min_deposit_ton || 0.1);
+      const feeRate = Number(state.depositConfig?.fee_rate || 0.002);
+      const feePct = (feeRate * 100).toFixed(2);
+
       return `
         <div class="content-section active">
           <!-- Wallet Connection -->
@@ -1541,7 +1786,39 @@ default:
           
           <!-- Balance Actions -->
           <div class="search-container">
-            <h3 style="margin-bottom: 16px;">Balance: ${formatTON(state.balance)}</h3>
+            <div class="wallet-status-card">
+              <div class="wallet-status-head">
+                <div>
+                  <div class="wallet-status-title">Deposit dashboard</div>
+                  <div class="wallet-status-subtitle">
+                    Deposit via TonConnect and wait for on-chain confirmation. Wallet signing and backend validation stay exactly the same.
+                  </div>
+                </div>
+                <div class="wallet-status-pill">
+                  <i class="fas fa-shield-alt"></i>
+                  Secure flow
+                </div>
+              </div>
+
+              <div class="wallet-status-grid">
+                <div class="wallet-status-metric">
+                  <div class="wallet-status-metric-label">Available balance</div>
+                  <div class="wallet-status-metric-value">${formatTON(state.balance)}</div>
+                </div>
+                <div class="wallet-status-metric">
+                  <div class="wallet-status-metric-label">Minimum deposit</div>
+                  <div class="wallet-status-metric-value">${formatTONExact(minDeposit, 3)}</div>
+                </div>
+                <div class="wallet-status-metric">
+                  <div class="wallet-status-metric-label">Deposit fee</div>
+                  <div class="wallet-status-metric-value">${feePct}%</div>
+                </div>
+                <div class="wallet-status-metric">
+                  <div class="wallet-status-metric-label">Wallet status</div>
+                  <div class="wallet-status-metric-value">${state.tonConnected ? 'Connected' : 'Not connected'}</div>
+                </div>
+              </div>
+            </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <button class="btn btn-primary" onclick="showDepositModal()">
@@ -1588,6 +1865,82 @@ default:
 
         </div>
       `;
+    }
+
+    async function loadDepositConfig(force = false) {
+      if (!force && state.depositConfig) return state.depositConfig;
+
+      const response = await apiFetch('/api/deposit/info', {
+        headers: {
+          'X-User-ID': String(state.user.id),
+          'X-Init-Data': tg.initData || ''
+        }
+      });
+
+      const info = await expectJson(response, 'Deposit info');
+      if (!response.ok || !info?.ok) {
+        throw new Error(info?.error || 'Failed to get deposit info');
+      }
+
+      state.depositConfig = info;
+      return info;
+    }
+
+    function renderDepositSummary(amountValue = '') {
+      const depositInfo = state.depositConfig || {};
+      const min = Number(depositInfo.min_deposit_ton || 0.1);
+      const feeRate = Number(depositInfo.fee_rate || 0.002);
+      const amount = Number.parseFloat(amountValue);
+      const validAmount = Number.isFinite(amount) ? amount : 0;
+      const credited = validAmount > 0 ? Math.max(validAmount * (1 - feeRate), 0) : 0;
+
+      return `
+        <div class="deposit-summary-card">
+          <div class="deposit-summary-label">You send</div>
+          <div class="deposit-summary-value">${validAmount > 0 ? formatTONExact(validAmount) : '0.0000 TON'}</div>
+          <div class="muted">Transaction is signed only in your connected wallet.</div>
+        </div>
+        <div class="deposit-summary-card primary">
+          <div class="deposit-summary-label">Estimated credit</div>
+          <div class="deposit-summary-value">${validAmount > 0 ? formatTONExact(credited) : '0.0000 TON'}</div>
+          <div class="muted">Estimate after ${(feeRate * 100).toFixed(2)}% deposit fee.</div>
+        </div>
+        <div class="deposit-summary-card">
+          <div class="deposit-summary-label">Recipient wallet</div>
+          <div class="deposit-summary-value">${shortenAddress(depositInfo.address) || 'Unavailable'}</div>
+          <div class="muted">Issued by the backend for this deposit flow.</div>
+        </div>
+        <div class="deposit-summary-card">
+          <div class="deposit-summary-label">Minimum deposit</div>
+          <div class="deposit-summary-value">${formatTONExact(min, 3)}</div>
+          <div class="muted">${validAmount > 0 && validAmount < min ? 'Entered amount is below the current minimum.' : 'Amounts below this are rejected.'}</div>
+        </div>
+      `;
+    }
+
+    function refreshDepositSummary() {
+      const input = document.getElementById('depositAmount');
+      const summary = document.getElementById('depositSummary');
+      if (!summary) return;
+
+      summary.innerHTML = renderDepositSummary(input?.value || '');
+
+      const currentValue = Number.parseFloat(input?.value || '');
+      const normalized = Number.isFinite(currentValue)
+        ? currentValue.toFixed(3).replace(/\.?0+$/, '')
+        : '';
+
+      document.querySelectorAll('.deposit-preset').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.amount === normalized);
+      });
+    }
+
+    function applyDepositPreset(value) {
+      const input = document.getElementById('depositAmount');
+      if (!input) return;
+      input.value = value;
+      refreshDepositSummary();
+      input.focus();
     }
 
     function renderTransactionHistory() {
@@ -1809,35 +2162,95 @@ default:
       `);
     }
 
-    function showDepositModal() {
+    async function showDepositModal() {
       if (!state.tonConnected) {
         showToast('Please connect your wallet first', 'warning');
         return;
       }
 
-      const modalId = createModal('Deposit TON', `
-        <div class="form-group">
-          <div class="form-label">Deposit Amount (TON)</div>
-          <input type="number" class="form-input" id="depositAmount" placeholder="0.0" step="0.001" min="0.1">
-          <p class="form-hint">Minimum deposit: 0.1 TON</p>
-        </div>
-        
-        <div class="form-group">
-          <div class="form-label">Connected Wallet</div>
-          <div style="background: var(--bg-secondary); padding: 12px; border-radius: var(--radius-md); font-family: monospace; font-size: 12px; word-break: break-all;">
-            ${state.walletAddress}
+      let info;
+      try {
+        info = await loadDepositConfig();
+      } catch (error) {
+        showToast(error?.message || 'Failed to load deposit info', 'error');
+        return;
+      }
+
+      const min = Number(info.min_deposit_ton || 0.1);
+      const minPreset = Math.max(min, 0.5).toFixed(3).replace(/\.?0+$/, '');
+
+      createModal('Deposit TON', `
+        <div class="deposit-shell">
+          <div class="deposit-hero">
+            <div class="deposit-hero-title">Fund your auction balance</div>
+            <div class="deposit-hero-text">
+              Send TON from the connected wallet. Address, payload and validation come from the existing backend flow, and confirmation happens only in TonConnect.
+            </div>
           </div>
+
+          <div class="deposit-info-grid">
+            <div class="deposit-info-card">
+              <div class="deposit-info-label">Connected wallet</div>
+              <div class="deposit-info-value">${shortenAddress(state.walletAddress)}</div>
+            </div>
+            <div class="deposit-info-card">
+              <div class="deposit-info-label">Deposit fee</div>
+              <div class="deposit-info-value">${(Number(info.fee_rate || 0.002) * 100).toFixed(2)}%</div>
+            </div>
+            <div class="deposit-info-card">
+              <div class="deposit-info-label">Minimum amount</div>
+              <div class="deposit-info-value">${formatTONExact(min, 3)}</div>
+            </div>
+            <div class="deposit-info-card">
+              <div class="deposit-info-label">Recipient</div>
+              <div class="deposit-info-value">${shortenAddress(info.address)}</div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-label">Deposit amount</div>
+            <div class="deposit-amount-row">
+              <div class="deposit-input-wrap">
+                <input type="number" class="form-input" id="depositAmount" placeholder="${min.toFixed(3)}" step="0.001" min="${min}" oninput="refreshDepositSummary()">
+                <span class="deposit-input-unit">TON</span>
+              </div>
+            </div>
+            <p class="form-hint">Use presets or enter any amount above the current minimum.</p>
+          </div>
+
+          <div class="deposit-presets">
+            <button type="button" class="deposit-preset" data-amount="${minPreset}" onclick="applyDepositPreset(this.dataset.amount)">${minPreset} TON</button>
+            <button type="button" class="deposit-preset" data-amount="1" onclick="applyDepositPreset(this.dataset.amount)">1 TON</button>
+            <button type="button" class="deposit-preset" data-amount="3" onclick="applyDepositPreset(this.dataset.amount)">3 TON</button>
+            <button type="button" class="deposit-preset" data-amount="5" onclick="applyDepositPreset(this.dataset.amount)">5 TON</button>
+          </div>
+
+          <div id="depositSummary" class="deposit-summary">
+            ${renderDepositSummary('')}
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-label">Destination address</div>
+            <div class="mono-box">${info.address}</div>
+          </div>
+
+          <div class="deposit-note">
+            <i class="fas fa-exclamation-triangle" style="margin-top: 2px;"></i>
+            <div>Balance updates after the deposit watcher sees and processes the on-chain transaction. Do not send TON outside this deposit flow.</div>
+          </div>
+
+          <button id="depositBtn" class="btn btn-primary" onclick="initiateDeposit()" style="width: 100%;">
+            <i class="fas fa-arrow-down"></i>
+            Deposit with TonConnect
+          </button>
+
+          <p style="color: var(--text-secondary); font-size: 12px; text-align: center;">
+            TonConnect opens your wallet for final confirmation. Security flow is unchanged.
+          </p>
         </div>
-        
-        <button id="depositBtn" class="btn btn-primary" onclick="initiateDeposit()" style="width: 100%;">
-          <i class="fas fa-arrow-down"></i>
-          Deposit with TonConnect
-        </button>
-        
-        <p style="color: var(--text-secondary); font-size: 12px; margin-top: 16px; text-align: center;">
-          Transaction will be signed using TonConnect
-        </p>
       `);
+
+      setTimeout(() => refreshDepositSummary(), 0);
     }
 
     function showWithdrawModal() {
@@ -2004,10 +2417,6 @@ default:
       }
 
       const amount = parseFloat(document.getElementById('depositAmount')?.value);
-      if (!amount || amount < 0.1) {
-        showToast('Minimum deposit: 0.1 TON', 'error');
-        return;
-      }
 
       const btn = document.getElementById('depositBtn');
       const setBtn = (htmlText, disabled=false) => {
@@ -2019,19 +2428,9 @@ default:
       try {
         setBtn('<span class="loading"></span> Preparing...', true);
 
-        const infoRes = await apiFetch('/api/deposit/info', {
-          headers: {
-            'X-User-ID': String(state.user.id),
-            'X-Init-Data': tg.initData || ''
-          }
-        });
-
-        const info = await infoRes.json();
-        if (!infoRes.ok || !info?.ok) {
-          throw new Error(info?.error || 'Failed to get deposit info');
-        }
-
+        const info = await loadDepositConfig(true);
         const min = Number(info.min_deposit_ton || 0.1);
+        if (!Number.isFinite(amount)) throw new Error('Enter deposit amount');
         if (amount < min) throw new Error(`Minimum deposit: ${min} TON`);
 
         const nano = String(Math.floor(amount * 1e9));
